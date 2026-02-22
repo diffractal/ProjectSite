@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Showcase</title>
+<title>diffractal</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -11,7 +11,6 @@
     --amber:  #E8943A;
     --burnt:  #C45C1A;
     --sienna: #8B3A10;
-    --bark:   #3B1A08;
     --dusk:   #1E0F04;
     --cream:  #FAF0DC;
   }
@@ -67,7 +66,7 @@
   .hero-inner { position: relative; z-index: 1; max-width: 900px; }
 
   .hero-eyebrow {
-    font-size: 11px;
+    font-size: 17px;
     letter-spacing: 6px;
     text-transform: uppercase;
     color: var(--amber);
@@ -80,14 +79,15 @@
     font-size: clamp(52px, 8vw, 108px);
     font-weight: 700;
     line-height: 0.95;
+    color: var(--sun);
+    font-variant-ligatures: normal;
     margin-bottom: 28px;
     opacity: 0;
     animation: fade-up 0.7s ease 0.25s forwards;
   }
-  .hero-title { color: var(--sun); font-variant-ligatures: normal; }
   .hero-desc {
     max-width: 520px;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.85;
     color: rgba(250,240,220,0.6);
     opacity: 0;
@@ -110,16 +110,16 @@
     animation: fade-up 0.7s ease 0.5s forwards;
   }
   .divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(242,201,76,0.4), transparent); }
-  .divider-label { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: rgba(242,201,76,0.5); }
+  .divider-label { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: rgba(242,201,76,0.5); }
 
   /* ── GRID ── */
   .projects { padding: 0 60px 100px; max-width: 1200px; margin: 0 auto; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2px; }
 
   /* ── CARD ── */
   .card {
     position: relative;
-    padding: 36px 32px;
+    padding: 40px 36px;
     border: 1px solid rgba(242,201,76,0.1);
     background: rgba(255,255,255,0.02);
     transition: background 0.25s, border-color 0.25s;
@@ -137,40 +137,62 @@
   .card:hover { background: rgba(242,201,76,0.04); border-color: rgba(242,201,76,0.25); }
   .card:hover::before { transform: scaleX(1); }
 
-  .card-number { font-size: 10px; letter-spacing: 4px; color: rgba(242,201,76,0.35); margin-bottom: 20px; text-transform: uppercase; }
-  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 700; line-height: 1.1; color: var(--cream); margin-bottom: 14px; }
-  .card-desc { font-size: 12px; line-height: 1.8; color: rgba(250,240,220,0.55); margin-bottom: 28px; }
-  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 20px; border-top: 1px solid rgba(242,201,76,0.1); }
-  .card-formula { font-style: italic; font-size: 11px; color: var(--amber); opacity: 0.8; }
-  .card-link { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--sun); text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid rgba(242,201,76,0.3); transition: border-color 0.2s, color 0.2s; }
-  .card-link:hover { color: var(--cream); border-color: var(--cream); }
-
-  /* ── ADD CARD ── */
-  .card-add {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 12px; min-height: 240px;
-    border: 1px dashed rgba(242,201,76,0.2);
-    background: transparent; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+  .card-number {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(242,201,76,0.35);
+    margin-bottom: 20px;
+    text-transform: uppercase;
   }
-  .card-add::before { display: none; }
-  .card-add:hover { border-color: rgba(242,201,76,0.45); background: rgba(242,201,76,0.03); }
-  .plus-icon {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(242,201,76,0.3); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; color: rgba(242,201,76,0.4); line-height: 1;
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+  .card-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(250,240,220,0.55);
+    margin-bottom: 28px;
+  }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 1px solid rgba(242,201,76,0.1);
+  }
+  .card-formula {
+    font-style: italic;
+    font-size: 13px;
+    color: var(--amber);
+    opacity: 0.8;
+  }
+  .card-link {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--sun);
+    text-decoration: none;
+    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(242,201,76,0.3);
     transition: border-color 0.2s, color 0.2s;
   }
-  .card-add:hover .plus-icon { border-color: var(--sun); color: var(--sun); }
-  .add-text { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(242,201,76,0.35); transition: color 0.2s; }
-  .card-add:hover .add-text { color: rgba(242,201,76,0.7); }
+  .card-link:hover { color: var(--cream); border-color: var(--cream); }
 
   /* ── FOOTER ── */
   .footer-bands { display: flex; flex-direction: column; }
   .footer-text {
-    padding: 28px 60px; font-size: 10px; letter-spacing: 4px; color: rgba(250,240,220,0.2);
-    text-transform: uppercase; display: flex; justify-content: space-between;
+    padding: 28px 60px;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(250,240,220,0.2);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
   }
 
   /* ── FLOATING SYMBOLS ── */
@@ -185,39 +207,6 @@
     92%  { opacity: 0.04; }
     100% { transform: translateY(-5vh); opacity: 0; }
   }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(10,4,1,0.85);
-    z-index: 200; display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.2s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: #2A1206; border: 1px solid rgba(242,201,76,0.25);
-    padding: 44px; width: min(520px, 90vw);
-    transform: translateY(20px); transition: transform 0.25s;
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-  .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--sun); margin-bottom: 28px; }
-  .modal label { display: block; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(242,201,76,0.5); margin-bottom: 8px; }
-  .modal input, .modal textarea {
-    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(242,201,76,0.2);
-    color: var(--cream); font-family: 'DM Mono', monospace; font-size: 13px;
-    padding: 12px 14px; margin-bottom: 22px; outline: none; transition: border-color 0.2s; resize: none;
-  }
-  .modal input:focus, .modal textarea:focus { border-color: rgba(242,201,76,0.55); }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 16px; margin-top: 8px; }
-  .btn {
-    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px;
-    text-transform: uppercase; padding: 12px 24px; border: 1px solid;
-    cursor: pointer; transition: background 0.15s, color 0.15s; background: transparent;
-  }
-  .btn-cancel { border-color: rgba(242,201,76,0.2); color: rgba(250,240,220,0.4); }
-  .btn-cancel:hover { border-color: rgba(242,201,76,0.4); color: var(--cream); }
-  .btn-add { border-color: var(--sun); color: var(--sun); }
-  .btn-add:hover { background: var(--sun); color: var(--dusk); }
 </style>
 </head>
 <body>
@@ -232,7 +221,7 @@
 
 <section class="hero">
   <div class="hero-inner">
-    <p class="hero-eyebrow">Portfolio · Mathematics · Code</p>
+    <p class="hero-eyebrow">Mathematics · Code</p>
     <h1 class="hero-title">diffractal</h1>
     <p class="hero-desc">A curated collection of coding and mathematical explorations — each one an experiment in turning abstract ideas into working software.</p>
   </div>
@@ -245,7 +234,7 @@
 </div>
 
 <section class="projects">
-  <div class="grid" id="grid">
+  <div class="grid">
 
     <div class="card" style="animation:fade-up 0.6s ease 0.1s both">
       <div class="card-number">01 — Precalculus</div>
@@ -255,11 +244,6 @@
         <span class="card-formula">sin²θ + cos²θ = 1</span>
         <a href="#" class="card-link">View →</a>
       </div>
-    </div>
-
-    <div class="card card-add" id="add-btn">
-      <div class="plus-icon">+</div>
-      <span class="add-text">Add Project</span>
     </div>
 
   </div>
@@ -275,27 +259,7 @@
   <span>Mathematics · Code · Exploration</span>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h2>New Project</h2>
-    <label>Category</label>
-    <input type="text" id="f-category" placeholder="e.g. Graph Theory">
-    <label>Title</label>
-    <input type="text" id="f-title" placeholder="e.g. Dijkstra Visualizer">
-    <label>Description</label>
-    <textarea id="f-desc" rows="3" placeholder="What does this project explore?"></textarea>
-    <label>Formula or Expression</label>
-    <input type="text" id="f-formula" placeholder="e.g. O(V + E)">
-    <div class="modal-actions">
-      <button class="btn btn-cancel" id="modal-cancel">Cancel</button>
-      <button class="btn btn-add" id="modal-confirm">Add Project</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  // Floating math symbols
   const syms = ['∑','∫','π','∂','∇','λ','Δ','φ','ℝ','∈','≡','√','∞','∀','⊗'];
   const fl = document.getElementById('floaters');
   for (let i = 0; i < 14; i++) {
@@ -308,37 +272,6 @@
     d.style.animationDelay = (-Math.random() * 40) + 's';
     fl.appendChild(d);
   }
-
-  // Modal
-  const modal = document.getElementById('modal');
-  document.getElementById('add-btn').addEventListener('click', () => modal.classList.add('open'));
-  document.getElementById('modal-cancel').addEventListener('click', () => modal.classList.remove('open'));
-  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
-
-  let count = 1;
-  document.getElementById('modal-confirm').addEventListener('click', () => {
-    const cat   = document.getElementById('f-category').value.trim() || 'Project';
-    const title = document.getElementById('f-title').value.trim();
-    const desc  = document.getElementById('f-desc').value.trim() || 'A new coding project.';
-    const form  = document.getElementById('f-formula').value.trim() || 'f(x) = ?';
-    if (!title) return;
-
-    count++;
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.animation = 'fade-up 0.5s ease both';
-    card.innerHTML = `
-      <div class="card-number">${String(count).padStart(2,'0')} — ${cat}</div>
-      <div class="card-title">${title}</div>
-      <p class="card-desc">${desc}</p>
-      <div class="card-footer">
-        <span class="card-formula">${form}</span>
-        <a href="#" class="card-link">View →</a>
-      </div>`;
-    document.getElementById('grid').insertBefore(card, document.getElementById('add-btn'));
-    ['f-category','f-title','f-desc','f-formula'].forEach(id => document.getElementById(id).value = '');
-    modal.classList.remove('open');
-  });
 </script>
 </body>
 </html>
