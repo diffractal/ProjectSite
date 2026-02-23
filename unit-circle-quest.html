@@ -787,6 +787,12 @@ function nextQuestion() {
   const choices = getChoices(currentQ.answer, currentQ.pool, 4);
   const grid = document.getElementById('choices-grid');
   grid.innerHTML = '';
+
+  // Briefly disable pointer events so the hovered position doesn't
+  // immediately highlight the new button appearing under the cursor
+  grid.style.pointerEvents = 'none';
+  setTimeout(() => { grid.style.pointerEvents = ''; }, 120);
+
   choices.forEach(c => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
@@ -794,6 +800,9 @@ function nextQuestion() {
     btn.onclick = () => handleAnswer(c, btn);
     grid.appendChild(btn);
   });
+
+  // Remove focus from whatever was last clicked
+  if (document.activeElement) document.activeElement.blur();
 }
 
 function handleAnswer(choice, btn) {
