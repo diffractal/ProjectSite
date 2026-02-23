@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BloodGurgler</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f2e8d0;
+    --parchment-dark: #e0cfaa;
+    --ink: #2c1810;
+    --ink-light: #4a2f20;
+    --crimson: #8b1a1a;
+    --gold: #c9a227;
+    --stone: #7a6a55;
+    --stone-light: #a08c70;
+    --green-correct: #2d6a2d;
+    --hp-green: #3a8a3a;
+    --hp-red: #c0392b;
+    --hp-yellow: #c9a227;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #1a1008;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, #3d1f08 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Crimson Text', Georgia, serif;
+    padding: 20px;
+  }
+
+  .game-container { width: 100%; max-width: 800px; }
+
+  .frame {
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(180,140,80,0.2) 0%, transparent 50%);
+    border: 3px solid var(--gold);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 6px var(--ink),
+      0 0 0 9px var(--gold),
+      0 0 0 12px var(--ink),
+      0 20px 60px rgba(0,0,0,0.8),
+      inset 0 0 40px rgba(180,140,60,0.1);
+    padding: 32px 40px;
+    position: relative;
+    min-height: 500px;
+  }
+
+  .frame::before, .frame::after {
+    content: '✦'; position: absolute; color: var(--gold); font-size: 20px; line-height: 1;
+  }
+  .frame::before { top: 12px; left: 14px; }
+  .frame::after  { bottom: 12px; right: 14px; }
+  .corner-tr { position: absolute; top: 12px; right: 14px; color: var(--gold); font-size: 20px; }
+  .corner-bl { position: absolute; bottom: 12px; left: 14px; color: var(--gold); font-size: 20px; }
+  .version-tag {
+    position: absolute; bottom: 11px; right: 36px;
+    font-family: 'Cinzel', serif; font-size: 0.6rem;
+    color: var(--stone-light); letter-spacing: 2px; opacity: 0.6;
+  }
+
+  /* ===== SHARED ===== */
+  .game-title {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    color: var(--crimson);
+    text-shadow: 2px 2px 0 var(--gold), 3px 3px 0 var(--ink);
+    letter-spacing: 3px; line-height: 1.1; text-align: center;
+  }
+  .game-subtitle {
+    font-family: 'Cinzel', serif; font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+    color: var(--stone); letter-spacing: 6px; text-transform: uppercase;
+    text-align: center; margin-top: 4px; margin-bottom: 16px;
+  }
+  .divider {
+    border: none; border-top: 1px solid var(--stone-light);
+    margin: 16px auto; width: 80%; position: relative;
+  }
+  .divider::after {
+    content: '⚔'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--parchment); padding: 0 8px; color: var(--gold); font-size: 16px;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: linear-gradient(180deg, #a52020 0%, #6b1212 100%);
+    color: var(--parchment); border: 2px solid var(--gold);
+    padding: 12px 32px; font-family: 'Cinzel', serif;
+    font-size: 1rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-primary:hover { background: linear-gradient(180deg, #c52828 0%, #8b1a1a 100%); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(1px); }
+
+  .btn-secondary {
+    display: inline-block;
+    background: linear-gradient(180deg, #8a7450 0%, #5a4a30 100%);
+    color: var(--parchment); border: 2px solid var(--stone-light);
+    padding: 12px 24px; font-family: 'Cinzel', serif;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-secondary:hover { background: linear-gradient(180deg, #a08860 0%, #6a5a40 100%); transform: translateY(-1px); }
+
+  .screen-active { animation: fadeIn 0.35s ease both; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== TITLE SCREEN ===== */
+  #screen-title { text-align: center; }
+  .title-flavor {
+    font-size: 1.1rem; color: var(--ink-light); font-style: italic;
+    line-height: 1.7; margin: 12px 0 20px;
+  }
+  .rules-box {
+    background: rgba(44,24,16,0.05); border: 1px solid var(--parchment-dark);
+    border-radius: 2px; padding: 14px 20px; margin-bottom: 24px; text-align: left;
+  }
+  .rules-box p { color: var(--ink-light); font-size: 1.05rem; margin-bottom: 5px; line-height: 1.5; }
+  .rules-box p:last-child { margin-bottom: 0; }
+  .rules-box strong { color: var(--crimson); font-weight: 600; }
+  .title-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== BATTLE SCREEN ===== */
+  #screen-battle { display: none; }
+
+  /* Top HUD */
+  .battle-hud {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; gap: 16px;
+  }
+  .hud-block { text-align: center; min-width: 60px; }
+  .hud-label {
+    font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 3px;
+    color: var(--stone); text-transform: uppercase; display: block; margin-bottom: 2px;
+  }
+  .hud-value {
+    font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 900;
+    color: var(--crimson); line-height: 1;
+  }
+  .hud-gold { color: var(--gold); }
+
+  /* HP bars */
+  .hp-bar-wrap {
+    flex: 1; height: 10px; background: rgba(44,24,16,0.15);
+    border: 1px solid var(--stone-light); border-radius: 2px; overflow: hidden;
+  }
+  .hp-bar {
+    height: 100%; border-radius: 2px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+  }
+  .hp-bar.player { background: var(--hp-green); }
+  .hp-bar.boss   { background: var(--crimson); }
+
+  /* ===== BATTLEFIELD ===== */
+  .battlefield {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin: 8px 0 12px; gap: 12px;
+    min-height: 160px;
+  }
+
+  /* Combatant card */
+  .combatant {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; flex: 1;
+  }
+  .combatant-name {
+    font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase;
+  }
+  .combatant-sprite {
+    width: 80px; height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .combatant-sprite svg { width: 100%; height: 100%; }
+
+  /* Imp row — 3 imps side by side */
+  .imp-row {
+    display: flex; gap: 8px; align-items: flex-end; flex: 1; justify-content: center;
+  }
+  .imp-unit {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .imp-unit.dead { opacity: 0.25; filter: grayscale(1); }
+  .imp-hp-bar-wrap {
+    width: 36px; height: 6px; background: rgba(44,24,16,0.15);
+    border: 1px solid var(--stone-light); border-radius: 1px; overflow: hidden;
+  }
+  .imp-hp-bar { height: 100%; background: var(--crimson); border-radius: 1px; transition: width 0.4s; }
+
+  .combatant-hp-row {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+  }
+  .combatant-hp-label {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; color: var(--stone); white-space: nowrap;
+  }
+
+  /* Damage flash */
+  .hit-flash { animation: hitFlash 0.35s ease; }
+  @keyframes hitFlash {
+    0%   { filter: brightness(1); }
+    30%  { filter: brightness(2.5) saturate(3); }
+    100% { filter: brightness(1); }
+  }
+  .dead-shake { animation: deadShake 0.4s ease forwards; }
+  @keyframes deadShake {
+    0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+    30%  { transform: translateX(-8px) rotate(-5deg); }
+    60%  { transform: translateX(6px) rotate(3deg); }
+    100% { transform: translateX(0) rotate(0deg); opacity: 0.25; }
+  }
+
+  /* ===== QUESTION TIMER BAR ===== */
+  .q-timer-wrap {
+    height: 6px; background: rgba(44,24,16,0.12);
+    border: 1px solid var(--stone-light); border-radius: 2px;
+    overflow: hidden; margin-bottom: 10px;
+  }
+  .q-timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+    border-radius: 2px;
+    transition: width 0.25s linear;
+  }
+  .q-timer-bar.urgent { background: var(--crimson); animation: urgentPulse 0.3s infinite alternate; }
+  @keyframes urgentPulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+  /* ===== QUESTION AREA ===== */
+  .question-area {
+    text-align: center; margin-bottom: 16px; min-height: 64px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .question-type-tag {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 4px;
+    color: var(--stone); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .question-text {
+    font-family: 'Cinzel', serif; font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+    font-weight: 700; color: var(--ink); line-height: 1.3;
+  }
+  .angle-val { color: var(--crimson); }
+
+  /* ===== CHOICES ===== */
+  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .choice-btn {
+    background: rgba(44,24,16,0.04); border: 2px solid var(--stone-light);
+    border-radius: 2px; padding: 12px 10px; font-family: 'Crimson Text', serif;
+    font-size: 1.1rem; font-weight: 600; color: var(--ink);
+    cursor: pointer; transition: all 0.12s; min-height: 50px;
+  }
+  .choice-btn:hover:not(:disabled) {
+    background: rgba(201,162,39,0.1); border-color: var(--gold);
+    transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .choice-btn.correct { background: rgba(45,106,45,0.15); border-color: var(--green-correct); color: var(--green-correct); animation: correctPop 0.3s ease; }
+  .choice-btn.wrong   { background: rgba(139,26,26,0.1);  border-color: var(--crimson);       color: var(--crimson);       animation: wrongShake 0.3s ease; }
+  .choice-btn.reveal  { background: rgba(45,106,45,0.15); border-color: var(--green-correct); color: var(--green-correct); }
+  .choice-btn:disabled { cursor: not-allowed; }
+  @keyframes correctPop  { 0%{transform:scale(1)}    50%{transform:scale(1.04)} 100%{transform:scale(1)} }
+  @keyframes wrongShake  { 0%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} 100%{transform:translateX(0)} }
+
+  .battle-feedback {
+    text-align: center; min-height: 22px; font-family: 'Cinzel', serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--stone);
+  }
+
+  /* Streak flames along bottom */
+  .flame-row {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+    pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 2px; opacity: 0; transition: opacity 0.7s ease;
+    overflow: hidden; border-radius: 0 0 4px 4px;
+  }
+  .flame-row.active { opacity: 1; }
+  .flame { display: inline-block; line-height: 1; transform-origin: bottom center; }
+  @keyframes flameSize {
+    0%   { font-size: var(--fs-a); }
+    25%  { font-size: var(--fs-b); }
+    50%  { font-size: var(--fs-c); }
+    75%  { font-size: var(--fs-b); }
+    100% { font-size: var(--fs-a); }
+  }
+
+  /* ===== INTERSTITIAL SCREENS ===== */
+  #screen-victory, #screen-gameover, #screen-win { display: none; text-align: center; }
+
+  .interstitial-title {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    letter-spacing: 3px; line-height: 1.1; text-align: center; margin-bottom: 8px;
+  }
+  .victory-title { color: var(--gold); text-shadow: 1px 1px 0 var(--ink), 2px 2px 0 rgba(0,0,0,0.3); }
+  .defeat-title  { color: var(--crimson); text-shadow: 1px 1px 0 var(--ink); }
+
+  .gold-earned {
+    font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 700;
+    color: var(--gold); margin: 16px 0 8px; letter-spacing: 2px;
+  }
+  .gold-total {
+    font-family: 'Cinzel', serif; font-size: 0.9rem;
+    color: var(--stone); letter-spacing: 3px;
+  }
+  .interstitial-msg {
+    font-size: 1.1rem; color: var(--ink-light); font-style: italic;
+    line-height: 1.6; margin: 12px 0 24px;
+  }
+  .interstitial-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* Boss progress pips */
+  .boss-progress {
+    display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;
+  }
+  .boss-pip {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--stone-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    background: rgba(44,24,16,0.05);
+  }
+  .boss-pip.defeated { border-color: var(--gold); background: rgba(201,162,39,0.15); }
+  .boss-pip.current  { border-color: var(--crimson); background: rgba(139,26,26,0.1); animation: pipPulse 1s infinite alternate; }
+  @keyframes pipPulse { from { box-shadow: 0 0 0 0 rgba(139,26,26,0.4); } to { box-shadow: 0 0 0 6px rgba(139,26,26,0); } }
+
+  /* Final win screen */
+  .total-gold-display {
+    font-family: 'Cinzel', serif; font-size: clamp(3rem, 10vw, 5rem); font-weight: 900;
+    color: var(--gold); text-shadow: 2px 2px 0 var(--ink); line-height: 1;
+  }
+
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="frame" id="main-frame">
+    <span class="corner-tr">✦</span>
+    <span class="corner-bl">✦</span>
+    <span class="version-tag">v0.14</span>
+
+    <!-- ===== TITLE SCREEN ===== -->
+    <div id="screen-title">
+      <div class="game-title">Blood</div>
+      <div class="game-title" style="margin-top:2px; margin-bottom:12px;">Gurgler</div>
+      <div class="game-subtitle">Phase II — The Four Trials</div>
+      <hr class="divider">
+
+      <!-- Placeholder hero stickman -->
+      <svg width="80" height="100" viewBox="0 0 80 100" style="display:block;margin:0 auto 12px;" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="18" r="12" fill="#4a7fc1" stroke="#2c1810" stroke-width="2"/>
+        <line x1="40" y1="30" x2="40" y2="68" stroke="#4a7fc1" stroke-width="5" stroke-linecap="round"/>
+        <line x1="40" y1="42" x2="18" y2="58" stroke="#4a7fc1" stroke-width="4" stroke-linecap="round"/>
+        <line x1="40" y1="42" x2="62" y2="52" stroke="#4a7fc1" stroke-width="4" stroke-linecap="round"/>
+        <line x1="40" y1="68" x2="24" y2="90" stroke="#4a7fc1" stroke-width="4" stroke-linecap="round"/>
+        <line x1="40" y1="68" x2="56" y2="90" stroke="#4a7fc1" stroke-width="4" stroke-linecap="round"/>
+        <!-- sword -->
+        <line x1="62" y1="52" x2="76" y2="30" stroke="#c9a227" stroke-width="3" stroke-linecap="round"/>
+        <line x1="66" y1="46" x2="72" y2="48" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+
+      <div class="title-flavor">
+        Four bosses stand between thee and glory.<br>
+        Answer true and strike them down.<br>
+        Falter, and they will strike back.
+      </div>
+
+      <div class="rules-box">
+        <p>⚔ <strong>Correct answer</strong> — damages the boss. Streaks hit harder!</p>
+        <p>💀 <strong>Wrong answer or timeout</strong> — boss damages you. Streak resets.</p>
+        <p>⏱ <strong>15 seconds</strong> to answer each question.</p>
+        <p>🔥 <strong>Streak 1-2</strong> = 1 dmg &nbsp;|&nbsp; <strong>Streak 3-4</strong> = 2 dmg &nbsp;|&nbsp; <strong>Streak 5+</strong> = 3 dmg</p>
+        <p>💰 Defeat each boss to earn <strong>gold</strong>. Survive all four to win.</p>
+        <p>☠ If your HP hits zero — <strong>permadeath</strong>. You keep your gold.</p>
+      </div>
+
+      <div class="title-btns">
+        <button class="btn-primary" onclick="startGame()">Enter the Dungeon</button>
+        <a href="unit-circle-quest.html" style="text-decoration:none;">
+          <button class="btn-secondary" type="button">← Phase I</button>
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== BATTLE SCREEN ===== -->
+    <div id="screen-battle">
+
+      <!-- HUD: Player HP | Streak | Gold -->
+      <div class="battle-hud">
+        <div class="hud-block">
+          <span class="hud-label">HP</span>
+          <span class="hud-value" id="player-hp-val">20</span>
+        </div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar player" id="player-hp-bar" style="width:100%"></div>
+        </div>
+        <div class="hud-block">
+          <span class="hud-label">Streak</span>
+          <span class="hud-value" id="streak-display" style="color:var(--gold)">0</span>
+        </div>
+        <div class="hud-block" style="margin-left:8px;">
+          <span class="hud-label">Gold</span>
+          <span class="hud-value hud-gold" id="gold-display">0</span>
+        </div>
+      </div>
+
+      <!-- Boss progress pips -->
+      <div class="boss-progress" id="boss-progress"></div>
+
+      <!-- Battlefield -->
+      <div class="battlefield" id="battlefield"></div>
+
+      <!-- Question timer bar -->
+      <div class="q-timer-wrap">
+        <div class="q-timer-bar" id="q-timer-bar"></div>
+      </div>
+
+      <!-- Question -->
+      <div class="question-area">
+        <div class="question-type-tag" id="q-type-tag"></div>
+        <div class="question-text" id="q-text"></div>
+      </div>
+
+      <div class="choices-grid" id="choices-grid"></div>
+      <div class="battle-feedback" id="battle-feedback"></div>
+
+      <!-- Streak flames -->
+      <div class="flame-row" id="flame-row"></div>
+    </div>
+
+    <!-- ===== BOSS VICTORY INTERSTITIAL ===== -->
+    <div id="screen-victory">
+      <div class="interstitial-title victory-title" id="victory-title">Victory!</div>
+      <hr class="divider">
+      <div id="victory-sprite" style="margin: 12px auto; display:flex; justify-content:center;"></div>
+      <div class="interstitial-msg" id="victory-msg"></div>
+      <div class="gold-earned" id="gold-earned-display"></div>
+      <div class="gold-total" id="gold-total-display"></div>
+      <div style="margin-top: 20px;" class="interstitial-btns">
+        <button class="btn-primary" id="next-boss-btn" onclick="advanceToNextBoss()">Onward!</button>
+      </div>
+    </div>
+
+    <!-- ===== GAME OVER SCREEN ===== -->
+    <div id="screen-gameover">
+      <div class="interstitial-title defeat-title">Defeated!</div>
+      <hr class="divider">
+      <div id="gameover-sprite" style="margin: 12px auto; display:flex; justify-content:center;"></div>
+      <div class="interstitial-msg" id="gameover-msg"></div>
+      <div class="gold-earned" id="gameover-gold-display"></div>
+      <div class="gold-total" style="margin-bottom:24px;" id="gameover-gold-label"></div>
+      <div class="interstitial-btns">
+        <button class="btn-primary" onclick="startGame()">Try Again</button>
+        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      </div>
+    </div>
+
+    <!-- ===== FINAL WIN SCREEN ===== -->
+    <div id="screen-win">
+      <div class="interstitial-title victory-title">All Bosses Slain!</div>
+      <div class="game-subtitle" style="margin-top:8px;">The Dungeon is Cleared</div>
+      <hr class="divider">
+      <span style="font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:5px;color:var(--stone);display:block;margin:16px 0 6px;">Total Gold</span>
+      <div class="total-gold-display" id="win-gold-display">0</div>
+      <div style="font-family:'Cinzel',serif;font-size:0.85rem;color:var(--stone);margin:8px 0 16px;letter-spacing:2px;">💰 gold pieces earned</div>
+      <div class="interstitial-msg" id="win-msg"></div>
+      <div class="interstitial-btns" style="margin-top:8px;">
+        <button class="btn-primary" onclick="startGame()">Descend Again</button>
+        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      </div>
+    </div>
+
+  </div><!-- .frame -->
+</div><!-- .game-container -->
+
+<script>
+// ================================================================
+//  UNIT CIRCLE DATA
+// ================================================================
+const ANGLES = [
+  { deg: 0,   rad: '0',     sin: '0',      cos: '1',      tan: '0'         },
+  { deg: 30,  rad: 'π/6',   sin: '1/2',    cos: '√3/2',   tan: '√3/3'      },
+  { deg: 45,  rad: 'π/4',   sin: '√2/2',   cos: '√2/2',   tan: '1'         },
+  { deg: 60,  rad: 'π/3',   sin: '√3/2',   cos: '1/2',    tan: '√3'        },
+  { deg: 90,  rad: 'π/2',   sin: '1',      cos: '0',      tan: 'undefined' },
+  { deg: 120, rad: '2π/3',  sin: '√3/2',   cos: '-1/2',   tan: '-√3'       },
+  { deg: 135, rad: '3π/4',  sin: '√2/2',   cos: '-√2/2',  tan: '-1'        },
+  { deg: 150, rad: '5π/6',  sin: '1/2',    cos: '-√3/2',  tan: '-√3/3'     },
+  { deg: 180, rad: 'π',     sin: '0',      cos: '-1',     tan: '0'         },
+  { deg: 210, rad: '7π/6',  sin: '-1/2',   cos: '-√3/2',  tan: '√3/3'      },
+  { deg: 225, rad: '5π/4',  sin: '-√2/2',  cos: '-√2/2',  tan: '1'         },
+  { deg: 240, rad: '4π/3',  sin: '-√3/2',  cos: '-1/2',   tan: '√3'        },
+  { deg: 270, rad: '3π/2',  sin: '-1',     cos: '0',      tan: 'undefined' },
+  { deg: 300, rad: '5π/3',  sin: '-√3/2',  cos: '1/2',    tan: '-√3'       },
+  { deg: 315, rad: '7π/4',  sin: '-√2/2',  cos: '√2/2',   tan: '-1'        },
+  { deg: 330, rad: '11π/6', sin: '-1/2',   cos: '√3/2',   tan: '-√3/3'     },
+];
+const SIN_COS_POOL = ['0','1','-1','1/2','-1/2','√2/2','-√2/2','√3/2','-√3/2'];
+const TAN_POOL     = ['0','1','-1','√3','-√3','√3/3','-√3/3','undefined'];
+const RAD_POOL     = ['0','π/6','π/4','π/3','π/2','2π/3','3π/4','5π/6','π','7π/6','5π/4','4π/3','3π/2','5π/3','7π/4','11π/6','2π'];
+const DEG_POOL     = ['0°','30°','45°','60°','90°','120°','135°','150°','180°','210°','225°','240°','270°','300°','315°','330°','360°'];
+
+function buildQuestionPool() {
+  const pool = [];
+  for (const a of ANGLES) {
+    const deg = a.deg + '°', rad = a.deg === 0 ? '0' : a.rad;
+    pool.push({ tag:'Degrees → Radians', html:`Convert <span class="angle-val">${deg}</span> to radians`, answer:rad, pool:RAD_POOL });
+    pool.push({ tag:'Radians → Degrees', html:`Convert <span class="angle-val">${rad}</span> radians to degrees`, answer:deg, pool:DEG_POOL });
+    pool.push({ tag:'Sine',    html:`Find <span class="angle-val">sin(${deg})</span>`, answer:a.sin, pool:SIN_COS_POOL });
+    pool.push({ tag:'Cosine',  html:`Find <span class="angle-val">cos(${deg})</span>`, answer:a.cos, pool:SIN_COS_POOL });
+    pool.push({ tag:'Tangent', html:`Find <span class="angle-val">tan(${deg})</span>`, answer:a.tan, pool:TAN_POOL });
+    if (a.deg !== 0) {
+      pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${rad})</span>`, answer:a.sin, pool:SIN_COS_POOL });
+      pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${rad})</span>`, answer:a.cos, pool:SIN_COS_POOL });
+    }
+  }
+  return pool;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getChoices(answer, pool, n = 4) {
+  return shuffle([answer, ...shuffle(pool.filter(p => p !== answer)).slice(0, n - 1)]);
+}
+
+// ================================================================
+//  BOSS DEFINITIONS
+// ================================================================
+// Streak damage: 1-2 = 1, 3-4 = 2, 5+ = 3
+function streakDamage(streak) {
+  if (streak >= 5) return 3;
+  if (streak >= 3) return 2;
+  return 1;
+}
+
+// SVG stickman sprite generator
+function makeSprite(color, weapon, size = 80) {
+  const s = size, h = Math.round(s * 1.25);
+  const cx = s / 2, headR = Math.round(s * 0.18);
+  const torsoTop = headR * 2, torsoBot = Math.round(h * 0.66);
+  const shoulderY = Math.round(h * 0.38);
+  const hipY = torsoBot;
+  let weaponSVG = '';
+  if (weapon === 'claws') {
+    weaponSVG = `
+      <line x1="${Math.round(s*0.72)}" y1="${shoulderY+4}" x2="${Math.round(s*0.88)}" y2="${shoulderY-10}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+      <line x1="${Math.round(s*0.88)}" y1="${shoulderY-10}" x2="${Math.round(s*0.96)}" y2="${shoulderY-4}" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="${Math.round(s*0.88)}" y1="${shoulderY-10}" x2="${Math.round(s*0.98)}" y2="${shoulderY-14}" stroke="${color}" stroke-width="2" stroke-linecap="round"/>`;
+  } else if (weapon === 'fire') {
+    weaponSVG = `<text x="${Math.round(s*0.72)}" y="${shoulderY}" font-size="${Math.round(s*0.28)}" style="user-select:none;">🔥</text>`;
+  } else if (weapon === 'laser') {
+    weaponSVG = `
+      <rect x="${Math.round(s*0.70)}" y="${shoulderY-6}" width="${Math.round(s*0.28)}" height="6" rx="2" fill="#00ffcc" opacity="0.8"/>
+      <circle cx="${Math.round(s*0.98)}" cy="${shoulderY-3}" r="3" fill="#00ffcc" opacity="0.9"/>`;
+  } else if (weapon === 'tentacle') {
+    weaponSVG = `
+      <path d="M${Math.round(s*0.70)} ${shoulderY} Q${Math.round(s*0.95)} ${shoulderY-20} ${Math.round(s*0.88)} ${shoulderY-36}" stroke="${color}" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="${Math.round(s*0.88)}" cy="${shoulderY-36}" r="5" fill="${color}" opacity="0.8"/>`;
+  }
+  return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${cx}" cy="${headR}" r="${headR}" fill="${color}" stroke="#2c1810" stroke-width="2"/>
+    <line x1="${cx}" y1="${torsoTop}" x2="${cx}" y2="${torsoBot}" stroke="${color}" stroke-width="${Math.round(s*0.07)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${shoulderY}" x2="${Math.round(s*0.22)}" y2="${Math.round(h*0.52)}" stroke="${color}" stroke-width="${Math.round(s*0.06)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${shoulderY}" x2="${Math.round(s*0.72)}" y2="${shoulderY+4}" stroke="${color}" stroke-width="${Math.round(s*0.06)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${hipY}" x2="${Math.round(s*0.28)}" y2="${h-4}" stroke="${color}" stroke-width="${Math.round(s*0.06)}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${hipY}" x2="${Math.round(s*0.66)}" y2="${h-4}" stroke="${color}" stroke-width="${Math.round(s*0.06)}" stroke-linecap="round"/>
+    ${weaponSVG}
+  </svg>`;
+}
+
+function makeImpSprite(color) {
+  // Smaller, crouched imp
+  return `<svg width="36" height="50" viewBox="0 0 36 50" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="10" r="8" fill="${color}" stroke="#2c1810" stroke-width="1.5"/>
+    <!-- horns -->
+    <line x1="12" y1="4" x2="8" y2="0" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    <line x1="24" y1="4" x2="28" y2="0" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+    <line x1="18" y1="18" x2="18" y2="36" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="18" y1="24" x2="8" y2="32" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="24" x2="28" y2="28" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="36" x2="10" y2="48" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="36" x2="26" y2="48" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    <!-- claws -->
+    <line x1="28" y1="28" x2="33" y2="24" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="28" y1="28" x2="34" y2="29" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+const BOSSES = [
+  {
+    id: 'imps',
+    name: 'The Three Imps',
+    isImps: true,
+    imps: [
+      { name: 'Imp I',   color: '#c0392b', maxHp: 4, hp: 4 },
+      { name: 'Imp II',  color: '#8e44ad', maxHp: 4, hp: 4 },
+      { name: 'Imp III', color: '#e67e22', maxHp: 4, hp: 4 },
+    ],
+    // Damage to player = number of living imps
+    playerDamage: () => BOSSES[0].imps.filter(i => i.hp > 0).length,
+    gold: 10,
+    defeatMsg: 'The three imps screech and dissolve into smoke. Your blade is true.',
+    color: '#c0392b',
+  },
+  {
+    id: 'dragon',
+    name: 'Ignarath the Dragon',
+    isImps: false,
+    maxHp: 15, hp: 15,
+    playerDamage: () => 1,
+    sprite: makeSprite('#c0392b', 'fire', 80),
+    gold: 25,
+    defeatMsg: 'The dragon crashes to earth, its flames extinguished by the cold truth of mathematics.',
+    color: '#c0392b',
+  },
+  {
+    id: 'robot',
+    name: 'Unit-9 The Robot',
+    isImps: false,
+    maxHp: 20, hp: 20,
+    playerDamage: () => 1,
+    sprite: makeSprite('#2980b9', 'laser', 80),
+    gold: 50,
+    defeatMsg: 'Circuits overloaded. Unit-9 sparks and crashes. Error: insufficient math resistance.',
+    color: '#2980b9',
+  },
+  {
+    id: 'bloodgurgler',
+    name: 'The Blood Gurgler',
+    isImps: false,
+    maxHp: 30, hp: 30,
+    playerDamage: () => 2,
+    sprite: makeSprite('#6c3483', 'tentacle', 80),
+    gold: 100,
+    defeatMsg: 'The Blood Gurgler lets out one final, horrible gurgle... and is no more. The dungeon falls silent.',
+    color: '#6c3483',
+  },
+];
+
+const PLAYER = {
+  maxHp: 20,
+  sprite: makeSprite('#4a7fc1', 'sword', 80),
+};
+
+// ================================================================
+//  SCREEN MANAGEMENT
+// ================================================================
+const ALL_SCREENS = ['screen-title','screen-battle','screen-victory','screen-gameover','screen-win'];
+
+function setScreen(id) {
+  ALL_SCREENS.forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = 'none';
+    el.classList.remove('screen-active');
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  requestAnimationFrame(() => el.classList.add('screen-active'));
+}
+
+function showTitle() {
+  clearAllTimers();
+  setScreen('screen-title');
+}
+
+// ================================================================
+//  GAME STATE
+// ================================================================
+let playerHp = PLAYER.maxHp;
+let gold = 0;
+let streak = 0;
+let currentBossIdx = 0;
+let questionPool = [];
+let currentQ = null;
+let busy = false;
+let qTimerInterval = null;
+let qTimeLeft = 15;
+
+function clearAllTimers() {
+  clearInterval(qTimerInterval);
+}
+
+function resetBossHp() {
+  // Fresh HP for each new run
+  BOSSES[0].imps.forEach(imp => { imp.hp = imp.maxHp; });
+  BOSSES[1].hp = BOSSES[1].maxHp;
+  BOSSES[2].hp = BOSSES[2].maxHp;
+  BOSSES[3].hp = BOSSES[3].maxHp;
+}
+
+function startGame() {
+  clearAllTimers();
+  playerHp = PLAYER.maxHp;
+  gold = 0;
+  streak = 0;
+  currentBossIdx = 0;
+  resetBossHp();
+  questionPool = shuffle(buildQuestionPool());
+  startBattle();
+}
+
+// ================================================================
+//  BOSS PROGRESS PIPS
+// ================================================================
+function renderBossPips() {
+  const container = document.getElementById('boss-progress');
+  const emojis = ['👹','🐉','🤖','💀'];
+  container.innerHTML = BOSSES.map((b, i) => {
+    let cls = '';
+    if (i < currentBossIdx) cls = 'defeated';
+    else if (i === currentBossIdx) cls = 'current';
+    return `<div class="boss-pip ${cls}" title="${b.name}">${emojis[i]}</div>`;
+  }).join('');
+}
+
+// ================================================================
+//  BATTLEFIELD RENDERING
+// ================================================================
+function renderBattlefield() {
+  const boss = BOSSES[currentBossIdx];
+  const bf = document.getElementById('battlefield');
+
+  // Player side
+  const playerHpPct = Math.max(0, (playerHp / PLAYER.maxHp) * 100);
+  const playerHpColor = playerHpPct > 50 ? 'var(--hp-green)' : playerHpPct > 25 ? 'var(--hp-yellow)' : 'var(--hp-red)';
+  const playerHtml = `
+    <div class="combatant" id="combatant-player">
+      <div class="combatant-name">Hero</div>
+      <div class="combatant-sprite">${PLAYER.sprite}</div>
+      <div class="combatant-hp-row">
+        <span class="combatant-hp-label">HP ${playerHp}</span>
+        <div class="hp-bar-wrap" style="flex:1;">
+          <div class="hp-bar player" style="width:${playerHpPct}%;background:${playerHpColor};"></div>
+        </div>
+      </div>
+    </div>`;
+
+  // VS divider
+  const vsHtml = `<div style="font-family:'Cinzel',serif;font-weight:900;font-size:1.4rem;color:var(--stone);align-self:center;padding-bottom:20px;">VS</div>`;
+
+  // Boss side
+  let bossHtml = '';
+  if (boss.isImps) {
+    const impHtml = boss.imps.map((imp, i) => {
+      const pct = Math.max(0, (imp.hp / imp.maxHp) * 100);
+      const dead = imp.hp <= 0;
+      return `
+        <div class="imp-unit${dead ? ' dead' : ''}" id="imp-${i}">
+          ${makeImpSprite(imp.color)}
+          <div class="imp-hp-bar-wrap">
+            <div class="imp-hp-bar" id="imp-hp-${i}" style="width:${pct}%;"></div>
+          </div>
+          <span style="font-family:'Cinzel',serif;font-size:0.5rem;color:var(--stone);letter-spacing:1px;">${imp.name}</span>
+        </div>`;
+    }).join('');
+    const aliveCount = boss.imps.filter(i => i.hp > 0).length;
+    bossHtml = `
+      <div class="combatant" style="flex:1.4;">
+        <div class="combatant-name">${boss.name}</div>
+        <div class="imp-row">${impHtml}</div>
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;color:var(--stone);margin-top:4px;letter-spacing:2px;">${aliveCount} alive — ${aliveCount} dmg/miss</div>
+      </div>`;
+  } else {
+    const bossHpPct = Math.max(0, (boss.hp / boss.maxHp) * 100);
+    bossHtml = `
+      <div class="combatant" id="combatant-boss">
+        <div class="combatant-name">${boss.name}</div>
+        <div class="combatant-sprite">${boss.sprite}</div>
+        <div class="combatant-hp-row">
+          <span class="combatant-hp-label">HP ${boss.hp}</span>
+          <div class="hp-bar-wrap" style="flex:1;">
+            <div class="hp-bar boss" id="boss-hp-bar" style="width:${bossHpPct}%;"></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  bf.innerHTML = playerHtml + vsHtml + bossHtml;
+}
+
+// ================================================================
+//  HP BAR UPDATES (no full re-render — just update bars)
+// ================================================================
+function updatePlayerHpBar() {
+  const pct = Math.max(0, (playerHp / PLAYER.maxHp) * 100);
+  const color = pct > 50 ? 'var(--hp-green)' : pct > 25 ? 'var(--hp-yellow)' : 'var(--hp-red)';
+  const bar = document.getElementById('player-hp-bar');
+  if (bar) { bar.style.width = pct + '%'; bar.style.background = color; }
+  const val = document.getElementById('player-hp-val');
+  if (val) val.textContent = Math.max(0, playerHp);
+}
+
+function updateBossHpBar() {
+  const boss = BOSSES[currentBossIdx];
+  if (boss.isImps) {
+    boss.imps.forEach((imp, i) => {
+      const pct = Math.max(0, (imp.hp / imp.maxHp) * 100);
+      const bar = document.getElementById(`imp-hp-${i}`);
+      const unit = document.getElementById(`imp-${i}`);
+      if (bar) bar.style.width = pct + '%';
+      if (unit) unit.classList.toggle('dead', imp.hp <= 0);
+    });
+    // Update alive count label
+    const aliveCount = boss.imps.filter(i => i.hp > 0).length;
+    const label = document.querySelector('#battlefield .combatant div[style*="letter-spacing:2px"]');
+    if (label) label.textContent = `${aliveCount} alive — ${aliveCount} dmg/miss`;
+  } else {
+    const pct = Math.max(0, (boss.hp / boss.maxHp) * 100);
+    const bar = document.getElementById('boss-hp-bar');
+    const label = document.querySelector('#combatant-boss .combatant-hp-label');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = `HP ${Math.max(0, boss.hp)}`;
+  }
+}
+
+// ================================================================
+//  BATTLE FLOW
+// ================================================================
+function startBattle() {
+  setScreen('screen-battle');
+  renderBossPips();
+  renderBattlefield();
+  updateHud();
+  document.getElementById('flame-row').classList.remove('active');
+  nextQuestion();
+}
+
+function updateHud() {
+  document.getElementById('player-hp-val').textContent = Math.max(0, playerHp);
+  document.getElementById('streak-display').textContent = streak;
+  document.getElementById('gold-display').textContent = gold;
+  updatePlayerHpBar();
+}
+
+// ================================================================
+//  QUESTION TIMER
+// ================================================================
+function startQTimer() {
+  clearInterval(qTimerInterval);
+  qTimeLeft = 15;
+  const bar = document.getElementById('q-timer-bar');
+  bar.style.width = '100%';
+  bar.className = 'q-timer-bar';
+
+  qTimerInterval = setInterval(() => {
+    qTimeLeft--;
+    const pct = (qTimeLeft / 15) * 100;
+    bar.style.width = pct + '%';
+    if (qTimeLeft <= 5) bar.className = 'q-timer-bar urgent';
+    if (qTimeLeft <= 0) {
+      clearInterval(qTimerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+function handleTimeout() {
+  if (busy) return;
+  busy = true;
+  // Disable buttons
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === currentQ.answer) b.classList.add('reveal');
+  });
+  const dmg = BOSSES[currentBossIdx].playerDamage();
+  streak = 0;
+  playerHp -= dmg;
+  updateHud();
+  updateFlames();
+  document.getElementById('battle-feedback').textContent = `⏱ Time's up! −${dmg} HP  →  ${currentQ.answer}`;
+  flashCombatant('player', dmg);
+  setTimeout(() => checkGameState(), 1600);
+}
+
+// ================================================================
+//  NEXT QUESTION
+// ================================================================
+function nextQuestion() {
+  if (questionPool.length === 0) questionPool = shuffle(buildQuestionPool());
+  currentQ = questionPool.pop();
+  busy = false;
+
+  document.getElementById('q-type-tag').textContent = currentQ.tag;
+  document.getElementById('q-text').innerHTML = currentQ.html;
+  document.getElementById('battle-feedback').textContent = '';
+
+  const choices = getChoices(currentQ.answer, currentQ.pool, 4);
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  grid.style.pointerEvents = 'none';
+  setTimeout(() => { grid.style.pointerEvents = ''; }, 120);
+
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => handleAnswer(c, btn);
+    grid.appendChild(btn);
+  });
+
+  if (document.activeElement) document.activeElement.blur();
+  startQTimer();
+}
+
+// ================================================================
+//  ANSWER HANDLING
+// ================================================================
+function handleAnswer(choice, btn) {
+  if (busy) return;
+  busy = true;
+  clearInterval(qTimerInterval);
+
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  if (choice === currentQ.answer) {
+    btn.classList.add('correct');
+    streak++;
+    const dmg = streakDamage(streak);
+    dealDamageToBoss(dmg);
+    document.getElementById('streak-display').textContent = streak;
+    updateFlames();
+    const msg = streak >= 5 ? `🔥 x${streak} STREAK! −${dmg} boss HP` :
+                streak >= 3 ? `⚡ x${streak} Streak! −${dmg} boss HP` :
+                              `✦ Correct! −${dmg} boss HP`;
+    document.getElementById('battle-feedback').textContent = msg;
+    setTimeout(() => checkGameState(), 700);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === currentQ.answer) b.classList.add('reveal');
+    });
+    const dmg = BOSSES[currentBossIdx].playerDamage();
+    const oldStreak = streak;
+    streak = 0;
+    playerHp -= dmg;
+    updateHud();
+    updateFlames();
+    const msg = oldStreak >= 2 ? `✗ Streak lost! −${dmg} HP  →  ${currentQ.answer}` :
+                                 `✗ Wrong! −${dmg} HP  →  ${currentQ.answer}`;
+    document.getElementById('battle-feedback').textContent = msg;
+    flashCombatant('player', dmg);
+    setTimeout(() => checkGameState(), 1600);
+  }
+}
+
+function dealDamageToBoss(dmg) {
+  const boss = BOSSES[currentBossIdx];
+  if (boss.isImps) {
+    // Target first living imp
+    const target = boss.imps.find(i => i.hp > 0);
+    if (target) {
+      target.hp = Math.max(0, target.hp - dmg);
+      const idx = boss.imps.indexOf(target);
+      flashCombatant(`imp-${idx}`, dmg);
+    }
+  } else {
+    boss.hp = Math.max(0, boss.hp - dmg);
+    flashCombatant('boss', dmg);
+  }
+  updateBossHpBar();
+}
+
+function flashCombatant(type, dmg) {
+  let el = null;
+  if (type === 'player') el = document.getElementById('combatant-player');
+  else if (type === 'boss') el = document.getElementById('combatant-boss');
+  else if (type.startsWith('imp-')) el = document.getElementById(type);
+  if (!el) return;
+  el.classList.remove('hit-flash');
+  void el.offsetWidth;
+  el.classList.add('hit-flash');
+  setTimeout(() => el.classList.remove('hit-flash'), 400);
+}
+
+// ================================================================
+//  GAME STATE CHECKS
+// ================================================================
+function checkGameState() {
+  // Check player death first
+  if (playerHp <= 0) {
+    triggerGameOver();
+    return;
+  }
+
+  const boss = BOSSES[currentBossIdx];
+  const bossDefeated = boss.isImps
+    ? boss.imps.every(i => i.hp <= 0)
+    : boss.hp <= 0;
+
+  if (bossDefeated) {
+    triggerBossVictory();
+    return;
+  }
+
+  nextQuestion();
+}
+
+function triggerBossVictory() {
+  clearAllTimers();
+  const boss = BOSSES[currentBossIdx];
+  gold += boss.gold;
+
+  document.getElementById('victory-title').textContent =
+    currentBossIdx === BOSSES.length - 1 ? '🏆 Dungeon Cleared!' : `${boss.name} Defeated!`;
+  document.getElementById('victory-msg').textContent = boss.defeatMsg;
+  document.getElementById('gold-earned-display').textContent = `+${boss.gold} 💰 Gold`;
+  document.getElementById('gold-total-display').textContent = `Total: ${gold} gold`;
+
+  // Boss sprite in victory screen
+  const spriteEl = document.getElementById('victory-sprite');
+  if (boss.isImps) {
+    spriteEl.innerHTML = makeImpSprite(boss.imps[0].color) + makeImpSprite(boss.imps[1].color) + makeImpSprite(boss.imps[2].color);
+  } else {
+    spriteEl.innerHTML = boss.sprite;
+  }
+
+  const nextBtn = document.getElementById('next-boss-btn');
+  if (currentBossIdx === BOSSES.length - 1) {
+    nextBtn.textContent = 'See Results';
+    nextBtn.onclick = triggerFinalWin;
+  } else {
+    nextBtn.textContent = 'Onward!';
+    nextBtn.onclick = advanceToNextBoss;
+  }
+
+  setScreen('screen-victory');
+}
+
+function advanceToNextBoss() {
+  currentBossIdx++;
+  streak = 0;
+  questionPool = shuffle(buildQuestionPool());
+  startBattle();
+}
+
+function triggerGameOver() {
+  clearAllTimers();
+  const boss = BOSSES[currentBossIdx];
+  document.getElementById('gameover-msg').textContent =
+    `You fell before ${boss.name}. The dungeon claims another soul.`;
+  document.getElementById('gameover-gold-display').textContent = `${gold} 💰`;
+  document.getElementById('gameover-gold-label').textContent = 'gold pieces kept';
+  const spriteEl = document.getElementById('gameover-sprite');
+  if (boss.isImps) {
+    spriteEl.innerHTML = makeImpSprite(boss.imps[0].color);
+  } else {
+    spriteEl.innerHTML = boss.sprite;
+  }
+  setScreen('screen-gameover');
+}
+
+function triggerFinalWin() {
+  clearAllTimers();
+  document.getElementById('win-gold-display').textContent = gold;
+  const msgs = [
+    'All four bosses lie defeated. The unit circle yields all its secrets.',
+    'The dungeon trembles. No challenge remains. You have mastered the circle.',
+  ];
+  document.getElementById('win-msg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  setScreen('screen-win');
+}
+
+// ================================================================
+//  FLAME SYSTEM (identical to Phase 1)
+// ================================================================
+(function buildFlames() {
+  const row = document.getElementById('flame-row');
+  for (let i = 0; i < 18; i++) {
+    const span = document.createElement('span');
+    span.className = 'flame';
+    span.textContent = '🔥';
+    const duration = (0.6 + Math.random() * 0.8).toFixed(2);
+    const delay    = (Math.random() * 1.0).toFixed(2);
+    const fsA = (1.3 + Math.random() * 0.4).toFixed(1);
+    const fsB = (1.8 + Math.random() * 0.4).toFixed(1);
+    const fsC = (1.1 + Math.random() * 0.4).toFixed(1);
+    span.style.cssText = `
+      font-size:${fsA}rem;
+      --fs-a:${fsA}rem; --fs-b:${fsB}rem; --fs-c:${fsC}rem;
+      animation: flameSize ${duration}s ${delay}s ease-in-out infinite;
+    `;
+    row.appendChild(span);
+  }
+})();
+
+function updateFlames() {
+  document.getElementById('flame-row').classList.toggle('active', streak >= 5);
+}
+</script>
+</body>
+</html>
