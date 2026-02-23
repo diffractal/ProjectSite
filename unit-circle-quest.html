@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Circle Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f2e8d0;
+    --parchment-dark: #e0cfaa;
+    --ink: #2c1810;
+    --ink-light: #4a2f20;
+    --crimson: #8b1a1a;
+    --gold: #c9a227;
+    --stone: #7a6a55;
+    --stone-light: #a08c70;
+    --green-correct: #2d6a2d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #1a1008;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, #3d1f08 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Crimson Text', Georgia, serif;
+    padding: 20px;
+  }
+
+  .game-container {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .frame {
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(180,140,80,0.2) 0%, transparent 50%);
+    border: 3px solid var(--gold);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 6px var(--ink),
+      0 0 0 9px var(--gold),
+      0 0 0 12px var(--ink),
+      0 20px 60px rgba(0,0,0,0.8),
+      inset 0 0 40px rgba(180,140,60,0.1);
+    padding: 40px 48px;
+    position: relative;
+  }
+
+  .frame::before, .frame::after {
+    content: '✦';
+    position: absolute;
+    color: var(--gold);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .frame::before { top: 12px; left: 14px; }
+  .frame::after { bottom: 12px; right: 14px; }
+  .corner-tr { position: absolute; top: 12px; right: 14px; color: var(--gold); font-size: 20px; }
+  .corner-bl { position: absolute; bottom: 12px; left: 14px; color: var(--gold); font-size: 20px; }
+
+  /* ===== TYPOGRAPHY ===== */
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--crimson);
+    text-shadow: 2px 2px 0 var(--gold), 3px 3px 0 var(--ink);
+    letter-spacing: 3px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .game-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    color: var(--stone);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--stone-light);
+    margin: 20px auto;
+    width: 80%;
+    position: relative;
+  }
+  .divider::after {
+    content: '⚔';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--parchment);
+    padding: 0 8px;
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  /* ===== JACKALOPE ===== */
+  .jackalope-container {
+    margin: 0 auto 16px;
+    width: 150px;
+    height: 150px;
+    display: block;
+    filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.25));
+  }
+
+  /* ===== TITLE SCREEN ===== */
+  #screen-title { text-align: center; }
+
+  .intro-text {
+    font-size: 1.15rem;
+    color: var(--ink-light);
+    line-height: 1.7;
+    margin: 12px 0 20px;
+    font-style: italic;
+  }
+
+  .rules-box {
+    background: rgba(44,24,16,0.05);
+    border: 1px solid var(--parchment-dark);
+    border-radius: 2px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    text-align: left;
+  }
+  .rules-box p {
+    color: var(--ink-light);
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .rules-box p:last-child { margin-bottom: 0; }
+  .rules-box strong { color: var(--crimson); font-weight: 600; }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    display: inline-block;
+    background: linear-gradient(180deg, #a52020 0%, #6b1212 100%);
+    color: var(--parchment);
+    border: 2px solid var(--gold);
+    padding: 14px 40px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #c52828 0%, #8b1a1a 100%);
+    box-shadow: 0 6px 20px rgba(139,26,26,0.5);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(1px); }
+
+  /* ===== GAME HUD ===== */
+  #screen-game { display: none; }
+
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .hud-stat { text-align: center; }
+  .hud-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    color: var(--stone);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .hud-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--crimson);
+    line-height: 1;
+  }
+
+  .timer-bar-wrap {
+    flex: 1;
+    margin: 0 24px;
+    height: 12px;
+    background: rgba(44,24,16,0.12);
+    border: 1px solid var(--stone-light);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+    width: 100%;
+    transition: width 1s linear;
+    border-radius: 2px;
+  }
+  .timer-bar.warning {
+    animation: pulse 0.5s infinite alternate;
+  }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+  /* ===== QUESTION ===== */
+  .question-area {
+    text-align: center;
+    margin-bottom: 28px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .question-type-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 4px;
+    color: var(--stone);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .question-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.2rem, 4vw, 1.7rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .angle-val { color: var(--crimson); }
+
+  /* ===== CHOICES ===== */
+  .choices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .choice-btn {
+    background: rgba(44,24,16,0.04);
+    border: 2px solid var(--stone-light);
+    border-radius: 2px;
+    padding: 16px 12px;
+    font-family: 'Crimson Text', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.12s;
+    min-height: 60px;
+  }
+  .choice-btn:hover:not(:disabled) {
+    background: rgba(201,162,39,0.1);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .choice-btn.correct {
+    background: rgba(45,106,45,0.15);
+    border-color: var(--green-correct);
+    color: var(--green-correct);
+    animation: correctPop 0.3s ease;
+  }
+  .choice-btn.wrong {
+    background: rgba(139,26,26,0.1);
+    border-color: var(--crimson);
+    color: var(--crimson);
+    animation: wrongShake 0.3s ease;
+  }
+  .choice-btn.reveal {
+    background: rgba(45,106,45,0.15);
+    border-color: var(--green-correct);
+    color: var(--green-correct);
+  }
+  .choice-btn:disabled { cursor: not-allowed; }
+
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+  @keyframes wrongShake {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-6px); }
+    75%  { transform: translateX(6px); }
+    100% { transform: translateX(0); }
+  }
+
+  .feedback-msg {
+    text-align: center;
+    min-height: 26px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--stone);
+  }
+
+  /* ===== END SCREEN ===== */
+  #screen-end { display: none; text-align: center; }
+
+  .score-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 5px;
+    color: var(--stone);
+    text-transform: uppercase;
+    display: block;
+    margin: 20px 0 6px;
+  }
+  .score-big {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(4rem, 15vw, 7rem);
+    font-weight: 900;
+    color: var(--crimson);
+    text-shadow: 3px 3px 0 var(--gold), 5px 5px 0 var(--ink);
+    line-height: 1;
+  }
+  .score-total {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--stone);
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+  .rank-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .end-message {
+    font-size: 1.1rem;
+    color: var(--ink-light);
+    font-style: italic;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* fade-in for screen transitions */
+  .screen-active {
+    animation: fadeIn 0.35s ease both;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="frame">
+    <span class="corner-tr">✦</span>
+    <span class="corner-bl">✦</span>
+
+    <!-- ===== TITLE SCREEN ===== -->
+    <div id="screen-title">
+
+      <div class="game-title">Unit Circle</div>
+      <div class="game-title" style="font-size:clamp(1.4rem,4vw,2rem);margin-top:2px;">Quest</div>
+      <div class="game-subtitle">Phase I — The Trial Begins</div>
+
+      <hr class="divider">
+
+      <!-- Hand-drawn style Jackalope SVG -->
+      <svg class="jackalope-container" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shadow -->
+        <ellipse cx="78" cy="142" rx="30" ry="5" fill="rgba(44,24,16,0.15)"/>
+        <!-- Body -->
+        <ellipse cx="78" cy="108" rx="32" ry="22" fill="#c8a878" stroke="#5c3a1e" stroke-width="2"/>
+        <!-- Fluffy tail -->
+        <circle cx="108" cy="116" r="10" fill="#f0ebe0" stroke="#5c3a1e" stroke-width="1.5"/>
+        <circle cx="108" cy="116" r="6" fill="white"/>
+        <!-- Haunches -->
+        <ellipse cx="96" cy="118" rx="16" ry="14" fill="#b8946a" stroke="#5c3a1e" stroke-width="1.5"/>
+        <!-- Head -->
+        <ellipse cx="56" cy="85" rx="21" ry="18" fill="#c8a878" stroke="#5c3a1e" stroke-width="2"/>
+        <!-- Rabbit ears -->
+        <ellipse cx="46" cy="57" rx="7" ry="19" fill="#c8a878" stroke="#5c3a1e" stroke-width="1.5" transform="rotate(-12 46 57)"/>
+        <ellipse cx="46" cy="57" rx="4" ry="13" fill="#e8a090" transform="rotate(-12 46 57)"/>
+        <ellipse cx="64" cy="54" rx="7" ry="20" fill="#c8a878" stroke="#5c3a1e" stroke-width="1.5" transform="rotate(10 64 54)"/>
+        <ellipse cx="64" cy="54" rx="4" ry="14" fill="#e8a090" transform="rotate(10 64 54)"/>
+        <!-- Antlers -->
+        <line x1="46" y1="68" x2="30" y2="44" stroke="#8b5e3c" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="30" y1="44" x2="22" y2="32" stroke="#8b5e3c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="30" y1="44" x2="20" y2="47" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
+        <line x1="30" y1="44" x2="34" y2="34" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
+        <line x1="64" y1="66" x2="80" y2="40" stroke="#8b5e3c" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="80" y1="40" x2="88" y2="28" stroke="#8b5e3c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="80" y1="40" x2="90" y2="45" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
+        <line x1="80" y1="40" x2="74" y2="30" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <circle cx="49" cy="83" r="3.5" fill="#2c1810"/>
+        <circle cx="50.5" cy="81.5" r="1.2" fill="white"/>
+        <circle cx="64" cy="82" r="3.5" fill="#2c1810"/>
+        <circle cx="65.5" cy="80.5" r="1.2" fill="white"/>
+        <!-- Nose -->
+        <ellipse cx="57" cy="90" rx="4" ry="2.5" fill="#d06878"/>
+        <!-- Smile -->
+        <path d="M53 92.5 Q57 96 61 92.5" stroke="#5c3a1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Whiskers -->
+        <line x1="30" y1="88" x2="50" y2="90" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+        <line x1="30" y1="92" x2="50" y2="92" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+        <line x1="64" y1="90" x2="82" y2="88" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+        <line x1="64" y1="92" x2="82" y2="92" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+        <!-- Front legs -->
+        <line x1="60" y1="124" x2="54" y2="142" stroke="#5c3a1e" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="53" cy="143" rx="6" ry="2.5" fill="#b8946a" stroke="#5c3a1e" stroke-width="1"/>
+        <line x1="72" y1="126" x2="70" y2="144" stroke="#5c3a1e" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="70" cy="145" rx="6" ry="2.5" fill="#b8946a" stroke="#5c3a1e" stroke-width="1"/>
+        <!-- Back big legs -->
+        <line x1="88" y1="126" x2="96" y2="144" stroke="#5c3a1e" stroke-width="3.5" stroke-linecap="round"/>
+        <ellipse cx="97" cy="145" rx="9" ry="3" fill="#b8946a" stroke="#5c3a1e" stroke-width="1.5"/>
+        <!-- Tiny scroll in paw area -->
+        <rect x="36" y="97" width="15" height="11" rx="2" fill="#f2e8d0" stroke="#8b5e3c" stroke-width="1.5"/>
+        <line x1="38" y1="101" x2="49" y2="101" stroke="#8b5e3c" stroke-width="1"/>
+        <line x1="38" y1="104" x2="47" y2="104" stroke="#8b5e3c" stroke-width="1"/>
+      </svg>
+
+      <div class="intro-text">
+        The Jackalope Guardian challenges thee!<br>
+        Prove thy mastery of the Unit Circle.
+      </div>
+
+      <div class="rules-box">
+        <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
+        <p>🎯 <strong>+1 point</strong> for each correct answer.</p>
+        <p>📐 Topics: <strong>Degrees ↔ Radians, Sine, Cosine, Tangent</strong></p>
+        <p>🔍 Wrong answers reveal the correct one briefly before continuing.</p>
+      </div>
+
+      <button class="btn-primary" onclick="startGame()">Begin the Trial</button>
+    </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div id="screen-game">
+      <div class="hud">
+        <div class="hud-stat">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" id="score-display">0</span>
+        </div>
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <div class="hud-stat">
+          <span class="hud-label">Time</span>
+          <span class="hud-value" id="timer-display">60</span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="question-area">
+        <div class="question-type-tag" id="q-type-tag"></div>
+        <div class="question-text" id="q-text"></div>
+      </div>
+
+      <div class="choices-grid" id="choices-grid"></div>
+      <div class="feedback-msg" id="feedback-msg"></div>
+    </div>
+
+    <!-- ===== END SCREEN ===== -->
+    <div id="screen-end">
+      <div class="game-title" style="font-size:clamp(1.5rem,5vw,2.2rem);">Trial Complete!</div>
+      <hr class="divider">
+      <span class="score-label">Final Score</span>
+      <div class="score-big" id="final-score">0</div>
+      <div class="score-total" id="questions-answered"></div>
+      <div class="rank-text" id="rank-text"></div>
+      <div class="end-message" id="end-message"></div>
+      <button class="btn-primary" onclick="showTitle()">Try Again</button>
+    </div>
+
+  </div><!-- .frame -->
+</div><!-- .game-container -->
+
+<script>
+// ================================================================
+//  UNIT CIRCLE DATA  — all 16 standard angles
+// ================================================================
+const ANGLES = [
+  { deg: 0,   rad: '0',     sin: '0',      cos: '1',      tan: '0'         },
+  { deg: 30,  rad: 'π/6',   sin: '1/2',    cos: '√3/2',   tan: '√3/3'      },
+  { deg: 45,  rad: 'π/4',   sin: '√2/2',   cos: '√2/2',   tan: '1'         },
+  { deg: 60,  rad: 'π/3',   sin: '√3/2',   cos: '1/2',    tan: '√3'        },
+  { deg: 90,  rad: 'π/2',   sin: '1',      cos: '0',      tan: 'undefined' },
+  { deg: 120, rad: '2π/3',  sin: '√3/2',   cos: '-1/2',   tan: '-√3'       },
+  { deg: 135, rad: '3π/4',  sin: '√2/2',   cos: '-√2/2',  tan: '-1'        },
+  { deg: 150, rad: '5π/6',  sin: '1/2',    cos: '-√3/2',  tan: '-√3/3'     },
+  { deg: 180, rad: 'π',     sin: '0',      cos: '-1',     tan: '0'         },
+  { deg: 210, rad: '7π/6',  sin: '-1/2',   cos: '-√3/2',  tan: '√3/3'      },
+  { deg: 225, rad: '5π/4',  sin: '-√2/2',  cos: '-√2/2',  tan: '1'         },
+  { deg: 240, rad: '4π/3',  sin: '-√3/2',  cos: '-1/2',   tan: '√3'        },
+  { deg: 270, rad: '3π/2',  sin: '-1',     cos: '0',      tan: 'undefined' },
+  { deg: 300, rad: '5π/3',  sin: '-√3/2',  cos: '1/2',    tan: '-√3'       },
+  { deg: 315, rad: '7π/4',  sin: '-√2/2',  cos: '√2/2',   tan: '-1'        },
+  { deg: 330, rad: '11π/6', sin: '-1/2',   cos: '√3/2',   tan: '-√3/3'     },
+];
+
+// Distractor pools
+const SIN_COS_POOL = ['0','1','-1','1/2','-1/2','√2/2','-√2/2','√3/2','-√3/2'];
+const TAN_POOL     = ['0','1','-1','√3','-√3','√3/3','-√3/3','undefined'];
+const RAD_POOL     = ['0','π/6','π/4','π/3','π/2','2π/3','3π/4','5π/6','π',
+                      '7π/6','5π/4','4π/3','3π/2','5π/3','7π/4','11π/6','2π'];
+const DEG_POOL     = ['0°','30°','45°','60°','90°','120°','135°','150°','180°',
+                      '210°','225°','240°','270°','300°','315°','330°','360°'];
+
+// ================================================================
+//  QUESTION GENERATORS
+// ================================================================
+function buildQuestionPool() {
+  const pool = [];
+  for (const a of ANGLES) {
+    const deg = a.deg + '°';
+    const rad = a.deg === 0 ? '0' : a.rad;
+
+    // 1. Degrees → Radians
+    pool.push({
+      tag: 'Degrees → Radians',
+      html: `Convert <span class="angle-val">${deg}</span> to radians`,
+      answer: rad,
+      pool: RAD_POOL
+    });
+
+    // 2. Radians → Degrees
+    pool.push({
+      tag: 'Radians → Degrees',
+      html: `Convert <span class="angle-val">${rad}</span> radians to degrees`,
+      answer: deg,
+      pool: DEG_POOL
+    });
+
+    // 3. sin(deg)
+    pool.push({
+      tag: 'Sine',
+      html: `Find <span class="angle-val">sin(${deg})</span>`,
+      answer: a.sin,
+      pool: SIN_COS_POOL
+    });
+
+    // 4. cos(deg)
+    pool.push({
+      tag: 'Cosine',
+      html: `Find <span class="angle-val">cos(${deg})</span>`,
+      answer: a.cos,
+      pool: SIN_COS_POOL
+    });
+
+    // 5. tan(deg)
+    pool.push({
+      tag: 'Tangent',
+      html: `Find <span class="angle-val">tan(${deg})</span>`,
+      answer: a.tan,
+      pool: TAN_POOL
+    });
+
+    // 6 & 7. sin/cos from radians (skip 0° since rad = deg label both "0")
+    if (a.deg !== 0) {
+      pool.push({
+        tag: 'Sine',
+        html: `Find <span class="angle-val">sin(${rad})</span>`,
+        answer: a.sin,
+        pool: SIN_COS_POOL
+      });
+      pool.push({
+        tag: 'Cosine',
+        html: `Find <span class="angle-val">cos(${rad})</span>`,
+        answer: a.cos,
+        pool: SIN_COS_POOL
+      });
+    }
+  }
+  return pool;
+}
+
+// ================================================================
+//  HELPERS
+// ================================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getChoices(answer, pool, n = 4) {
+  const wrong = shuffle(pool.filter(p => p !== answer)).slice(0, n - 1);
+  return shuffle([answer, ...wrong]);
+}
+
+function setScreen(id) {
+  ['screen-title','screen-game','screen-end'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = 'none';
+    el.classList.remove('screen-active');
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  requestAnimationFrame(() => el.classList.add('screen-active'));
+}
+
+// ================================================================
+//  GAME STATE
+// ================================================================
+let score = 0;
+let timeLeft = 60;
+let timerInterval = null;
+let questionPool = [];
+let currentQ = null;
+let busy = false;
+let attempted = 0;
+
+function showTitle() {
+  clearInterval(timerInterval);
+  setScreen('screen-title');
+}
+
+function startGame() {
+  score = 0;
+  timeLeft = 60;
+  attempted = 0;
+  questionPool = shuffle(buildQuestionPool());
+
+  document.getElementById('score-display').textContent = '0';
+  document.getElementById('timer-display').textContent = '60';
+  document.getElementById('timer-bar').style.width = '100%';
+  document.getElementById('timer-bar').className = 'timer-bar';
+  document.getElementById('feedback-msg').textContent = '';
+
+  setScreen('screen-game');
+  nextQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer-display').textContent = timeLeft;
+    document.getElementById('timer-bar').style.width = (timeLeft / 60 * 100) + '%';
+    if (timeLeft <= 15) document.getElementById('timer-bar').classList.add('warning');
+    if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
+  }, 1000);
+}
+
+function nextQuestion() {
+  if (questionPool.length === 0) questionPool = shuffle(buildQuestionPool());
+  currentQ = questionPool.pop();
+  busy = false;
+
+  document.getElementById('q-type-tag').textContent = currentQ.tag;
+  document.getElementById('q-text').innerHTML = currentQ.html;
+  document.getElementById('feedback-msg').textContent = '';
+
+  const choices = getChoices(currentQ.answer, currentQ.pool, 4);
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => handleAnswer(c, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAnswer(choice, btn) {
+  if (busy) return;
+  busy = true;
+  attempted++;
+
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (choice === currentQ.answer) {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-display').textContent = score;
+    document.getElementById('feedback-msg').textContent = '✦ Correct! ✦';
+    setTimeout(nextQuestion, 600);
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if (b.textContent === currentQ.answer) b.classList.add('reveal'); });
+    document.getElementById('feedback-msg').textContent = `Correct answer: ${currentQ.answer}`;
+    setTimeout(nextQuestion, 1600);
+  }
+}
+
+function endGame() {
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('questions-answered').textContent =
+    `${score} correct out of ${attempted} attempted`;
+
+  const { rank, msg } = getRank(score, attempted);
+  document.getElementById('rank-text').textContent = rank;
+  document.getElementById('end-message').textContent = msg;
+  setScreen('screen-end');
+}
+
+function getRank(s, a) {
+  const pct = a > 0 ? s / a : 0;
+  if (s >= 20 && pct >= 0.85) return { rank: '⚔ Grand Master of the Circle ⚔', msg: 'Extraordinary! The Jackalope bows before thy mastery.' };
+  if (s >= 15 && pct >= 0.75) return { rank: '🏆 Circle Knight',                msg: 'Impressive! The unit circle holds few secrets from thee.' };
+  if (s >= 10 && pct >= 0.60) return { rank: '📜 Apprentice Scholar',           msg: 'Solid effort, young scholar. Keep practicing!' };
+  if (s >= 5)                  return { rank: '🌱 Initiate',                     msg: 'A humble start. The Jackalope believes in thee.' };
+                               return { rank: '🐾 Wanderer',                    msg: 'The circle awaits thy study. Try again!' };
+}
+</script>
+</body>
+</html>
