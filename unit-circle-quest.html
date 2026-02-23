@@ -219,6 +219,44 @@
     font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; color: var(--stone);
   }
 
+  /* ===== FLAMES ===== */
+  .flame-row {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 54px; pointer-events: none;
+    display: flex; align-items: flex-end; justify-content: space-around;
+    padding: 0 24px; opacity: 0;
+    transition: opacity 0.6s ease;
+    overflow: hidden; border-radius: 0 0 4px 4px;
+  }
+  .flame-row.active { opacity: 1; }
+
+  .flame {
+    width: 18px; position: relative; bottom: 0;
+    animation: flicker 0.6s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+  }
+  /* Stagger each flame independently */
+  .flame:nth-child(1)  { animation-delay: 0.00s; animation-duration: 0.55s; }
+  .flame:nth-child(2)  { animation-delay: 0.08s; animation-duration: 0.65s; }
+  .flame:nth-child(3)  { animation-delay: 0.15s; animation-duration: 0.50s; }
+  .flame:nth-child(4)  { animation-delay: 0.22s; animation-duration: 0.70s; }
+  .flame:nth-child(5)  { animation-delay: 0.05s; animation-duration: 0.58s; }
+  .flame:nth-child(6)  { animation-delay: 0.18s; animation-duration: 0.63s; }
+  .flame:nth-child(7)  { animation-delay: 0.30s; animation-duration: 0.48s; }
+  .flame:nth-child(8)  { animation-delay: 0.12s; animation-duration: 0.72s; }
+  .flame:nth-child(9)  { animation-delay: 0.25s; animation-duration: 0.54s; }
+  .flame:nth-child(10) { animation-delay: 0.38s; animation-duration: 0.61s; }
+  .flame:nth-child(11) { animation-delay: 0.09s; animation-duration: 0.67s; }
+  .flame:nth-child(12) { animation-delay: 0.20s; animation-duration: 0.52s; }
+
+  @keyframes flicker {
+    0%   { transform: scaleX(1)   scaleY(1)    skewX(0deg);   }
+    25%  { transform: scaleX(0.9) scaleY(1.08) skewX(-3deg);  }
+    50%  { transform: scaleX(1.1) scaleY(0.95) skewX(2deg);   }
+    75%  { transform: scaleX(0.95) scaleY(1.1) skewX(-2deg);  }
+    100% { transform: scaleX(1.05) scaleY(1.0) skewX(1deg);   }
+  }
+
   /* ===== END SCREEN ===== */
   #screen-end { display: none; text-align: center; }
   .score-label {
@@ -348,7 +386,7 @@
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
       <div class="game-title">Unit Circle</div>
-      <div class="game-title" style="margin-top:2px;">Quest</div>
+      <div class="game-title" style="margin-top:2px; margin-bottom:12px;">Quest</div>
       <div class="game-subtitle">Phase I — The Trial Begins</div>
       <hr class="divider">
 
@@ -398,7 +436,6 @@
         <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
         <p>🎯 <strong>+1 point</strong> for your first correct answer.</p>
         <p>🔥 <strong>Streak bonus</strong> — each consecutive correct answer scores one more point than the last. Miss one and the streak resets!</p>
-        <p>💀 <strong>-1 point</strong> for a wrong answer (streak resets).</p>
         <p>🏆 Score high enough to claim a spot on the <strong>Hall of Champions</strong>!</p>
       </div>
 
@@ -434,6 +471,23 @@
       </div>
       <div class="choices-grid" id="choices-grid"></div>
       <div class="feedback-msg" id="feedback-msg"></div>
+
+      <!-- Flames appear at streak 5+ -->
+      <div class="flame-row" id="flame-row">
+        <!-- Each flame is an inline SVG tongue -->
+        <svg class="flame" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 38 C3 30 1 22 5 15 C6 22 8 20 9 14 C10 20 12 22 13 15 C17 22 15 30 9 38Z" fill="url(#fg1)"/><defs><linearGradient id="fg1" x1="9" y1="38" x2="9" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="50%" stop-color="#e05010"/><stop offset="100%" stop-color="#ff6600" stop-opacity="0.7"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 46 C2 36 0 25 5 16 C7 25 8 22 9 13 C10 22 11 25 13 16 C18 25 16 36 9 46Z" fill="url(#fg2)"/><defs><linearGradient id="fg2" x1="9" y1="46" x2="9" y2="13" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="45%" stop-color="#e03000"/><stop offset="100%" stop-color="#ff4400" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 34 C4 26 2 19 6 12 C7 19 8 17 9 11 C10 17 11 19 12 12 C16 19 14 26 9 34Z" fill="url(#fg3)"/><defs><linearGradient id="fg3" x1="9" y1="34" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e08000"/><stop offset="50%" stop-color="#e04010"/><stop offset="100%" stop-color="#ff5500" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 50 C2 38 0 27 5 16 C7 26 8 23 9 12 C10 23 11 26 13 16 C18 27 16 38 9 50Z" fill="url(#fg4)"/><defs><linearGradient id="fg4" x1="9" y1="50" x2="9" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="40%" stop-color="#e02000"/><stop offset="100%" stop-color="#ff3300" stop-opacity="0.5"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 38 C3 30 1 22 5 15 C6 22 8 20 9 14 C10 20 12 22 13 15 C17 22 15 30 9 38Z" fill="url(#fg5)"/><defs><linearGradient id="fg5" x1="9" y1="38" x2="9" y2="14" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e09000"/><stop offset="50%" stop-color="#e04500"/><stop offset="100%" stop-color="#ff6000" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 42 C3 33 1 23 5 14 C7 23 8 21 9 12 C10 21 11 23 13 14 C17 23 15 33 9 42Z" fill="url(#fg6)"/><defs><linearGradient id="fg6" x1="9" y1="42" x2="9" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="48%" stop-color="#e03500"/><stop offset="100%" stop-color="#ff4800" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 34 C4 26 2 19 6 12 C7 19 8 17 9 11 C10 17 11 19 12 12 C16 19 14 26 9 34Z" fill="url(#fg7)"/><defs><linearGradient id="fg7" x1="9" y1="34" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e08000"/><stop offset="50%" stop-color="#dd3000"/><stop offset="100%" stop-color="#ff5000" stop-opacity="0.5"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 50" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 48 C2 37 0 26 5 15 C7 25 8 22 9 11 C10 22 11 25 13 15 C18 26 16 37 9 48Z" fill="url(#fg8)"/><defs><linearGradient id="fg8" x1="9" y1="48" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="42%" stop-color="#e02800"/><stop offset="100%" stop-color="#ff3800" stop-opacity="0.5"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 38" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 36 C3 28 1 20 5 13 C6 20 8 18 9 12 C10 18 12 20 13 13 C17 20 15 28 9 36Z" fill="url(#fg9)"/><defs><linearGradient id="fg9" x1="9" y1="36" x2="9" y2="12" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e09000"/><stop offset="50%" stop-color="#e03800"/><stop offset="100%" stop-color="#ff5500" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 46" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 44 C2 34 0 24 5 14 C7 24 8 21 9 11 C10 21 11 24 13 14 C18 24 16 34 9 44Z" fill="url(#fg10)"/><defs><linearGradient id="fg10" x1="9" y1="44" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="44%" stop-color="#e02d00"/><stop offset="100%" stop-color="#ff4000" stop-opacity="0.55"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 34 C4 26 2 19 6 12 C7 19 8 17 9 11 C10 17 11 19 12 12 C16 19 14 26 9 34Z" fill="url(#fg11)"/><defs><linearGradient id="fg11" x1="9" y1="34" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e08500"/><stop offset="50%" stop-color="#df3500"/><stop offset="100%" stop-color="#ff5200" stop-opacity="0.6"/></linearGradient></defs></svg>
+        <svg class="flame" viewBox="0 0 18 42" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 40 C3 31 1 22 5 13 C7 22 8 20 9 11 C10 20 11 22 13 13 C17 22 15 31 9 40Z" fill="url(#fg12)"/><defs><linearGradient id="fg12" x1="9" y1="40" x2="9" y2="11" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c9a227"/><stop offset="46%" stop-color="#e03200"/><stop offset="100%" stop-color="#ff4500" stop-opacity="0.55"/></linearGradient></defs></svg>
+      </div>
     </div>
 
     <!-- ===== END SCREEN ===== -->
@@ -758,6 +812,7 @@ function startGame() {
   document.getElementById('timer-bar').style.width = '100%';
   document.getElementById('timer-bar').className = 'timer-bar';
   document.getElementById('feedback-msg').textContent = '';
+  document.getElementById('flame-row').classList.remove('active');
 
   setScreen('screen-game');
   nextQuestion();
@@ -805,6 +860,15 @@ function nextQuestion() {
   if (document.activeElement) document.activeElement.blur();
 }
 
+function updateFlames() {
+  const flameRow = document.getElementById('flame-row');
+  if (streak >= 5) {
+    flameRow.classList.add('active');
+  } else {
+    flameRow.classList.remove('active');
+  }
+}
+
 function handleAnswer(choice, btn) {
   if (busy) return;
   busy = true;
@@ -819,6 +883,7 @@ function handleAnswer(choice, btn) {
     score = Math.max(0, score);
     document.getElementById('score-display').textContent = score;
     document.getElementById('streak-display').textContent = streak;
+    updateFlames();
     const msg = streak >= 5 ? `🔥 x${streak} STREAK! +${points}` :
                 streak >= 3 ? `⚡ x${streak} Streak! +${points}` :
                 streak >= 2 ? `✦ x${streak} Streak! +${points}` : `✦ Correct! +${points}`;
@@ -831,10 +896,9 @@ function handleAnswer(choice, btn) {
     });
     const oldStreak = streak;
     streak = 0;
-    score = Math.max(0, score - 1);
-    document.getElementById('score-display').textContent = score;
     document.getElementById('streak-display').textContent = '0';
-    const msg = oldStreak >= 2 ? `✗ Streak lost! −1` : `✗ Wrong! −1`;
+    updateFlames();
+    const msg = oldStreak >= 2 ? `✗ Streak lost!` : `✗ Wrong!`;
     document.getElementById('feedback-msg').textContent = `${msg}  →  ${currentQ.answer}`;
     setTimeout(nextQuestion, 1600);
   }
