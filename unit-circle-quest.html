@@ -348,7 +348,7 @@
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
       <div class="game-title">Unit Circle</div>
-      <div class="game-title" style="font-size:clamp(1.4rem,4vw,2rem);margin-top:2px;">Quest</div>
+      <div class="game-title" style="margin-top:2px;">Quest</div>
       <div class="game-subtitle">Phase I — The Trial Begins</div>
       <hr class="divider">
 
@@ -392,13 +392,13 @@
         <line x1="38" y1="104" x2="47" y2="104" stroke="#8b5e3c" stroke-width="1"/>
       </svg>
 
-      <div class="intro-text">The Jackalope Guardian challenges thee!<br>Prove thy mastery of the Unit Circle.</div>
+      <div class="intro-text">Challenge the Jackalope!<br>Prove your mastery.</div>
 
       <div class="rules-box">
         <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
-        <p>🎯 <strong>+1 point</strong> for each correct answer.</p>
-        <p>📐 Topics: <strong>Degrees ↔ Radians, Sine, Cosine, Tangent</strong></p>
-        <p>🔍 Wrong answers reveal the correct one before continuing.</p>
+        <p>🎯 <strong>+1 point</strong> for your first correct answer.</p>
+        <p>🔥 <strong>Streak bonus</strong> — each consecutive correct answer scores one more point than the last. Miss one and the streak resets!</p>
+        <p>💀 <strong>-1 point</strong> for a wrong answer (streak resets).</p>
         <p>🏆 Score high enough to claim a spot on the <strong>Hall of Champions</strong>!</p>
       </div>
 
@@ -419,6 +419,10 @@
           <div class="timer-bar" id="timer-bar"></div>
         </div>
         <div class="hud-stat">
+          <span class="hud-label">Streak</span>
+          <span class="hud-value" id="streak-display" style="color:var(--gold)">0</span>
+        </div>
+        <div class="hud-stat" style="margin-left:16px;">
           <span class="hud-label">Time</span>
           <span class="hud-value" id="timer-display">60</span>
         </div>
@@ -594,43 +598,30 @@ function formatDate(ts) {
 }
 
 // ================================================================
-//  LEADERBOARD  (persistent shared storage)
+//  LEADERBOARD  (localStorage — persists in this browser only)
 // ================================================================
 const LB_KEY = 'unitcircle:leaderboard:v1';
 let lastNewEntryId = null;
 
-async function loadLeaderboard() {
+function loadLeaderboard() {
   try {
-    const result = await window.storage.get(LB_KEY, true);
-    if (!result) return [];
-    return JSON.parse(result.value);
+    const raw = localStorage.getItem(LB_KEY);
+    return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
   }
 }
 
-async function saveLeaderboard(entries) {
+function saveLeaderboard(entries) {
   try {
-    await window.storage.set(LB_KEY, JSON.stringify(entries), true);
+    localStorage.setItem(LB_KEY, JSON.stringify(entries));
   } catch (e) {
     console.error('Failed to save leaderboard:', e);
   }
 }
 
-async function addLeaderboardEntry(initials, score) {
-  const entries = await loadLeaderboard();
-  const id = Date.now() + Math.random().toString(36).slice(2);
-  const entry = { id, initials: initials.toUpperCase(), score, ts: Date.now() };
-  entries.push(entry);
-  entries.sort((a, b) => b.score - a.score || a.ts - b.ts);
-  const top10 = entries.slice(0, 10);
-  await saveLeaderboard(top10);
-  lastNewEntryId = id;
-  return top10;
-}
-
-async function checkIsTop10(score) {
-  const entries = await loadLeaderboard();
+function checkIsTop10(score) {
+  const entries = loadLeaderboard();
   if (entries.length < 10) return true;
   return score > entries[entries.length - 1].score;
 }
@@ -668,12 +659,12 @@ function renderLeaderboard(entries) {
   }).join('');
 }
 
-async function showLeaderboard(highlightNew) {
+function showLeaderboard(highlightNew) {
   setScreen('screen-leaderboard');
   document.getElementById('lb-rows').innerHTML = '<div class="lb-loading">Consulting the ancient scrolls...</div>';
   if (!highlightNew) lastNewEntryId = null;
-  const entries = await loadLeaderboard();
-  renderLeaderboard(entries);
+  const entries = loadLeaderboard();
+  setTimeout(() => renderLeaderboard(entries), 300);
 }
 
 // ================================================================
@@ -702,7 +693,7 @@ function getInitialsValue() {
   return ['init-0','init-1','init-2'].map(id => document.getElementById(id).value.toUpperCase()).join('');
 }
 
-async function submitInitials() {
+function submitInitials() {
   const initials = getInitialsValue();
   const errorEl = document.getElementById('initials-error');
 
@@ -716,17 +707,16 @@ async function submitInitials() {
   }
 
   errorEl.textContent = '';
-  // Store rank title with entry
   const pct = attempted > 0 ? score / attempted : 0;
   const rankTitle = getRankTitle(score, pct);
 
-  const entries = await loadLeaderboard();
+  const entries = loadLeaderboard();
   const id = Date.now() + Math.random().toString(36).slice(2);
   const entry = { id, initials, score, rankTitle, ts: Date.now() };
   entries.push(entry);
   entries.sort((a, b) => b.score - a.score || a.ts - b.ts);
   const top10 = entries.slice(0, 10);
-  await saveLeaderboard(top10);
+  saveLeaderboard(top10);
   lastNewEntryId = id;
 
   setScreen('screen-leaderboard');
@@ -742,6 +732,7 @@ function skipInitials() {
 //  GAME STATE
 // ================================================================
 let score = 0;
+let streak = 0;
 let timeLeft = 60;
 let timerInterval = null;
 let questionPool = [];
@@ -756,11 +747,13 @@ function showTitle() {
 
 function startGame() {
   score = 0;
+  streak = 0;
   timeLeft = 60;
   attempted = 0;
   questionPool = shuffle(buildQuestionPool());
 
   document.getElementById('score-display').textContent = '0';
+  document.getElementById('streak-display').textContent = '0';
   document.getElementById('timer-display').textContent = '60';
   document.getElementById('timer-bar').style.width = '100%';
   document.getElementById('timer-bar').className = 'timer-bar';
@@ -811,21 +804,34 @@ function handleAnswer(choice, btn) {
 
   if (choice === currentQ.answer) {
     btn.classList.add('correct');
-    score++;
+    streak++;
+    const points = streak; // streak 1 = +1, streak 2 = +2, etc.
+    score += points;
+    score = Math.max(0, score);
     document.getElementById('score-display').textContent = score;
-    document.getElementById('feedback-msg').textContent = '✦ Correct! ✦';
+    document.getElementById('streak-display').textContent = streak;
+    const msg = streak >= 5 ? `🔥 x${streak} STREAK! +${points}` :
+                streak >= 3 ? `⚡ x${streak} Streak! +${points}` :
+                streak >= 2 ? `✦ x${streak} Streak! +${points}` : `✦ Correct! +${points}`;
+    document.getElementById('feedback-msg').textContent = msg;
     setTimeout(nextQuestion, 600);
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.choice-btn').forEach(b => {
       if (b.textContent === currentQ.answer) b.classList.add('reveal');
     });
-    document.getElementById('feedback-msg').textContent = `Correct answer: ${currentQ.answer}`;
+    const oldStreak = streak;
+    streak = 0;
+    score = Math.max(0, score - 1);
+    document.getElementById('score-display').textContent = score;
+    document.getElementById('streak-display').textContent = '0';
+    const msg = oldStreak >= 2 ? `✗ Streak lost! −1` : `✗ Wrong! −1`;
+    document.getElementById('feedback-msg').textContent = `${msg}  →  ${currentQ.answer}`;
     setTimeout(nextQuestion, 1600);
   }
 }
 
-async function endGame() {
+function endGame() {
   document.getElementById('final-score').textContent = score;
   document.getElementById('questions-answered').textContent =
     `${score} correct out of ${attempted} attempted`;
@@ -838,7 +844,7 @@ async function endGame() {
   setScreen('screen-end');
 
   // Check if score qualifies for top 10
-  const qualifies = await checkIsTop10(score);
+  const qualifies = checkIsTop10(score);
   if (qualifies && score > 0) {
     setTimeout(() => {
       document.getElementById('initials-score-display').textContent = score;
