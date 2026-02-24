@@ -110,7 +110,7 @@
   /* ===== TITLE SCREEN ===== */
   #screen-title { text-align: center; }
   .intro-text {
-    font-size: 1.15rem; color: var(--ink-light);
+    font-size: 1.3rem; color: var(--ink-light);
     line-height: 1.7; margin: 12px 0 20px; font-style: italic;
   }
   .rules-box {
@@ -526,7 +526,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v0.21</span>
+    <span class="version-tag">v0.24</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -580,7 +580,7 @@
       <div class="rules-box">
         <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
         <p>🎯 <strong>+1 point</strong> for your first correct answer.</p>
-        <p>🔥 <strong>Streak bonus</strong> — each consecutive correct answer scores one more point than the last. Miss one and the streak resets!</p>
+        <p>🔥 <strong>Streak bonus</strong> — each consecutive correct answer scores<br><span style="padding-left:1.4em">one more point than the last. Miss one and the streak resets!</span></p>
         <p>🏆 Score high enough to claim a spot on the <strong>Hall of Champions</strong>!</p>
       </div>
 
@@ -679,14 +679,14 @@
           <div class="diff-icon">⚔</div>
           <div class="diff-text">
             <span class="diff-label">Medium</span>
-            <span class="diff-desc">Angle conversions plus sine and cosine values. The circle reveals its coordinates.</span>
+            <span class="diff-desc">Angle conversions plus sine and cosine values.<br>The circle reveals its coordinates.</span>
           </div>
         </div>
         <div class="diff-card" onclick="selectDifficulty('expert')">
           <div class="diff-icon">🌌</div>
           <div class="diff-text">
             <span class="diff-label">Expert</span>
-            <span class="diff-desc">All questions including tangent. Undefined values included. Face the full circle.</span>
+            <span class="diff-desc">Angles, sine, cosine and tangent.<br>Face the full circle.</span>
           </div>
         </div>
       </div>
