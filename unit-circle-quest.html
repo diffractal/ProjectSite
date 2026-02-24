@@ -419,9 +419,105 @@
     cursor: pointer; text-transform: uppercase;
   }
 
+  /* ===== DIFFICULTY POPUP ===== */
+  #screen-difficulty { display: none; text-align: center; }
+  .diff-intro {
+    font-family: 'Crimson Text', serif; font-size: 1.1rem; color: var(--ink-light);
+    font-style: italic; margin: 8px 0 24px; line-height: 1.6;
+  }
+  .diff-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  .diff-card {
+    border: 2px solid var(--stone-light); border-radius: 2px;
+    padding: 18px 24px; cursor: pointer; text-align: left;
+    background: rgba(44,24,16,0.03); transition: all 0.15s;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .diff-card:hover {
+    border-color: var(--gold); background: rgba(201,162,39,0.07);
+    transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+  .diff-card.selected {
+    border-color: var(--crimson); background: rgba(139,26,26,0.07);
+  }
+  .diff-icon { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+  .diff-text { flex: 1; min-width: 0; padding-right: 8px; }
+  .diff-label {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem;
+    color: var(--crimson); letter-spacing: 2px; text-transform: uppercase;
+    display: block; margin-bottom: 6px;
+  }
+  .diff-desc {
+    font-family: 'Crimson Text', serif; font-size: 1.05rem;
+    color: var(--ink-light); line-height: 1.55;
+  }
+  .diff-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== LEADERBOARD — THREE COLUMN ===== */
+  #screen-leaderboard { display: none; }
+  .lb-title {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--crimson);
+    text-shadow: 1px 1px 0 var(--gold), 2px 2px 0 var(--ink);
+    letter-spacing: 3px; text-align: center; margin-bottom: 4px;
+  }
+  .lb-subtitle {
+    font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 5px;
+    color: var(--stone); text-transform: uppercase; text-align: center; margin-bottom: 16px;
+  }
+  .lb-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .lb-column-wrap { border: 2px solid var(--parchment-dark); border-radius: 2px; overflow: hidden; }
+  .lb-column-header {
+    background: rgba(44,24,16,0.08); border-bottom: 2px solid var(--parchment-dark);
+    padding: 8px 6px; text-align: center;
+  }
+  .lb-column-header-label {
+    font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase; font-weight: 700;
+    display: block; margin-bottom: 2px;
+  }
+  .lb-column-header-icon { font-size: 1rem; }
+  .lb-col-row {
+    display: grid; grid-template-columns: 28px 1fr 36px;
+    padding: 7px 8px; border-bottom: 1px solid rgba(160,140,112,0.25);
+    align-items: center;
+  }
+  .lb-col-row:last-child { border-bottom: none; }
+  .lb-col-row:hover { background: rgba(201,162,39,0.06); }
+  .lb-col-row.new-entry { background: rgba(201,162,39,0.12); animation: newEntryGlow 1.5s ease; }
+  @keyframes newEntryGlow {
+    0%   { background: rgba(201,162,39,0.35); }
+    100% { background: rgba(201,162,39,0.12); }
+  }
+  .lb-col-rank {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.7rem;
+    color: var(--stone); text-align: center;
+  }
+  .lb-col-rank.gold   { color: #c9a227; }
+  .lb-col-rank.silver { color: #909090; }
+  .lb-col-rank.bronze { color: #a0694a; }
+  .lb-col-initials {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.85rem;
+    color: var(--crimson); letter-spacing: 3px;
+  }
+  .lb-col-score {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem;
+    color: var(--ink); text-align: right;
+  }
+  .lb-empty {
+    text-align: center; padding: 20px 8px;
+    font-family: 'Crimson Text', serif; font-style: italic;
+    color: var(--stone); font-size: 0.85rem; line-height: 1.4;
+  }
+  .lb-loading {
+    text-align: center; padding: 20px 8px;
+    font-family: 'Cinzel', serif; font-size: 0.65rem;
+    letter-spacing: 2px; color: var(--stone);
+  }
+  .lb-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
   /* screen transitions */
   .screen-active { animation: fadeIn 0.35s ease both; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
@@ -430,7 +526,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v0.13</span>
+    <span class="version-tag">v0.20</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -489,7 +585,7 @@
       </div>
 
       <div class="title-btns">
-        <button class="btn-primary" onclick="startGame()">Begin the Trial</button>
+        <button class="btn-primary" onclick="showDifficulty()">Begin the Trial</button>
         <button class="btn-secondary" onclick="showLeaderboard(false)">Hall of Champions</button>
       </div>
     </div>
@@ -513,6 +609,9 @@
           <span class="hud-value" id="timer-display">60</span>
         </div>
       </div>
+      <div style="text-align:center; margin-bottom:8px; margin-top:-10px;">
+        <span id="difficulty-badge" style="font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:3px; color:var(--stone); text-transform:uppercase;"></span>
+      </div>
       <hr class="divider">
       <div class="question-area">
         <div class="question-type-tag" id="q-type-tag"></div>
@@ -533,9 +632,10 @@
       <div class="score-big" id="final-score">0</div>
       <div class="score-total" id="questions-answered"></div>
       <div class="rank-text" id="rank-text"></div>
+      <div id="end-difficulty" style="font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:4px; color:var(--stone); text-transform:uppercase; margin-bottom:6px;"></div>
       <div class="end-message" id="end-message"></div>
       <div class="end-btns">
-        <button class="btn-primary" onclick="startGame()">Try Again</button>
+        <button class="btn-primary" onclick="showDifficulty()">Try Again</button>
         <button class="btn-secondary" onclick="showLeaderboard(false)">Hall of Champions</button>
         <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
       </div>
@@ -562,23 +662,69 @@
       </div>
     </div>
 
+    <!-- ===== DIFFICULTY SCREEN ===== -->
+    <div id="screen-difficulty">
+      <div class="game-title" style="font-size:clamp(1.4rem,4vw,2rem);">Choose Thy Path</div>
+      <hr class="divider">
+      <div class="diff-intro">Select your difficulty. The Hall of Champions tracks each path separately.</div>
+      <div class="diff-cards">
+        <div class="diff-card" onclick="selectDifficulty('easy')">
+          <div class="diff-icon">🌱</div>
+          <div class="diff-text">
+            <span class="diff-label">Easy</span>
+            <span class="diff-desc">Angle conversions only — degrees to radians and back. Master the language of the circle.</span>
+          </div>
+        </div>
+        <div class="diff-card" onclick="selectDifficulty('medium')">
+          <div class="diff-icon">⚔</div>
+          <div class="diff-text">
+            <span class="diff-label">Medium</span>
+            <span class="diff-desc">Angle conversions plus sine and cosine values. The circle reveals its coordinates.</span>
+          </div>
+        </div>
+        <div class="diff-card" onclick="selectDifficulty('expert')">
+          <div class="diff-icon">🌌</div>
+          <div class="diff-text">
+            <span class="diff-label">Expert</span>
+            <span class="diff-desc">All questions including tangent. Undefined values included. Face the full circle.</span>
+          </div>
+        </div>
+      </div>
+      <div class="diff-btns">
+        <button class="btn-secondary" onclick="showTitle()">Back</button>
+      </div>
+    </div>
+
     <!-- ===== LEADERBOARD SCREEN ===== -->
     <div id="screen-leaderboard">
       <div class="lb-title">Hall of Champions</div>
-      <div class="lb-subtitle">Top 10 — All Time</div>
+      <div class="lb-subtitle">Top 10 · By Difficulty</div>
       <hr class="divider">
-      <div class="lb-table-wrap">
-        <div class="lb-header">
-          <span style="text-align:center">Rank</span>
-          <span style="text-align:center">Name</span>
-          <span style="padding-left:8px">Title</span>
-          <span style="text-align:center">Score</span>
-          <span style="text-align:right">Date</span>
+      <div class="lb-columns">
+        <div class="lb-column-wrap">
+          <div class="lb-column-header">
+            <span class="lb-column-header-icon">🌱</span>
+            <span class="lb-column-header-label">Easy</span>
+          </div>
+          <div id="lb-rows-easy"><div class="lb-loading">Loading...</div></div>
         </div>
-        <div id="lb-rows"><div class="lb-loading">Consulting the ancient scrolls...</div></div>
+        <div class="lb-column-wrap">
+          <div class="lb-column-header">
+            <span class="lb-column-header-icon">⚔</span>
+            <span class="lb-column-header-label">Medium</span>
+          </div>
+          <div id="lb-rows-medium"><div class="lb-loading">Loading...</div></div>
+        </div>
+        <div class="lb-column-wrap">
+          <div class="lb-column-header">
+            <span class="lb-column-header-icon">🌌</span>
+            <span class="lb-column-header-label">Expert</span>
+          </div>
+          <div id="lb-rows-expert"><div class="lb-loading">Loading...</div></div>
+        </div>
       </div>
       <div class="lb-btns">
-        <button class="btn-primary" onclick="startGame()">Play Again</button>
+        <button class="btn-primary" onclick="showDifficulty()">Play Again</button>
         <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
       </div>
     </div>
@@ -595,6 +741,14 @@
 </div>
 
 <script>
+// ================================================================
+//  GOOGLE SHEETS BACKEND CONFIG
+//  Paste your Apps Script deployment URL below once it's live.
+//  Leave as null to use localStorage only (offline/dev mode).
+// ================================================================
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwloLrx8rXdOUsKakC1o6lLFQyGpbD9eVpfaIuAQ7gvxJpaVP6rKAq8cktNm4f75Lil/exec';
+const SHEETS_KEY = 'jackalope2025';
+
 // ================================================================
 //  PROFANITY BLOCKLIST — common inappropriate 3-letter combos
 // ================================================================
@@ -647,15 +801,24 @@ function buildQuestionPool() {
   for (const a of ANGLES) {
     const deg = a.deg + '°';
     const rad = a.deg === 0 ? '0' : a.rad;
+    // Easy+: angle conversions
     pool.push({ tag:'Degrees → Radians', html:`Convert <span class="angle-val">${deg}</span> to radians`, answer:rad, pool:RAD_POOL });
     pool.push({ tag:'Radians → Degrees', html:`Convert <span class="angle-val">${rad}</span> radians to degrees`, answer:deg, pool:DEG_POOL });
-    pool.push({ tag:'Sine',    html:`Find <span class="angle-val">sin(${deg})</span>`, answer:a.sin, pool:SIN_COS_POOL });
-    pool.push({ tag:'Cosine',  html:`Find <span class="angle-val">cos(${deg})</span>`, answer:a.cos, pool:SIN_COS_POOL });
-    pool.push({ tag:'Tangent', html:`Find <span class="angle-val">tan(${deg})</span>`, answer:a.tan, pool:TAN_POOL });
-    if (a.deg !== 0) {
-      pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${rad})</span>`, answer:a.sin, pool:SIN_COS_POOL });
-      pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${rad})</span>`, answer:a.cos, pool:SIN_COS_POOL });
+    // Medium+: sine and cosine
+    if (currentDifficulty === 'medium' || currentDifficulty === 'expert') {
+      pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${deg})</span>`, answer:a.sin, pool:SIN_COS_POOL });
+      pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${deg})</span>`, answer:a.cos, pool:SIN_COS_POOL });
+      pool.push({ tag:'Tangent', html:`Find <span class="angle-val">tan(${deg})</span>`, answer:a.tan, pool:TAN_POOL });
+      if (a.deg !== 0) {
+        pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${rad})</span>`, answer:a.sin, pool:SIN_COS_POOL });
+        pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${rad})</span>`, answer:a.cos, pool:SIN_COS_POOL });
+      }
     }
+    // Expert: tangent (already included above in medium+ block, but only for expert we keep it)
+  }
+  // Remove tangent from medium
+  if (currentDifficulty === 'medium') {
+    return pool.filter(q => q.tag !== 'Tangent');
   }
   return pool;
 }
@@ -676,7 +839,7 @@ function getChoices(answer, pool, n = 4) {
   return shuffle([answer, ...shuffle(pool.filter(p => p !== answer)).slice(0, n - 1)]);
 }
 
-const ALL_SCREENS = ['screen-title','screen-game','screen-end','screen-initials','screen-leaderboard'];
+const ALL_SCREENS = ['screen-title','screen-difficulty','screen-game','screen-end','screen-initials','screen-leaderboard'];
 
 function setScreen(id) {
   ALL_SCREENS.forEach(s => {
@@ -695,34 +858,8 @@ function formatDate(ts) {
 }
 
 // ================================================================
-//  LEADERBOARD  (localStorage — persists in this browser only)
+//  RANK HELPERS
 // ================================================================
-const LB_KEY = 'unitcircle:leaderboard:v1';
-let lastNewEntryId = null;
-
-function loadLeaderboard() {
-  try {
-    const raw = localStorage.getItem(LB_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveLeaderboard(entries) {
-  try {
-    localStorage.setItem(LB_KEY, JSON.stringify(entries));
-  } catch (e) {
-    console.error('Failed to save leaderboard:', e);
-  }
-}
-
-function checkIsTop10(score) {
-  const entries = loadLeaderboard();
-  if (entries.length < 10) return true;
-  return score > entries[entries.length - 1].score;
-}
-
 function getRankTitle(score) {
   if (score >= 100) return 'Lord of Hyperspheres';
   if (score >= 80)  return 'Master of Spheres';
@@ -738,23 +875,23 @@ function getRankTitle(score) {
 }
 
 function getRankDisplay(s) {
-  if (s >= 100) return { rank: '🌌 Lord of Hyperspheres 🌌',              msg: 'Inconceivable. You have transcended the circle itself.' };
-  if (s >= 80)  return { rank: '🔮 Master of Spheres',                    msg: 'Extraordinary mastery. The hypersphere beckons.' };
-  if (s >= 70)  return { rank: '🌙 Sorceress of Radii',                   msg: 'Radiant command of every angle and arc.' };
-  if (s >= 60)  return { rank: '🧙 Wizard of Orbs',                       msg: 'Your orbital wisdom is without equal.' };
-  if (s >= 50)  return { rank: '📋 Assistant to the District Manager',    msg: 'Beets. Bears. Battlestar Galactica.' };
-  if (s >= 40)  return { rank: '⚔ Grand Master of the Round',             msg: 'A seat at the round table is yours.' };
-  if (s >= 30)  return { rank: '🏆 Circle Knight',                        msg: 'The unit circle holds few secrets from thee.' };
-  if (s >= 20)  return { rank: '📜 Scholar',                              msg: 'Solid scholarship. The circle yields its secrets.' };
-  if (s >= 10)  return { rank: '🎓 Apprentice',                           msg: 'A promising start. Keep sharpening thy blade.' };
-  if (s >= 5)   return { rank: '🌱 Initiate',                             msg: 'A humble start. The Jackalope believes in thee.' };
-                return { rank: '🐾 Wanderer',                             msg: 'The circle awaits thy study. Try again!' };
+  if (s >= 100) return { rank: '🌌 Lord of Hyperspheres 🌌',           msg: 'Inconceivable. You have transcended the circle itself.' };
+  if (s >= 80)  return { rank: '🔮 Master of Spheres',                 msg: 'Extraordinary mastery. The hypersphere beckons.' };
+  if (s >= 70)  return { rank: '🌙 Sorceress of Radii',                msg: 'Radiant command of every angle and arc.' };
+  if (s >= 60)  return { rank: '🧙 Wizard of Orbs',                    msg: 'Your orbital wisdom is without equal.' };
+  if (s >= 50)  return { rank: '📋 Assistant to the District Manager', msg: 'Beets. Bears. Battlestar Galactica.' };
+  if (s >= 40)  return { rank: '⚔ Grand Master of the Round',          msg: 'A seat at the round table is yours.' };
+  if (s >= 30)  return { rank: '🏆 Circle Knight',                     msg: 'The unit circle holds few secrets from thee.' };
+  if (s >= 20)  return { rank: '📜 Scholar',                           msg: 'Solid scholarship. The circle yields its secrets.' };
+  if (s >= 10)  return { rank: '🎓 Apprentice',                        msg: 'A promising start. Keep sharpening thy blade.' };
+  if (s >= 5)   return { rank: '🌱 Initiate',                          msg: 'A humble start. The Jackalope believes in thee.' };
+                return { rank: '🐾 Wanderer',                          msg: 'The circle awaits thy study. Try again!' };
 }
 
-function renderLeaderboard(entries) {
-  const container = document.getElementById('lb-rows');
-  if (entries.length === 0) {
-    container.innerHTML = '<div class="lb-empty">No champions yet — be the first to claim glory!</div>';
+function renderColumnLeaderboard(containerId, entries) {
+  const container = document.getElementById(containerId);
+  if (!entries || entries.length === 0) {
+    container.innerHTML = '<div class="lb-empty">No champions yet —<br>be the first!</div>';
     return;
   }
   container.innerHTML = entries.map((e, i) => {
@@ -766,22 +903,119 @@ function renderLeaderboard(entries) {
     if (rankNum === 3) { rankClass = 'bronze'; rankDisplay = '🛡'; }
     const isNew = e.id === lastNewEntryId;
     return `
-      <div class="lb-row${isNew ? ' new-entry' : ''}">
-        <div class="lb-rank ${rankClass}">${rankDisplay}</div>
-        <div class="lb-initials">${e.initials}</div>
-        <div class="lb-rank-title">${e.rankTitle || ''}</div>
-        <div class="lb-score">${e.score}</div>
-        <div class="lb-date">${formatDate(e.ts)}</div>
+      <div class="lb-col-row${isNew ? ' new-entry' : ''}">
+        <div class="lb-col-rank ${rankClass}">${rankDisplay}</div>
+        <div class="lb-col-initials">${e.initials}</div>
+        <div class="lb-col-score">${e.score}</div>
       </div>`;
   }).join('');
 }
 
-function showLeaderboard(highlightNew) {
+// ================================================================
+//  LEADERBOARD  — Google Sheets (global) with localStorage fallback
+// ================================================================
+const LB_KEY = 'unitcircle:leaderboard:v2';
+let lastNewEntryId = null;
+let currentDifficulty = null; // 'easy' | 'medium' | 'expert'
+
+// ---------- localStorage helpers (always available as fallback) ----------
+function loadLocalLB() {
+  try {
+    const raw = localStorage.getItem(LB_KEY);
+    return raw ? JSON.parse(raw) : { easy: [], medium: [], expert: [] };
+  } catch (e) { return { easy: [], medium: [], expert: [] }; }
+}
+function saveLocalLB(data) {
+  try { localStorage.setItem(LB_KEY, JSON.stringify(data)); } catch (e) {}
+}
+
+// ---------- Sheets helpers ----------
+async function sheetsGet() {
+  const res = await fetch(SHEETS_URL + '?action=get&game=ucq&key=' + SHEETS_KEY);
+  if (!res.ok) throw new Error('GET failed');
+  return res.json();
+}
+
+async function sheetsPost(entry) {
+  const params = new URLSearchParams({
+    action: 'post',
+    key:        SHEETS_KEY,
+    game:       entry.game,
+    difficulty: entry.difficulty,
+    initials:   entry.initials,
+    score:      entry.score,
+    rankTitle:  entry.rankTitle,
+    ts:         entry.ts,
+    id:         entry.id
+  });
+  const res = await fetch(SHEETS_URL + '?' + params.toString());
+  if (!res.ok) throw new Error('POST-as-GET failed');
+}
+
+// ---------- Public API used by the rest of the game ----------
+function checkIsTop10(score) {
+  const data = loadLocalLB();
+  const entries = data[currentDifficulty] || [];
+  if (entries.length < 10) return true;
+  return score > entries[entries.length - 1].score;
+}
+
+async function submitScore(initials, score) {
+  const rankTitle = getRankTitle(score);
+  const id = Date.now() + Math.random().toString(36).slice(2);
+  const entry = { id, initials, score, rankTitle, difficulty: currentDifficulty, game: 'ucq', ts: Date.now() };
+
+  // Always write locally first so it's instant
+  const data = loadLocalLB();
+  const bucket = data[currentDifficulty] || [];
+  bucket.push(entry);
+  bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
+  data[currentDifficulty] = bucket.slice(0, 10);
+  saveLocalLB(data);
+  lastNewEntryId = id;
+
+  // Fire-and-forget to Sheets if configured
+  if (SHEETS_URL) {
+    try { await sheetsPost(entry); } catch (e) { console.warn('Sheets POST failed, using local only:', e); }
+  }
+
+  showLeaderboard(true);
+}
+
+async function showLeaderboard(highlightNew) {
   setScreen('screen-leaderboard');
-  document.getElementById('lb-rows').innerHTML = '<div class="lb-loading">Consulting the ancient scrolls...</div>';
   if (!highlightNew) lastNewEntryId = null;
-  const entries = loadLeaderboard();
-  setTimeout(() => renderLeaderboard(entries), 300);
+  ['lb-rows-easy','lb-rows-medium','lb-rows-expert'].forEach(id => {
+    document.getElementById(id).innerHTML = '<div class="lb-loading">Consulting the ancient scrolls...</div>';
+  });
+
+  let data;
+  if (SHEETS_URL) {
+    try {
+      data = await sheetsGet();
+      // Merge remote into local so offline still works
+      saveLocalLB(data);
+    } catch (e) {
+      console.warn('Sheets GET failed, using local cache:', e);
+      data = loadLocalLB();
+    }
+  } else {
+    await new Promise(r => setTimeout(r, 300)); // brief dramatic pause
+    data = loadLocalLB();
+  }
+
+  renderColumnLeaderboard('lb-rows-easy',   data.easy   || []);
+  renderColumnLeaderboard('lb-rows-medium', data.medium || []);
+  renderColumnLeaderboard('lb-rows-expert', data.expert || []);
+}
+
+function showDifficulty() {
+  setScreen('screen-difficulty');
+}
+
+function selectDifficulty(diff) {
+  currentDifficulty = diff;
+  startGame();
 }
 
 // ================================================================
@@ -824,21 +1058,9 @@ function submitInitials() {
   }
 
   errorEl.textContent = '';
-  const rankTitle = getRankTitle(score);
-
-  const entries = loadLeaderboard();
-  const id = Date.now() + Math.random().toString(36).slice(2);
-  const entry = { id, initials, score, rankTitle, ts: Date.now() };
-  entries.push(entry);
-  entries.sort((a, b) => b.score - a.score || a.ts - b.ts);
-  const top10 = entries.slice(0, 10);
-  saveLeaderboard(top10);
-  lastNewEntryId = id;
-
-  setScreen('screen-leaderboard');
-  document.getElementById('lb-rows').innerHTML = '<div class="lb-loading">Recording thy glory...</div>';
-  setTimeout(() => renderLeaderboard(top10), 400);
+  submitScore(initials, score); // async — handles both Sheets and localStorage
 }
+
 
 function skipInitials() {
   showLeaderboard(false);
@@ -868,6 +1090,8 @@ function startGame() {
   attempted = 0;
   questionPool = shuffle(buildQuestionPool());
 
+  const diffIcons = { easy: '🌱 Easy', medium: '⚔ Medium', expert: '🌌 Expert' };
+  document.getElementById('difficulty-badge').textContent = diffIcons[currentDifficulty] || '';
   document.getElementById('score-display').textContent = '0';
   document.getElementById('streak-display').textContent = '0';
   document.getElementById('timer-display').textContent = '60';
@@ -1055,6 +1279,8 @@ function endGame() {
 
   const { rank, msg } = getRankDisplay(score);
   document.getElementById('rank-text').textContent = rank;
+  const diffLabels = { easy: '🌱 Easy Mode', medium: '⚔ Medium Mode', expert: '🌌 Expert Mode' };
+  document.getElementById('end-difficulty').textContent = diffLabels[currentDifficulty] || '';
   document.getElementById('end-message').textContent = msg;
 
   setScreen('screen-end');
