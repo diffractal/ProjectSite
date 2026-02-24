@@ -452,7 +452,7 @@
   }
   .diff-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-  /* ===== LEADERBOARD — THREE COLUMN ===== */
+  /* ===== LEADERBOARD — RESPONSIVE ===== */
   #screen-leaderboard { display: none; }
   .lb-title {
     font-family: 'Cinzel', serif; font-weight: 900;
@@ -465,22 +465,33 @@
     font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 5px;
     color: var(--stone); text-transform: uppercase; text-align: center; margin-bottom: 16px;
   }
-  .lb-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+
+  /* Three columns on wide screens, stacked on mobile */
+  .lb-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  @media (max-width: 540px) {
+    .lb-columns { grid-template-columns: 1fr; gap: 14px; }
+  }
+
   .lb-column-wrap { border: 2px solid var(--parchment-dark); border-radius: 2px; overflow: hidden; }
   .lb-column-header {
     background: rgba(44,24,16,0.08); border-bottom: 2px solid var(--parchment-dark);
-    padding: 8px 6px; text-align: center;
+    padding: 10px 8px; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .lb-column-header-label {
-    font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 2px;
-    color: var(--stone); text-transform: uppercase; font-weight: 700;
-    display: block; margin-bottom: 2px;
+    font-family: 'Cinzel', serif; font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    letter-spacing: 3px; color: var(--stone); text-transform: uppercase; font-weight: 700;
   }
-  .lb-column-header-icon { font-size: 1rem; }
+  .lb-column-header-icon { font-size: clamp(1rem, 3vw, 1.3rem); }
+
   .lb-col-row {
-    display: grid; grid-template-columns: 28px 1fr 36px;
-    padding: 7px 8px; border-bottom: 1px solid rgba(160,140,112,0.25);
-    align-items: center;
+    display: grid; grid-template-columns: 32px 1fr auto;
+    padding: 9px 10px; border-bottom: 1px solid rgba(160,140,112,0.25);
+    align-items: center; gap: 4px;
   }
   .lb-col-row:last-child { border-bottom: none; }
   .lb-col-row:hover { background: rgba(201,162,39,0.06); }
@@ -490,24 +501,27 @@
     100% { background: rgba(201,162,39,0.12); }
   }
   .lb-col-rank {
-    font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.7rem;
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
     color: var(--stone); text-align: center;
   }
   .lb-col-rank.gold   { color: #c9a227; }
   .lb-col-rank.silver { color: #909090; }
   .lb-col-rank.bronze { color: #a0694a; }
   .lb-col-initials {
-    font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.85rem;
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
     color: var(--crimson); letter-spacing: 3px;
   }
   .lb-col-score {
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem;
-    color: var(--ink); text-align: right;
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    color: var(--ink); text-align: right; white-space: nowrap;
   }
   .lb-empty {
     text-align: center; padding: 20px 8px;
     font-family: 'Crimson Text', serif; font-style: italic;
-    color: var(--stone); font-size: 0.85rem; line-height: 1.4;
+    color: var(--stone); font-size: clamp(0.85rem, 2.5vw, 1rem); line-height: 1.4;
   }
   .lb-loading {
     text-align: center; padding: 20px 8px;
@@ -526,7 +540,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v0.24</span>
+    <span class="version-tag">v0.26</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -918,7 +932,7 @@ const LB_KEY = 'unitcircle:leaderboard:v2';
 let lastNewEntryId = null;
 let currentDifficulty = null; // 'easy' | 'medium' | 'expert'
 
-// ---------- localStorage helpers (always available as fallback) ----------
+// ---------- localStorage helpers (cache only — Sheets is source of truth) ----------
 function loadLocalLB() {
   try {
     const raw = localStorage.getItem(LB_KEY);
@@ -928,6 +942,12 @@ function loadLocalLB() {
 function saveLocalLB(data) {
   try { localStorage.setItem(LB_KEY, JSON.stringify(data)); } catch (e) {}
 }
+function clearLocalLB() {
+  try { localStorage.removeItem(LB_KEY); } catch (e) {}
+}
+
+// On load, wipe any old locally-stored scores so Sheets is always source of truth
+if (SHEETS_URL) clearLocalLB();
 
 // ---------- Sheets helpers ----------
 async function sheetsGet() {
@@ -964,19 +984,32 @@ async function submitScore(initials, score) {
   const rankTitle = getRankTitle(score);
   const id = Date.now() + Math.random().toString(36).slice(2);
   const entry = { id, initials, score, rankTitle, difficulty: currentDifficulty, game: 'ucq', ts: Date.now() };
-
-  // Always write locally first so it's instant
-  const data = loadLocalLB();
-  const bucket = data[currentDifficulty] || [];
-  bucket.push(entry);
-  bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
-  data[currentDifficulty] = bucket.slice(0, 10);
-  saveLocalLB(data);
   lastNewEntryId = id;
 
-  // Fire-and-forget to Sheets if configured
   if (SHEETS_URL) {
-    try { await sheetsPost(entry); } catch (e) { console.warn('Sheets POST failed, using local only:', e); }
+    try {
+      await sheetsPost(entry);
+      // After posting, fetch fresh data from Sheets and cache it locally
+      const fresh = await sheetsGet();
+      saveLocalLB(fresh);
+    } catch (e) {
+      console.warn('Sheets unavailable, saving locally:', e);
+      // Fallback: write to local cache only
+      const data = loadLocalLB();
+      const bucket = data[currentDifficulty] || [];
+      bucket.push(entry);
+      bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
+      data[currentDifficulty] = bucket.slice(0, 10);
+      saveLocalLB(data);
+    }
+  } else {
+    // No Sheets configured — local only
+    const data = loadLocalLB();
+    const bucket = data[currentDifficulty] || [];
+    bucket.push(entry);
+    bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
+    data[currentDifficulty] = bucket.slice(0, 10);
+    saveLocalLB(data);
   }
 
   showLeaderboard(true);
@@ -1125,9 +1158,14 @@ function nextQuestion() {
   document.getElementById('q-text').innerHTML = currentQ.html;
   document.getElementById('feedback-msg').textContent = '';
 
+  // Blur active element BEFORE rebuilding buttons so hover state
+  // doesn't carry over to the new button appearing at same position
+  if (document.activeElement) document.activeElement.blur();
+
   const choices = getChoices(currentQ.answer, currentQ.pool, 4);
   const grid = document.getElementById('choices-grid');
   grid.innerHTML = '';
+  grid.blur();
 
   // Briefly disable pointer events so the hovered position doesn't
   // immediately highlight the new button appearing under the cursor
@@ -1141,9 +1179,6 @@ function nextQuestion() {
     btn.onclick = () => handleAnswer(c, btn);
     grid.appendChild(btn);
   });
-
-  // Remove focus from whatever was last clicked
-  if (document.activeElement) document.activeElement.blur();
 }
 
 // ================================================================
