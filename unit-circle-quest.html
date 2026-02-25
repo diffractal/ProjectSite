@@ -103,7 +103,7 @@
 
   /* ===== JACKALOPE ===== */
   .jackalope-container {
-    margin: 0 auto 16px; width: 150px; height: 150px;
+    margin: 0 auto 16px; width: 225px; height: 225px;
     display: block; filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.25));
     object-fit: contain;
   }
@@ -119,7 +119,7 @@
     border: 1px solid var(--parchment-dark);
     border-radius: 2px; padding: 16px 20px; margin-bottom: 20px; text-align: left;
   }
-  .rules-box p { color: var(--ink-light); font-size: 1.05rem; margin-bottom: 6px; line-height: 1.5; }
+  .rules-box p { color: var(--ink-light); font-size: 1.15rem; margin-bottom: 6px; line-height: 1.5; }
   .rules-box p:last-child { margin-bottom: 0; }
   .rules-box strong { color: var(--crimson); font-weight: 600; }
 
@@ -162,7 +162,7 @@
   .hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .hud-stat { text-align: center; }
   .hud-label {
-    font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 3px;
+    font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 3px;
     color: var(--stone); text-transform: uppercase; display: block; margin-bottom: 2px;
   }
   .hud-value { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 900; color: var(--crimson); line-height: 1; }
@@ -184,7 +184,7 @@
     display: flex; flex-direction: column; justify-content: center;
   }
   .question-type-tag {
-    font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 4px;
+    font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 4px;
     color: var(--stone); text-transform: uppercase; margin-bottom: 8px;
   }
   .question-text {
@@ -222,7 +222,8 @@
 
   .feedback-msg {
     text-align: center; min-height: 26px; font-family: 'Cinzel', serif;
-    font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; color: var(--stone);
+    font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: var(--stone);
+    margin-bottom: 10px;
   }
 
   /* ===== FLAMES ===== */
@@ -484,7 +485,7 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .lb-column-header-label {
-    font-family: 'Cinzel', serif; font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    font-family: 'Cinzel', serif; font-size: clamp(0.75rem, 2.5vw, 0.9rem);
     letter-spacing: 3px; color: var(--stone); text-transform: uppercase; font-weight: 700;
   }
   .lb-column-header-icon { font-size: clamp(1rem, 3vw, 1.3rem); }
@@ -503,7 +504,7 @@
   }
   .lb-col-rank {
     font-family: 'Cinzel', serif; font-weight: 900;
-    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
     color: var(--stone); text-align: center;
   }
   .lb-col-rank.gold   { color: #c9a227; }
@@ -511,12 +512,12 @@
   .lb-col-rank.bronze { color: #a0694a; }
   .lb-col-initials {
     font-family: 'Cinzel', serif; font-weight: 900;
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-size: clamp(1rem, 3vw, 1.2rem);
     color: var(--crimson); letter-spacing: 3px;
   }
   .lb-col-score {
     font-family: 'Cinzel', serif; font-weight: 700;
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-size: clamp(1rem, 3vw, 1.2rem);
     color: var(--ink); text-align: right; white-space: nowrap;
   }
   .lb-empty {
@@ -564,7 +565,7 @@
 
   /* ===== CONTINUE BUTTON (Chill Mode) ===== */
   .btn-continue {
-    display: none; margin: 12px auto 0; 
+    display: none;
     background: linear-gradient(180deg, #8a7450 0%, #5a4a30 100%);
     color: var(--parchment); border: 2px solid var(--stone-light);
     padding: 12px 36px; font-family: 'Cinzel', serif;
@@ -582,7 +583,7 @@
   .chill-totals-wrap { display: none; text-align: center; margin-top: 10px; }
   .chill-totals-wrap.chill-active { display: block; }
   .chill-totals {
-    font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 2px;
+    font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 2px;
     color: var(--stone); text-transform: uppercase;
   }
   .chill-totals .t-correct { color: var(--green-correct); font-weight: 700; }
@@ -604,7 +605,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v1.0.6</span>
+    <span class="version-tag">v1.0.12</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -615,7 +616,7 @@
 
       <img class="jackalope-container" src="images/character1.png" alt="Mascot">
 
-      <div class="intro-text">Challenge the Jackalope!<br>Prove your mastery.</div>
+      <div class="intro-text" style="font-size:1.5rem;">Prove your mastery.</div>
 
       <div class="rules-box">
         <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
@@ -658,29 +659,34 @@
         </div>
       </div>
       <div style="text-align:center; margin-bottom:8px; margin-top:-10px;">
-        <span id="difficulty-badge" style="font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:3px; color:var(--stone); text-transform:uppercase;"></span>
+        <span id="difficulty-badge" style="font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:3px; color:var(--stone); text-transform:uppercase;"></span>
       </div>
       <hr class="divider">
       <div class="question-area">
         <div class="question-type-tag" id="q-type-tag"></div>
         <div class="question-text" id="q-text"></div>
       </div>
-      <div class="choices-grid" id="choices-grid"></div>
       <div class="feedback-msg" id="feedback-msg"></div>
-      <button class="btn-continue" id="continue-btn" onclick="nextQuestion()">Continue</button>
-      <button class="btn-totals-toggle" id="totals-toggle-btn" onclick="toggleTotals()">Show Totals</button>
+      <div class="choices-grid" id="choices-grid"></div>
       <div class="chill-totals-wrap" id="chill-totals-wrap">
         <div class="chill-totals">
           ✦ Correct: <span class="t-correct" id="tally-correct">0</span>
           &nbsp;&nbsp;✗ Incorrect: <span class="t-wrong" id="tally-wrong">0</span>
         </div>
       </div>
-      <div id="chill-menu-btn-wrap" style="display:none; text-align:center; margin-top:14px;">
-        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      <button class="btn-totals-toggle" id="totals-toggle-btn" onclick="toggleTotals()">Show Totals</button>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+        <button class="btn-continue" id="continue-btn" onclick="nextQuestion()">Continue</button>
+        <div id="chill-menu-btn-wrap" style="display:none;">
+          <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+        </div>
       </div>
 
       <!-- Flames appear at streak 5+, built dynamically by JS -->
       <div class="flame-row" id="flame-row"></div>
+      <div id="restart-btn-wrap" style="text-align:center; margin-top:10px;">
+        <button onclick="showDifficulty()" style="background:none; border:none; font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:2px; color:var(--stone-light); text-transform:uppercase; cursor:pointer; text-decoration:underline; text-underline-offset:3px;">Restart</button>
+      </div>
     </div>
 
     <!-- ===== END SCREEN ===== -->
@@ -1222,6 +1228,7 @@ function startGame() {
   totalsBtn.textContent = 'Show Totals';
   totalsBtn.classList.toggle('chill-active', chillMode);
   document.getElementById('chill-menu-btn-wrap').style.display = chillMode ? 'block' : 'none';
+  document.getElementById('restart-btn-wrap').style.display = chillMode ? 'none' : 'block';
 
   // Hide HUD elements that don't apply in Chill Mode
   const hudScore  = document.getElementById('score-display').closest('.hud-stat');
