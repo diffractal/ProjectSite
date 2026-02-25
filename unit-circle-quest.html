@@ -103,7 +103,7 @@
 
   /* ===== JACKALOPE ===== */
   .jackalope-container {
-    margin: 0 auto 4px; width: 338px; height: 338px;
+    margin: 0 auto 4px; margin-left: calc(50% - 178px); width: 287px; height: 287px;
     display: block; filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.25));
     object-fit: contain;
   }
@@ -535,32 +535,32 @@
   /* ===== CHILL MODE TOGGLE ===== */
   .chill-toggle-wrap {
     display: flex; align-items: center; justify-content: center;
-    gap: 10px; margin: 16px 0 4px;
+    gap: 14px; margin: 20px 0 8px;
   }
   .chill-label {
-    font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px;
+    font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 2px;
     color: var(--stone); text-transform: uppercase; cursor: pointer; user-select: none;
   }
   .chill-label span { color: var(--crimson); }
   .toggle-switch {
-    position: relative; width: 44px; height: 24px; cursor: pointer;
+    position: relative; width: 56px; height: 30px; cursor: pointer;
   }
   .toggle-switch input { opacity: 0; width: 0; height: 0; }
   .toggle-track {
     position: absolute; inset: 0;
     background: var(--parchment-dark); border: 2px solid var(--stone-light);
-    border-radius: 24px; transition: all 0.2s;
+    border-radius: 30px; transition: all 0.2s;
   }
   .toggle-track::after {
-    content: ''; position: absolute; left: 2px; top: 2px;
-    width: 16px; height: 16px; border-radius: 50%;
+    content: ''; position: absolute; left: 3px; top: 3px;
+    width: 20px; height: 20px; border-radius: 50%;
     background: var(--stone); transition: all 0.2s;
   }
   .toggle-switch input:checked + .toggle-track { background: rgba(139,26,26,0.15); border-color: var(--crimson); }
-  .toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); background: var(--crimson); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(26px); background: var(--crimson); }
   .chill-desc {
-    font-family: 'Crimson Text', serif; font-size: 1.05rem; font-style: italic;
-    color: var(--stone); text-align: center; margin-bottom: 16px; min-height: 22px;
+    font-family: 'Crimson Text', serif; font-size: 1.1rem; font-style: italic;
+    color: var(--stone); text-align: center; margin-bottom: 16px;
   }
 
   /* ===== CONTINUE BUTTON (Chill Mode) ===== */
@@ -605,7 +605,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v1.0.13</span>
+    <span class="version-tag">v1.0.16</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -636,7 +636,7 @@
         </label>
         <span class="chill-label" onclick="document.getElementById('chill-toggle').click()"><span>Chill Mode</span></span>
       </div>
-      <div class="chill-desc" id="chill-desc"></div>
+      <div class="chill-desc">No timer · No score · Go at your own pace</div>
     </div>
 
     <!-- ===== GAME SCREEN ===== -->
@@ -1191,10 +1191,7 @@ function toggleTotals() {
 }
 
 function updateChillDesc() {
-  const on = document.getElementById('chill-toggle').checked;
-  document.getElementById('chill-desc').textContent = on
-    ? 'No timer · No score · Go at your own pace'
-    : '';
+  // desc is always visible, nothing to toggle
 }
 
 function startGame() {
