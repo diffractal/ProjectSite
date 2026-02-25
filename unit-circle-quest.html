@@ -105,6 +105,7 @@
   .jackalope-container {
     margin: 0 auto 16px; width: 150px; height: 150px;
     display: block; filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.25));
+    object-fit: contain;
   }
 
   /* ===== TITLE SCREEN ===== */
@@ -530,9 +531,72 @@
   }
   .lb-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-  /* screen transitions */
+  /* ===== CHILL MODE TOGGLE ===== */
+  .chill-toggle-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin: 16px 0 4px;
+  }
+  .chill-label {
+    font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase; cursor: pointer; user-select: none;
+  }
+  .chill-label span { color: var(--crimson); }
+  .toggle-switch {
+    position: relative; width: 44px; height: 24px; cursor: pointer;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--parchment-dark); border: 2px solid var(--stone-light);
+    border-radius: 24px; transition: all 0.2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; left: 2px; top: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--stone); transition: all 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: rgba(139,26,26,0.15); border-color: var(--crimson); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); background: var(--crimson); }
+  .chill-desc {
+    font-family: 'Crimson Text', serif; font-size: 1.05rem; font-style: italic;
+    color: var(--stone); text-align: center; margin-bottom: 16px; min-height: 22px;
+  }
+
+  /* ===== CONTINUE BUTTON (Chill Mode) ===== */
+  .btn-continue {
+    display: none; margin: 12px auto 0; 
+    background: linear-gradient(180deg, #8a7450 0%, #5a4a30 100%);
+    color: var(--parchment); border: 2px solid var(--stone-light);
+    padding: 12px 36px; font-family: 'Cinzel', serif;
+    font-size: 1rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-continue:hover { background: linear-gradient(180deg, #a08860 0%, #6a5a40 100%); transform: translateY(-1px); }
+  .btn-continue.visible { display: block; }
   .screen-active { animation: fadeIn 0.35s ease both; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== CHILL TOTALS BAR ===== */
+  .chill-totals-wrap { display: none; text-align: center; margin-top: 10px; }
+  .chill-totals-wrap.chill-active { display: block; }
+  .chill-totals {
+    font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase;
+  }
+  .chill-totals .t-correct { color: var(--green-correct); font-weight: 700; }
+  .chill-totals .t-wrong   { color: var(--crimson); font-weight: 700; }
+  .btn-totals-toggle {
+    display: none; margin: 10px auto 0;
+    background: none; border: 1px solid var(--stone-light);
+    border-radius: 2px; padding: 5px 16px;
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-totals-toggle:hover { border-color: var(--gold); color: var(--ink); }
+  .btn-totals-toggle.chill-active { display: inline-block; }
 </style>
 </head>
 <body>
@@ -540,7 +604,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v1.0.0</span>
+    <span class="version-tag">v1.0.6</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -549,45 +613,7 @@
       <div class="game-subtitle">Phase I — The Trial Begins</div>
       <hr class="divider">
 
-      <svg class="jackalope-container" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="78" cy="142" rx="30" ry="5" fill="rgba(44,24,16,0.15)"/>
-        <ellipse cx="78" cy="108" rx="32" ry="22" fill="#c8a878" stroke="#5c3a1e" stroke-width="2"/>
-        <circle cx="108" cy="116" r="10" fill="#f0ebe0" stroke="#5c3a1e" stroke-width="1.5"/>
-        <circle cx="108" cy="116" r="6" fill="white"/>
-        <ellipse cx="96" cy="118" rx="16" ry="14" fill="#b8946a" stroke="#5c3a1e" stroke-width="1.5"/>
-        <ellipse cx="56" cy="85" rx="21" ry="18" fill="#c8a878" stroke="#5c3a1e" stroke-width="2"/>
-        <ellipse cx="46" cy="57" rx="7" ry="19" fill="#c8a878" stroke="#5c3a1e" stroke-width="1.5" transform="rotate(-12 46 57)"/>
-        <ellipse cx="46" cy="57" rx="4" ry="13" fill="#e8a090" transform="rotate(-12 46 57)"/>
-        <ellipse cx="64" cy="54" rx="7" ry="20" fill="#c8a878" stroke="#5c3a1e" stroke-width="1.5" transform="rotate(10 64 54)"/>
-        <ellipse cx="64" cy="54" rx="4" ry="14" fill="#e8a090" transform="rotate(10 64 54)"/>
-        <line x1="46" y1="68" x2="30" y2="44" stroke="#8b5e3c" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="30" y1="44" x2="22" y2="32" stroke="#8b5e3c" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="30" y1="44" x2="20" y2="47" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
-        <line x1="30" y1="44" x2="34" y2="34" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
-        <line x1="64" y1="66" x2="80" y2="40" stroke="#8b5e3c" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="80" y1="40" x2="88" y2="28" stroke="#8b5e3c" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="80" y1="40" x2="90" y2="45" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
-        <line x1="80" y1="40" x2="74" y2="30" stroke="#8b5e3c" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="49" cy="83" r="3.5" fill="#2c1810"/>
-        <circle cx="50.5" cy="81.5" r="1.2" fill="white"/>
-        <circle cx="64" cy="82" r="3.5" fill="#2c1810"/>
-        <circle cx="65.5" cy="80.5" r="1.2" fill="white"/>
-        <ellipse cx="57" cy="90" rx="4" ry="2.5" fill="#d06878"/>
-        <path d="M53 92.5 Q57 96 61 92.5" stroke="#5c3a1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <line x1="30" y1="88" x2="50" y2="90" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-        <line x1="30" y1="92" x2="50" y2="92" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-        <line x1="64" y1="90" x2="82" y2="88" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-        <line x1="64" y1="92" x2="82" y2="92" stroke="#5c3a1e" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-        <line x1="60" y1="124" x2="54" y2="142" stroke="#5c3a1e" stroke-width="3" stroke-linecap="round"/>
-        <ellipse cx="53" cy="143" rx="6" ry="2.5" fill="#b8946a" stroke="#5c3a1e" stroke-width="1"/>
-        <line x1="72" y1="126" x2="70" y2="144" stroke="#5c3a1e" stroke-width="3" stroke-linecap="round"/>
-        <ellipse cx="70" cy="145" rx="6" ry="2.5" fill="#b8946a" stroke="#5c3a1e" stroke-width="1"/>
-        <line x1="88" y1="126" x2="96" y2="144" stroke="#5c3a1e" stroke-width="3.5" stroke-linecap="round"/>
-        <ellipse cx="97" cy="145" rx="9" ry="3" fill="#b8946a" stroke="#5c3a1e" stroke-width="1.5"/>
-        <rect x="36" y="97" width="15" height="11" rx="2" fill="#f2e8d0" stroke="#8b5e3c" stroke-width="1.5"/>
-        <line x1="38" y1="101" x2="49" y2="101" stroke="#8b5e3c" stroke-width="1"/>
-        <line x1="38" y1="104" x2="47" y2="104" stroke="#8b5e3c" stroke-width="1"/>
-      </svg>
+      <img class="jackalope-container" src="images/character1.png" alt="Mascot">
 
       <div class="intro-text">Challenge the Jackalope!<br>Prove your mastery.</div>
 
@@ -602,6 +628,14 @@
         <button class="btn-primary" onclick="showDifficulty()">Begin the Trial</button>
         <button class="btn-secondary" onclick="showLeaderboard(false)">Hall of Champions</button>
       </div>
+      <div class="chill-toggle-wrap">
+        <label class="toggle-switch">
+          <input type="checkbox" id="chill-toggle" onchange="updateChillDesc()">
+          <div class="toggle-track"></div>
+        </label>
+        <span class="chill-label" onclick="document.getElementById('chill-toggle').click()"><span>Chill Mode</span></span>
+      </div>
+      <div class="chill-desc" id="chill-desc"></div>
     </div>
 
     <!-- ===== GAME SCREEN ===== -->
@@ -633,6 +667,17 @@
       </div>
       <div class="choices-grid" id="choices-grid"></div>
       <div class="feedback-msg" id="feedback-msg"></div>
+      <button class="btn-continue" id="continue-btn" onclick="nextQuestion()">Continue</button>
+      <button class="btn-totals-toggle" id="totals-toggle-btn" onclick="toggleTotals()">Show Totals</button>
+      <div class="chill-totals-wrap" id="chill-totals-wrap">
+        <div class="chill-totals">
+          ✦ Correct: <span class="t-correct" id="tally-correct">0</span>
+          &nbsp;&nbsp;✗ Incorrect: <span class="t-wrong" id="tally-wrong">0</span>
+        </div>
+      </div>
+      <div id="chill-menu-btn-wrap" style="display:none; text-align:center; margin-top:14px;">
+        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      </div>
 
       <!-- Flames appear at streak 5+, built dynamically by JS -->
       <div class="flame-row" id="flame-row"></div>
@@ -671,7 +716,7 @@
       </div>
       <div class="initials-error" id="initials-error"></div>
       <div class="initials-btns">
-        <button class="btn-primary" onclick="submitInitials()">Claim Glory</button>
+        <button class="btn-primary" id="claim-glory-btn" onclick="submitInitials()">Claim Glory</button>
         <button class="btn-secondary" onclick="skipInitials()">Skip</button>
       </div>
     </div>
@@ -1013,6 +1058,7 @@ async function submitScore(initials, score) {
   }
 
   showLeaderboard(true);
+  return Promise.resolve();
 }
 
 async function showLeaderboard(highlightNew) {
@@ -1078,6 +1124,7 @@ function getInitialsValue() {
 }
 
 function submitInitials() {
+  if (submitting) return; // prevent double-submission
   const initials = getInitialsValue();
   const errorEl = document.getElementById('initials-error');
 
@@ -1090,8 +1137,18 @@ function submitInitials() {
     return;
   }
 
+  // Lock the button immediately
+  submitting = true;
+  const btn = document.getElementById('claim-glory-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
   errorEl.textContent = '';
-  submitScore(initials, score); // async — handles both Sheets and localStorage
+  submitScore(initials, score).finally(() => {
+    submitting = false;
+    btn.disabled = false;
+    btn.textContent = 'Claim Glory';
+  });
 }
 
 
@@ -1110,13 +1167,32 @@ let questionPool = [];
 let currentQ = null;
 let busy = false;
 let attempted = 0;
+let chillMode = false;
+let submitting = false;
+let tallyCorrect = 0;
+let tallyWrong = 0;
+let showTotals = false;
 
 function showTitle() {
   clearInterval(timerInterval);
   setScreen('screen-title');
 }
 
+function toggleTotals() {
+  showTotals = !showTotals;
+  document.getElementById('chill-totals-wrap').classList.toggle('chill-active', showTotals);
+  document.getElementById('totals-toggle-btn').textContent = showTotals ? 'Hide Totals' : 'Show Totals';
+}
+
+function updateChillDesc() {
+  const on = document.getElementById('chill-toggle').checked;
+  document.getElementById('chill-desc').textContent = on
+    ? 'No timer · No score · Go at your own pace'
+    : '';
+}
+
 function startGame() {
+  chillMode = document.getElementById('chill-toggle').checked;
   score = 0;
   streak = 0;
   timeLeft = 60;
@@ -1124,7 +1200,8 @@ function startGame() {
   questionPool = shuffle(buildQuestionPool());
 
   const diffIcons = { easy: '🌱 Easy', medium: '⚔ Medium', expert: '🌌 Expert' };
-  document.getElementById('difficulty-badge').textContent = diffIcons[currentDifficulty] || '';
+  const chillTag = chillMode ? ' · ❄️ Chill' : '';
+  document.getElementById('difficulty-badge').textContent = (diffIcons[currentDifficulty] || '') + chillTag;
   document.getElementById('score-display').textContent = '0';
   document.getElementById('streak-display').textContent = '0';
   document.getElementById('timer-display').textContent = '60';
@@ -1132,10 +1209,40 @@ function startGame() {
   document.getElementById('timer-bar').className = 'timer-bar';
   document.getElementById('feedback-msg').textContent = '';
   document.getElementById('flame-row').classList.remove('active');
+  document.getElementById('continue-btn').classList.remove('visible');
+
+  // Reset tallies
+  tallyCorrect = 0;
+  tallyWrong = 0;
+  showTotals = false;
+  document.getElementById('tally-correct').textContent = '0';
+  document.getElementById('tally-wrong').textContent = '0';
+  document.getElementById('chill-totals-wrap').classList.remove('chill-active');
+  const totalsBtn = document.getElementById('totals-toggle-btn');
+  totalsBtn.textContent = 'Show Totals';
+  totalsBtn.classList.toggle('chill-active', chillMode);
+  document.getElementById('chill-menu-btn-wrap').style.display = chillMode ? 'block' : 'none';
+
+  // Hide HUD elements that don't apply in Chill Mode
+  const hudScore  = document.getElementById('score-display').closest('.hud-stat');
+  const hudStreak = document.getElementById('streak-display').closest('.hud-stat');
+  const hudTime   = document.getElementById('timer-display').closest('.hud-stat');
+  const timerBar  = document.querySelector('.timer-bar-wrap');
+  if (chillMode) {
+    hudScore.style.visibility  = 'hidden';
+    hudStreak.style.visibility = 'hidden';
+    hudTime.style.visibility   = 'hidden';
+    timerBar.style.visibility  = 'hidden';
+  } else {
+    hudScore.style.visibility  = '';
+    hudStreak.style.visibility = '';
+    hudTime.style.visibility   = '';
+    timerBar.style.visibility  = '';
+  }
 
   setScreen('screen-game');
   nextQuestion();
-  startTimer();
+  if (!chillMode) startTimer();
 }
 
 function startTimer() {
@@ -1154,6 +1261,7 @@ function nextQuestion() {
   currentQ = questionPool.pop();
   busy = false;
 
+  document.getElementById('continue-btn').classList.remove('visible');
   document.getElementById('q-type-tag').textContent = currentQ.tag;
   document.getElementById('q-text').innerHTML = currentQ.html;
   document.getElementById('feedback-msg').textContent = '';
@@ -1278,10 +1386,31 @@ function handleAnswer(choice, btn) {
   attempted++;
   document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
 
+  // Chill mode: always reveal correct answer
+  if (chillMode) {
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === currentQ.answer) b.classList.add('reveal');
+    });
+    if (choice === currentQ.answer) {
+      btn.classList.add('correct');
+      tallyCorrect++;
+      document.getElementById('feedback-msg').textContent = '✦ Correct!';
+    } else {
+      btn.classList.add('wrong');
+      tallyWrong++;
+      document.getElementById('feedback-msg').textContent = `✗ The answer is ${currentQ.answer}`;
+    }
+    document.getElementById('tally-correct').textContent = tallyCorrect;
+    document.getElementById('tally-wrong').textContent = tallyWrong;
+    document.getElementById('continue-btn').classList.add('visible');
+    return;
+  }
+
+  // Normal mode
   if (choice === currentQ.answer) {
     btn.classList.add('correct');
     streak++;
-    const points = streak; // streak 1 = +1, streak 2 = +2, etc.
+    const points = streak;
     score += points;
     score = Math.max(0, score);
     document.getElementById('score-display').textContent = score;
@@ -1319,6 +1448,9 @@ function endGame() {
   document.getElementById('end-message').textContent = msg;
 
   setScreen('screen-end');
+
+  // Chill mode — no leaderboard, no easter egg
+  if (chillMode) return;
 
   // Lord of Hyperspheres easter egg
   if (score >= 100) {
