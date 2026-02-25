@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Inverter</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment:    #eef2f6;
+    --parchment-dark: #d4dce6;
+    --ink:          #1c2433;
+    --ink-light:    #2e3f55;
+    --accent:       #2a5c7a;
+    --gold:         #4a8faa;
+    --gold-light:   #80c0d8;
+    --stone:        #5a7080;
+    --stone-light:  #8aaabb;
+    --green-correct: #2d6a4a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #111820;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, #1a2a3d 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Crimson Text', Georgia, serif;
+    padding: 20px;
+  }
+
+  .game-container { width: 100%; max-width: 720px; }
+
+  .frame {
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(74,143,170,0.06) 0%, transparent 50%);
+    border: 3px solid var(--gold);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 6px var(--ink),
+      0 0 0 9px var(--gold),
+      0 0 0 12px var(--ink),
+      0 20px 60px rgba(0,0,0,0.8),
+      inset 0 0 40px rgba(74,143,170,0.05);
+    padding: 40px 48px;
+    position: relative;
+  }
+
+  .frame::before, .frame::after {
+    content: '✦'; position: absolute; color: var(--gold); font-size: 20px; line-height: 1;
+  }
+  .frame::before { top: 12px; left: 14px; }
+  .frame::after  { bottom: 12px; right: 14px; }
+  .corner-tr { position: absolute; top: 12px; right: 14px; color: var(--gold); font-size: 20px; }
+  .corner-bl { position: absolute; bottom: 12px; left: 14px; color: var(--gold); font-size: 20px; }
+  .version-tag {
+    position: absolute; bottom: 11px; right: 36px;
+    font-family: 'Cinzel', serif; font-size: 0.6rem;
+    color: var(--stone-light); letter-spacing: 2px; opacity: 0.6;
+  }
+
+  /* ===== SHARED TYPOGRAPHY ===== */
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--gold), 3px 3px 0 var(--ink);
+    letter-spacing: 3px;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .game-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    color: var(--stone);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 4px;
+    margin-bottom: 20px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--stone-light);
+    margin: 20px auto;
+    width: 80%;
+    position: relative;
+  }
+  .divider::after {
+    content: '∿';
+    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+    background: var(--parchment); padding: 0 8px;
+    color: var(--gold); font-size: 18px;
+  }
+
+  /* ===== CHARACTER ===== */
+  .character-container {
+    margin: 0 auto 4px; margin-left: calc(50% - 178px); width: 287px; height: 287px;
+    display: block; filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.2));
+    object-fit: contain;
+  }
+
+  /* ===== TITLE SCREEN ===== */
+  #screen-title { text-align: center; }
+  .intro-text {
+    font-size: 1.3rem; color: var(--ink-light);
+    line-height: 1.7; margin: 12px 0 20px; font-style: italic;
+  }
+  .rules-box {
+    background: rgba(28,36,51,0.05);
+    border: 1px solid var(--parchment-dark);
+    border-radius: 2px; padding: 16px 20px; margin-bottom: 20px; text-align: left;
+  }
+  .rules-box p { color: var(--ink-light); font-size: 1.15rem; margin-bottom: 6px; line-height: 1.5; }
+  .rules-box p:last-child { margin-bottom: 0; }
+  .rules-box strong { color: var(--accent); font-weight: 600; }
+
+  .title-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    display: inline-block;
+    background: linear-gradient(180deg, #3a7a9a 0%, #1e4d63 100%);
+    color: var(--parchment); border: 2px solid var(--gold);
+    padding: 14px 40px; font-family: 'Cinzel', serif;
+    font-size: 1.1rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #4a90b0 0%, #2a6080 100%);
+    box-shadow: 0 6px 20px rgba(42,92,122,0.5); transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(1px); }
+
+  .btn-secondary {
+    display: inline-block;
+    background: linear-gradient(180deg, #7a8a9a 0%, #4a5a6a 100%);
+    color: var(--parchment); border: 2px solid var(--stone-light);
+    padding: 14px 28px; font-family: 'Cinzel', serif;
+    font-size: 0.95rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(180deg, #8a9aaa 0%, #5a6a7a 100%);
+    transform: translateY(-1px);
+  }
+
+  /* ===== GAME HUD ===== */
+  #screen-game { display: none; padding-bottom: 64px; }
+  .hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .hud-stat { text-align: center; }
+  .hud-label {
+    font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 3px;
+    color: var(--stone); text-transform: uppercase; display: block; margin-bottom: 2px;
+  }
+  .hud-value { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 900; color: var(--accent); line-height: 1; }
+  .timer-bar-wrap {
+    flex: 1; margin: 0 24px; height: 12px;
+    background: rgba(28,36,51,0.10); border: 1px solid var(--stone-light);
+    border-radius: 2px; overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold-light));
+    width: 100%; transition: width 1s linear; border-radius: 2px;
+  }
+  .timer-bar.warning { animation: pulse 0.5s infinite alternate; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+  /* ===== QUESTION ===== */
+  .question-area {
+    text-align: center; margin-bottom: 28px; min-height: 80px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .question-type-tag {
+    font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 4px;
+    color: var(--stone); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .question-text {
+    font-family: 'Cinzel', serif; font-size: clamp(1.2rem, 4vw, 1.7rem);
+    font-weight: 700; color: var(--ink); line-height: 1.3;
+  }
+  .angle-val { color: var(--accent); }
+
+  /* ===== CHOICES ===== */
+  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .choice-btn {
+    background: rgba(28,36,51,0.03); border: 2px solid var(--stone-light);
+    border-radius: 2px; padding: 16px 12px; font-family: 'Crimson Text', serif;
+    font-size: 1.2rem; font-weight: 600; color: var(--ink);
+    cursor: pointer; transition: all 0.12s; min-height: 60px;
+  }
+  .choice-btn:hover:not(:disabled) {
+    background: rgba(74,143,170,0.10); border-color: var(--gold);
+    transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.10);
+  }
+  .choice-btn.correct {
+    background: rgba(45,106,74,0.15); border-color: var(--green-correct);
+    color: var(--green-correct); animation: correctPop 0.3s ease;
+  }
+  .choice-btn.wrong {
+    background: rgba(42,92,122,0.10); border-color: var(--accent);
+    color: var(--accent); animation: wrongShake 0.3s ease;
+  }
+  .choice-btn.reveal {
+    background: rgba(45,106,74,0.15); border-color: var(--green-correct); color: var(--green-correct);
+  }
+  .choice-btn:disabled { cursor: not-allowed; }
+  @keyframes correctPop { 0%{transform:scale(1)} 50%{transform:scale(1.04)} 100%{transform:scale(1)} }
+  @keyframes wrongShake { 0%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} 100%{transform:translateX(0)} }
+
+  .feedback-msg {
+    text-align: center; min-height: 26px; font-family: 'Cinzel', serif;
+    font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: var(--stone);
+    margin-bottom: 10px;
+  }
+
+  /* ===== FLAMES ===== */
+  .flame-row {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 52px; pointer-events: none;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 2px; opacity: 0;
+    transition: opacity 0.7s ease;
+    overflow: hidden; border-radius: 0 0 4px 4px;
+  }
+  .flame-row.active { opacity: 1; }
+  .flame {
+    display: inline-block; line-height: 1; transform-origin: bottom center;
+  }
+  @keyframes flameSize {
+    0%   { font-size: var(--fs-a); }
+    25%  { font-size: var(--fs-b); }
+    50%  { font-size: var(--fs-c); }
+    75%  { font-size: var(--fs-b); }
+    100% { font-size: var(--fs-a); }
+  }
+
+  /* ===== END SCREEN ===== */
+  #screen-end { display: none; text-align: center; }
+  .score-label {
+    font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 5px;
+    color: var(--stone); text-transform: uppercase; display: block; margin: 20px 0 6px;
+  }
+  .score-big {
+    font-family: 'Cinzel', serif; font-size: clamp(4rem, 15vw, 7rem); font-weight: 900;
+    color: var(--accent); text-shadow: 3px 3px 0 var(--gold), 5px 5px 0 var(--ink); line-height: 1;
+  }
+  .score-total { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--stone); margin-top: 4px; margin-bottom: 16px; }
+  .rank-text { font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; letter-spacing: 1px; }
+  .end-message { font-size: 1.1rem; color: var(--ink-light); font-style: italic; margin-bottom: 20px; line-height: 1.6; }
+  .end-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+
+  /* ===== INITIALS ENTRY ===== */
+  #screen-initials { display: none; text-align: center; }
+  .initials-prompt {
+    font-family: 'Cinzel', serif; font-size: 1rem; color: var(--ink-light);
+    letter-spacing: 2px; margin: 16px 0 24px; line-height: 1.6;
+  }
+  .initials-prompt strong { color: var(--accent); font-size: 1.3em; }
+  .initials-row { display: flex; gap: 14px; justify-content: center; margin-bottom: 10px; }
+  .initial-input {
+    width: 64px; height: 80px;
+    font-family: 'Cinzel', serif; font-size: 2.4rem; font-weight: 900;
+    text-align: center; text-transform: uppercase;
+    background: rgba(28,36,51,0.04); border: 3px solid var(--stone-light);
+    border-radius: 2px; color: var(--accent);
+    outline: none; transition: border-color 0.15s;
+    caret-color: var(--accent);
+  }
+  .initial-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(74,143,170,0.2); }
+  .initials-error {
+    font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--accent);
+    letter-spacing: 2px; min-height: 22px; margin-bottom: 16px;
+  }
+  .initials-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== DIFFICULTY SCREEN ===== */
+  #screen-difficulty { display: none; text-align: center; }
+  .diff-intro {
+    font-family: 'Crimson Text', serif; font-size: 1.1rem; color: var(--ink-light);
+    font-style: italic; margin: 8px 0 24px; line-height: 1.6;
+  }
+  .diff-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  .diff-card {
+    border: 2px solid var(--stone-light); border-radius: 2px;
+    padding: 18px 24px; cursor: pointer; text-align: left;
+    background: rgba(28,36,51,0.03); transition: all 0.15s;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .diff-card:hover {
+    border-color: var(--gold); background: rgba(74,143,170,0.07);
+    transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  }
+  .diff-icon { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+  .diff-text { flex: 1; min-width: 0; padding-right: 8px; }
+  .diff-label {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem;
+    color: var(--accent); letter-spacing: 2px; text-transform: uppercase;
+    display: block; margin-bottom: 6px;
+  }
+  .diff-desc {
+    font-family: 'Crimson Text', serif; font-size: 1.05rem;
+    color: var(--ink-light); line-height: 1.55;
+  }
+  .diff-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== LEADERBOARD ===== */
+  #screen-leaderboard { display: none; }
+  .lb-title {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--accent);
+    text-shadow: 1px 1px 0 var(--gold), 2px 2px 0 var(--ink);
+    letter-spacing: 3px; text-align: center; margin-bottom: 4px;
+  }
+  .lb-subtitle {
+    font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 5px;
+    color: var(--stone); text-transform: uppercase; text-align: center; margin-bottom: 16px;
+  }
+  .lb-columns {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  @media (max-width: 480px) {
+    .lb-columns { grid-template-columns: 1fr; gap: 14px; }
+  }
+  .lb-column-wrap { border: 2px solid var(--parchment-dark); border-radius: 2px; overflow: hidden; }
+  .lb-column-header {
+    background: rgba(28,36,51,0.06); border-bottom: 2px solid var(--parchment-dark);
+    padding: 10px 8px; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .lb-column-header-label {
+    font-family: 'Cinzel', serif; font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+    letter-spacing: 3px; color: var(--stone); text-transform: uppercase; font-weight: 700;
+  }
+  .lb-column-header-icon { font-size: clamp(1rem, 3vw, 1.3rem); }
+  .lb-col-row {
+    display: grid; grid-template-columns: 32px 1fr auto;
+    padding: 9px 10px; border-bottom: 1px solid rgba(138,170,187,0.25);
+    align-items: center; gap: 4px;
+  }
+  .lb-col-row:last-child { border-bottom: none; }
+  .lb-col-row:hover { background: rgba(74,143,170,0.06); }
+  .lb-col-row.new-entry { background: rgba(74,143,170,0.12); animation: newEntryGlow 1.5s ease; }
+  @keyframes newEntryGlow {
+    0%   { background: rgba(74,143,170,0.35); }
+    100% { background: rgba(74,143,170,0.12); }
+  }
+  .lb-col-rank {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(0.8rem, 2.5vw, 1rem); color: var(--stone); text-align: center;
+  }
+  .lb-col-rank.gold   { color: #c9a227; }
+  .lb-col-rank.silver { color: #909090; }
+  .lb-col-rank.bronze { color: #a0694a; }
+  .lb-col-initials {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1rem, 3vw, 1.2rem); color: var(--accent); letter-spacing: 3px;
+  }
+  .lb-col-score {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(1rem, 3vw, 1.2rem); color: var(--ink); text-align: right; white-space: nowrap;
+  }
+  .lb-empty {
+    text-align: center; padding: 20px 8px;
+    font-family: 'Crimson Text', serif; font-style: italic;
+    color: var(--stone); font-size: clamp(0.85rem, 2.5vw, 1rem); line-height: 1.4;
+  }
+  .lb-loading {
+    text-align: center; padding: 20px 8px;
+    font-family: 'Cinzel', serif; font-size: 0.65rem;
+    letter-spacing: 2px; color: var(--stone);
+  }
+  .lb-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== CHILL MODE TOGGLE ===== */
+  .chill-toggle-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; margin: 20px 0 8px;
+  }
+  .chill-label {
+    font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase; cursor: pointer; user-select: none;
+  }
+  .chill-label span { color: var(--accent); }
+  .toggle-switch { position: relative; width: 56px; height: 30px; cursor: pointer; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--parchment-dark); border: 2px solid var(--stone-light);
+    border-radius: 30px; transition: all 0.2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; left: 3px; top: 3px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--stone); transition: all 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: rgba(42,92,122,0.15); border-color: var(--accent); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(26px); background: var(--accent); }
+  .chill-desc {
+    font-family: 'Crimson Text', serif; font-size: 1.1rem; font-style: italic;
+    color: var(--stone); text-align: center; margin-bottom: 16px;
+  }
+
+  /* ===== CONTINUE BUTTON (Chill Mode) ===== */
+  .btn-continue {
+    display: none;
+    background: linear-gradient(180deg, #7a8a9a 0%, #4a5a6a 100%);
+    color: var(--parchment); border: 2px solid var(--stone-light);
+    padding: 12px 36px; font-family: 'Cinzel', serif;
+    font-size: 1rem; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-continue:hover { background: linear-gradient(180deg, #8a9aaa 0%, #5a6a7a 100%); transform: translateY(-1px); }
+  .btn-continue.visible { display: block; }
+
+  /* ===== CHILL TOTALS ===== */
+  .chill-totals-wrap { display: none; text-align: center; margin-top: 10px; }
+  .chill-totals-wrap.chill-active { display: block; }
+  .chill-totals {
+    font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase;
+  }
+  .chill-totals .t-correct { color: var(--green-correct); font-weight: 700; }
+  .chill-totals .t-wrong   { color: var(--accent); font-weight: 700; }
+  .btn-totals-toggle {
+    display: none; margin: 10px auto 0;
+    background: none; border: 1px solid var(--stone-light);
+    border-radius: 2px; padding: 5px 16px;
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 2px;
+    color: var(--stone); text-transform: uppercase; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-totals-toggle:hover { border-color: var(--gold); color: var(--ink); }
+  .btn-totals-toggle.chill-active { display: inline-block; }
+
+  /* ===== HYPERSPHERE EASTER EGG ===== */
+  #hypersphere-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: #000; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  #hypersphere-overlay.active { display: flex; }
+  .hs-title {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1.8rem, 6vw, 3.5rem); color: #fff;
+    text-shadow: 0 0 20px #00aaff, 0 0 40px #0066cc, 0 0 80px #003399;
+    letter-spacing: 4px; z-index: 2; position: relative;
+    animation: hsPulse 1s ease-in-out infinite alternate;
+  }
+  .hs-subtitle {
+    font-family: 'Crimson Text', serif; font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: #80c0ff; margin-top: 16px; z-index: 2; position: relative;
+    opacity: 0; animation: hsFadeIn 1s 1s forwards;
+  }
+  @keyframes hsPulse {
+    from { text-shadow: 0 0 20px #00aaff, 0 0 40px #0066cc, 0 0 80px #003399; }
+    to   { text-shadow: 0 0 40px #44ccff, 0 0 80px #00aaff, 0 0 120px #0055cc; }
+  }
+  @keyframes hsFadeIn { to { opacity: 1; } }
+  .hs-flames { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .hs-flame-span {
+    position: absolute; bottom: -10px;
+    animation: hsRise linear forwards; opacity: 0.9;
+  }
+  @keyframes hsRise {
+    0%   { transform: translateY(0) scale(1);   opacity: 0.9; }
+    80%  { opacity: 0.8; }
+    100% { transform: translateY(-110vh) scale(0.5); opacity: 0; }
+  }
+  .hs-continue {
+    font-family: 'Cinzel', serif; font-size: 0.75rem;
+    letter-spacing: 4px; color: rgba(128,192,255,0.6);
+    position: absolute; bottom: 32px; z-index: 2;
+    opacity: 0; animation: hsFadeIn 0.8s 5.5s forwards;
+    cursor: pointer; text-transform: uppercase;
+  }
+
+  .screen-active { animation: fadeIn 0.35s ease both; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="frame">
+    <span class="corner-tr">✦</span>
+    <span class="corner-bl">✦</span>
+    <span class="version-tag">v0.1</span>
+
+    <!-- ===== TITLE SCREEN ===== -->
+    <div id="screen-title">
+      <div class="game-title">The</div>
+      <div class="game-title" style="margin-top:2px; margin-bottom:12px;">Inverter</div>
+      <hr class="divider">
+
+      <img class="character-container" src="images/inverter1.png" alt="Mascot">
+
+      <div class="intro-text" style="font-size:1.5rem;">Know where the angles hide.</div>
+
+      <div class="rules-box">
+        <p>⏱ <strong>60 seconds</strong> — answer as many as you can.</p>
+        <p>🎯 <strong>+1 point</strong> for your first correct answer.</p>
+        <p>🔥 <strong>Streak bonus</strong> — each consecutive correct answer scores one more point than the last. Miss one and the streak resets!</p>
+        <p>🏆 Score high enough to be memorialized in the <strong>Hall of Champions</strong>!</p>
+      </div>
+
+      <div class="title-btns">
+        <button class="btn-primary" onclick="showDifficulty()">Begin the Trial</button>
+        <button class="btn-secondary" onclick="showLeaderboard(false)">Hall of Champions</button>
+      </div>
+      <div class="chill-toggle-wrap">
+        <label class="toggle-switch">
+          <input type="checkbox" id="chill-toggle" onchange="updateChillDesc()">
+          <div class="toggle-track"></div>
+        </label>
+        <span class="chill-label" onclick="document.getElementById('chill-toggle').click()"><span>Chill Mode</span></span>
+      </div>
+      <div class="chill-desc">No timer · No score · Go at your own pace</div>
+    </div>
+
+    <!-- ===== GAME SCREEN ===== -->
+    <div id="screen-game">
+      <div class="hud">
+        <div class="hud-stat">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" id="score-display">0</span>
+        </div>
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <div class="hud-stat">
+          <span class="hud-label">Streak</span>
+          <span class="hud-value" id="streak-display" style="color:var(--gold)">0</span>
+        </div>
+        <div class="hud-stat" style="margin-left:16px;">
+          <span class="hud-label">Time</span>
+          <span class="hud-value" id="timer-display">60</span>
+        </div>
+      </div>
+      <div style="text-align:center; margin-bottom:8px; margin-top:-10px;">
+        <span id="difficulty-badge" style="font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:3px; color:var(--stone); text-transform:uppercase;"></span>
+      </div>
+      <hr class="divider">
+      <div class="question-area">
+        <div class="question-type-tag" id="q-type-tag"></div>
+        <div class="question-text" id="q-text"></div>
+      </div>
+      <div class="feedback-msg" id="feedback-msg"></div>
+      <div class="choices-grid" id="choices-grid"></div>
+      <div class="chill-totals-wrap" id="chill-totals-wrap">
+        <div class="chill-totals">
+          ✦ Correct: <span class="t-correct" id="tally-correct">0</span>
+          &nbsp;&nbsp;✗ Incorrect: <span class="t-wrong" id="tally-wrong">0</span>
+        </div>
+      </div>
+      <button class="btn-totals-toggle" id="totals-toggle-btn" onclick="toggleTotals()">Show Totals</button>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:12px;">
+        <button class="btn-continue" id="continue-btn" onclick="nextQuestion()">Continue</button>
+        <div id="chill-menu-btn-wrap" style="display:none;">
+          <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+        </div>
+      </div>
+      <div class="flame-row" id="flame-row"></div>
+      <div id="restart-btn-wrap" style="text-align:center; margin-top:10px;">
+        <button onclick="showDifficulty()" style="background:none; border:none; font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:2px; color:var(--stone-light); text-transform:uppercase; cursor:pointer; text-decoration:underline; text-underline-offset:3px;">Restart</button>
+      </div>
+    </div>
+
+    <!-- ===== END SCREEN ===== -->
+    <div id="screen-end">
+      <div class="game-title" style="font-size:clamp(1.5rem,5vw,2.2rem);">Trial Complete!</div>
+      <hr class="divider">
+      <span class="score-label">Final Score</span>
+      <div class="score-big" id="final-score">0</div>
+      <div class="score-total" id="questions-answered"></div>
+      <div class="rank-text" id="rank-text"></div>
+      <div id="end-difficulty" style="font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:4px; color:var(--stone); text-transform:uppercase; margin-bottom:6px;"></div>
+      <div class="end-message" id="end-message"></div>
+      <div class="end-btns">
+        <button class="btn-primary" onclick="showDifficulty()">Try Again</button>
+        <button class="btn-secondary" onclick="showLeaderboard(false)">Hall of Champions</button>
+        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      </div>
+    </div>
+
+    <!-- ===== INITIALS ENTRY SCREEN ===== -->
+    <div id="screen-initials">
+      <div class="game-title" style="font-size:clamp(1.4rem,4vw,2rem);">New Champion!</div>
+      <hr class="divider">
+      <div class="initials-prompt">
+        Thy score of <strong id="initials-score-display">0</strong> hath earned a place<br>
+        in the Hall of Champions!<br>
+        Enter thy initials to claim thy glory.
+      </div>
+      <div class="initials-row">
+        <input class="initial-input" id="init-0" maxlength="1" autocomplete="off" spellcheck="false">
+        <input class="initial-input" id="init-1" maxlength="1" autocomplete="off" spellcheck="false">
+        <input class="initial-input" id="init-2" maxlength="1" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="initials-error" id="initials-error"></div>
+      <div class="initials-btns">
+        <button class="btn-primary" id="claim-glory-btn" onclick="submitInitials()">Claim Glory</button>
+        <button class="btn-secondary" onclick="skipInitials()">Skip</button>
+      </div>
+    </div>
+
+    <!-- ===== DIFFICULTY SCREEN ===== -->
+    <div id="screen-difficulty">
+      <div class="game-title" style="font-size:clamp(1.4rem,4vw,2rem);">Choose Thy Path</div>
+      <hr class="divider">
+      <div class="diff-intro">Select your difficulty. The Hall of Champions tracks each path separately.</div>
+      <div class="diff-cards">
+        <div class="diff-card" onclick="selectDifficulty('medium')">
+          <div class="diff-icon">⚔</div>
+          <div class="diff-text">
+            <span class="diff-label">Medium</span>
+            <span class="diff-desc">arcsin and arccos — find the angle from sine and cosine values. Master the principal ranges.</span>
+          </div>
+        </div>
+        <div class="diff-card" onclick="selectDifficulty('expert')">
+          <div class="diff-icon">🌌</div>
+          <div class="diff-text">
+            <span class="diff-label">Expert</span>
+            <span class="diff-desc">arcsin, arccos, and arctan — the full inverse suite. Face the restricted domains.</span>
+          </div>
+        </div>
+      </div>
+      <div class="diff-btns">
+        <button class="btn-secondary" onclick="showTitle()">Back</button>
+      </div>
+    </div>
+
+    <!-- ===== LEADERBOARD SCREEN ===== -->
+    <div id="screen-leaderboard">
+      <div class="lb-title">Hall of Champions</div>
+      <div class="lb-subtitle">Top 10 · By Difficulty</div>
+      <hr class="divider">
+      <div class="lb-columns">
+        <div class="lb-column-wrap">
+          <div class="lb-column-header">
+            <span class="lb-column-header-icon">⚔</span>
+            <span class="lb-column-header-label">Medium</span>
+          </div>
+          <div id="lb-rows-medium"><div class="lb-loading">Consulting the ancient scrolls...</div></div>
+        </div>
+        <div class="lb-column-wrap">
+          <div class="lb-column-header">
+            <span class="lb-column-header-icon">🌌</span>
+            <span class="lb-column-header-label">Expert</span>
+          </div>
+          <div id="lb-rows-expert"><div class="lb-loading">Consulting the ancient scrolls...</div></div>
+        </div>
+      </div>
+      <div class="lb-btns">
+        <button class="btn-primary" onclick="showDifficulty()">Play Again</button>
+        <button class="btn-secondary" onclick="showTitle()">Main Menu</button>
+      </div>
+    </div>
+
+  </div><!-- .frame -->
+</div><!-- .game-container -->
+
+<!-- ===== LORD OF HYPERSPHERES EASTER EGG ===== -->
+<div id="hypersphere-overlay" onclick="dismissHypersphereEgg()">
+  <div class="hs-flames" id="hs-flames"></div>
+  <div class="hs-title">🌌 MASTER OF INVERSES 🌌</div>
+  <div class="hs-subtitle">You have bent the functions back upon themselves.<br>The Jackalope weeps tears of pure arctangent.</div>
+  <div class="hs-continue">— click anywhere to continue —</div>
+</div>
+
+<script>
+// ================================================================
+//  GOOGLE SHEETS BACKEND CONFIG
+// ================================================================
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyLPSFxO2iYtjWCiZECtP0B6TKUnRAAgese09W5rh2jga2ze5bX8F9iNxL8UpiJP2Wj/exec';
+const SHEETS_KEY = 'jackalope2025';
+const GAME_TAG   = 'inverter';
+
+// ================================================================
+//  PROFANITY BLOCKLIST
+// ================================================================
+const BLOCKED_INITIALS = new Set([
+  'ASS','ARS','FCK','FUK','FUC','CUM','COK','COC','CNT','CNT',
+  'DIC','DIK','DIX','FAG','GAY','JIZ','KKK','NGR','NIG','PNS',
+  'PNS','PUS','SEX','SHT','SLT','TIT','VAG','WTF','HOR','HOE',
+  'SKK','SKK','BAS','FFS','FNG','MFR','SOB','STD','VJJ','XXX',
+  'ACE','KYS','SUK','SUC','BJ','BLJ','BWJ','HJB','HJ'
+]);
+function isBlockedInitials(str) { return BLOCKED_INITIALS.has(str.toUpperCase()); }
+
+// ================================================================
+//  INVERSE TRIG DATA
+//
+//  Principal value ranges enforced:
+//    arcsin : [-π/2, π/2]  →  output degrees in [-90, 90]
+//    arccos : [0, π]        →  output degrees in [0, 180]
+//    arctan : (-π/2, π/2)   →  output degrees in (-90, 90)
+//
+//  Each entry: { fn, input, answerDeg, answerRad }
+//  answerDeg / answerRad are the CORRECT principal-value answers.
+// ================================================================
+
+// Nice-form display strings for trig values
+// (used as question inputs)
+const ARCSIN_ENTRIES = [
+  { input: '0',      answerDeg: '0°',    answerRad: '0'     },
+  { input: '1/2',    answerDeg: '30°',   answerRad: 'π/6'   },
+  { input: '√2/2',   answerDeg: '45°',   answerRad: 'π/4'   },
+  { input: '√3/2',   answerDeg: '60°',   answerRad: 'π/3'   },
+  { input: '1',      answerDeg: '90°',   answerRad: 'π/2'   },
+  { input: '-1/2',   answerDeg: '-30°',  answerRad: '-π/6'  },
+  { input: '-√2/2',  answerDeg: '-45°',  answerRad: '-π/4'  },
+  { input: '-√3/2',  answerDeg: '-60°',  answerRad: '-π/3'  },
+  { input: '-1',     answerDeg: '-90°',  answerRad: '-π/2'  },
+];
+
+const ARCCOS_ENTRIES = [
+  { input: '1',      answerDeg: '0°',    answerRad: '0'     },
+  { input: '√3/2',   answerDeg: '30°',   answerRad: 'π/6'   },
+  { input: '√2/2',   answerDeg: '45°',   answerRad: 'π/4'   },
+  { input: '1/2',    answerDeg: '60°',   answerRad: 'π/3'   },
+  { input: '0',      answerDeg: '90°',   answerRad: 'π/2'   },
+  { input: '-1/2',   answerDeg: '120°',  answerRad: '2π/3'  },
+  { input: '-√2/2',  answerDeg: '135°',  answerRad: '3π/4'  },
+  { input: '-√3/2',  answerDeg: '150°',  answerRad: '5π/6'  },
+  { input: '-1',     answerDeg: '180°',  answerRad: 'π'     },
+];
+
+const ARCTAN_ENTRIES = [
+  { input: '0',      answerDeg: '0°',    answerRad: '0'     },
+  { input: '√3/3',   answerDeg: '30°',   answerRad: 'π/6'   },
+  { input: '1',      answerDeg: '45°',   answerRad: 'π/4'   },
+  { input: '√3',     answerDeg: '60°',   answerRad: 'π/3'   },
+  { input: '-√3/3',  answerDeg: '-30°',  answerRad: '-π/6'  },
+  { input: '-1',     answerDeg: '-45°',  answerRad: '-π/4'  },
+  { input: '-√3',    answerDeg: '-60°',  answerRad: '-π/3'  },
+];
+
+// Answer pools for wrong-choice generation
+// Degrees: principal-value outputs plus tempting full-circle distractors
+const DEG_POOL_ARCSIN = [
+  '0°','30°','45°','60°','90°','-30°','-45°','-60°','-90°',
+  '120°','150°','210°','240°','270°','300°','330°'   // tempting distractors
+];
+const DEG_POOL_ARCCOS = [
+  '0°','30°','45°','60°','90°','120°','135°','150°','180°',
+  '-30°','-45°','-60°','210°','240°','270°','300°','315°','330°'
+];
+const DEG_POOL_ARCTAN = [
+  '0°','30°','45°','60°','-30°','-45°','-60°',
+  '90°','-90°','120°','150°','210°','240°'
+];
+
+// Radians: principal-value outputs plus tempting full-circle distractors
+const RAD_POOL_ARCSIN = [
+  '0','π/6','π/4','π/3','π/2','-π/6','-π/4','-π/3','-π/2',
+  '2π/3','5π/6','7π/6','4π/3','3π/2','5π/3','7π/4'
+];
+const RAD_POOL_ARCCOS = [
+  '0','π/6','π/4','π/3','π/2','2π/3','3π/4','5π/6','π',
+  '-π/6','-π/4','-π/3','7π/6','5π/4','4π/3','3π/2'
+];
+const RAD_POOL_ARCTAN = [
+  '0','π/6','π/4','π/3','-π/6','-π/4','-π/3',
+  'π/2','-π/2','2π/3','5π/6','7π/6','4π/3'
+];
+
+// Notation variants — randomly chosen per question
+function arcsinNotation()  { return Math.random() < 0.5 ? 'arcsin' : 'sin⁻¹'; }
+function arccosNotation()  { return Math.random() < 0.5 ? 'arccos' : 'cos⁻¹'; }
+function arctanNotation()  { return Math.random() < 0.5 ? 'arctan' : 'tan⁻¹'; }
+
+// ================================================================
+//  QUESTION POOL BUILDER
+// ================================================================
+function buildQuestionPool() {
+  const pool = [];
+
+  // Helper: push both a degrees-answer and a radians-answer variant
+  function pushBoth(fn, notationFn, entry, degPool, radPool) {
+    const notation = notationFn();   // random once — same label for both variants of this entry
+    const label = fn.charAt(0).toUpperCase() + fn.slice(1); // "Arcsin" etc for tag
+    const inputHtml = `<span class="angle-val">${notation}(${entry.input})</span>`;
+
+    pool.push({
+      tag:    `${notation} · Degrees`,
+      html:   `Find ${inputHtml}`,
+      answer: entry.answerDeg,
+      pool:   degPool,
+    });
+    pool.push({
+      tag:    `${notation} · Radians`,
+      html:   `Find ${inputHtml}`,
+      answer: entry.answerRad,
+      pool:   radPool,
+    });
+  }
+
+  // Medium+: arcsin and arccos
+  for (const e of ARCSIN_ENTRIES) pushBoth('arcsin', arcsinNotation, e, DEG_POOL_ARCSIN, RAD_POOL_ARCSIN);
+  for (const e of ARCCOS_ENTRIES) pushBoth('arccos', arccosNotation, e, DEG_POOL_ARCCOS, RAD_POOL_ARCCOS);
+
+  // Expert only: arctan
+  if (currentDifficulty === 'expert') {
+    for (const e of ARCTAN_ENTRIES) pushBoth('arctan', arctanNotation, e, DEG_POOL_ARCTAN, RAD_POOL_ARCTAN);
+  }
+
+  return pool;
+}
+
+// ================================================================
+//  HELPERS
+// ================================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getChoices(answer, pool, n = 4) {
+  return shuffle([answer, ...shuffle(pool.filter(p => p !== answer)).slice(0, n - 1)]);
+}
+
+const ALL_SCREENS = ['screen-title','screen-difficulty','screen-game','screen-end','screen-initials','screen-leaderboard'];
+
+function setScreen(id) {
+  ALL_SCREENS.forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = 'none';
+    el.classList.remove('screen-active');
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  requestAnimationFrame(() => el.classList.add('screen-active'));
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+// ================================================================
+//  RANK HELPERS
+// ================================================================
+function getRankTitle(score) {
+  if (score >= 100) return 'Master of Inverses';
+  if (score >= 80)  return 'Arcane Sovereign';
+  if (score >= 70)  return 'Domain Wizard';
+  if (score >= 60)  return 'Range Sorcerer';
+  if (score >= 50)  return 'Assistant to the District Manager';
+  if (score >= 40)  return 'Principal Value Knight';
+  if (score >= 30)  return 'Restriction Scholar';
+  if (score >= 20)  return 'Inverse Apprentice';
+  if (score >= 10)  return 'Initiate';
+  if (score >= 5)   return 'Wanderer';
+  return 'Lost in the Domain';
+}
+
+function getRankDisplay(s) {
+  if (s >= 100) return { rank: '🌌 Master of Inverses 🌌',             msg: 'Inconceivable. The functions bend to your will.' };
+  if (s >= 80)  return { rank: '🔮 Arcane Sovereign',                  msg: 'Extraordinary command of every restricted domain.' };
+  if (s >= 70)  return { rank: '🌙 Domain Wizard',                     msg: 'The principal ranges hold no secrets from thee.' };
+  if (s >= 60)  return { rank: '🧙 Range Sorcerer',                    msg: 'Your mastery of output spaces is without equal.' };
+  if (s >= 50)  return { rank: '📋 Assistant to the District Manager', msg: 'Beets. Bears. Battlestar Galactica.' };
+  if (s >= 40)  return { rank: '⚔ Principal Value Knight',             msg: 'A seat at the table of inverses is yours.' };
+  if (s >= 30)  return { rank: '🏆 Restriction Scholar',               msg: 'The domain restrictions bend to your study.' };
+  if (s >= 20)  return { rank: '📜 Inverse Apprentice',                msg: 'Solid footing. Keep inverting.' };
+  if (s >= 10)  return { rank: '🎓 Initiate',                          msg: 'A promising start. The inverses await mastery.' };
+  if (s >= 5)   return { rank: '🌱 Wanderer',                          msg: 'The Jackalope believes in thee.' };
+                return { rank: '🐾 Lost in the Domain',                msg: 'The inverse functions await thy study. Try again!' };
+}
+
+// ================================================================
+//  LEADERBOARD RENDERING
+// ================================================================
+function renderColumnLeaderboard(containerId, entries) {
+  const container = document.getElementById(containerId);
+  if (!entries || entries.length === 0) {
+    container.innerHTML = '<div class="lb-empty">No champions yet —<br>be the first!</div>';
+    return;
+  }
+  container.innerHTML = entries.map((e, i) => {
+    const rankNum = i + 1;
+    let rankClass = '';
+    let rankDisplay = `#${rankNum}`;
+    if (rankNum === 1) { rankClass = 'gold';   rankDisplay = '👑'; }
+    if (rankNum === 2) { rankClass = 'silver'; rankDisplay = '⚔'; }
+    if (rankNum === 3) { rankClass = 'bronze'; rankDisplay = '🛡'; }
+    const isNew = e.id === lastNewEntryId;
+    return `
+      <div class="lb-col-row${isNew ? ' new-entry' : ''}">
+        <div class="lb-col-rank ${rankClass}">${rankDisplay}</div>
+        <div class="lb-col-initials">${e.initials}</div>
+        <div class="lb-col-score">${e.score}</div>
+      </div>`;
+  }).join('');
+}
+
+// ================================================================
+//  LEADERBOARD — Google Sheets with localStorage fallback
+// ================================================================
+const LB_KEY = 'inverter:leaderboard:v1';
+let lastNewEntryId = null;
+let currentDifficulty = null;
+
+function loadLocalLB() {
+  try {
+    const raw = localStorage.getItem(LB_KEY);
+    return raw ? JSON.parse(raw) : { medium: [], expert: [] };
+  } catch (e) { return { medium: [], expert: [] }; }
+}
+function saveLocalLB(data) {
+  try { localStorage.setItem(LB_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function clearLocalLB() {
+  try { localStorage.removeItem(LB_KEY); } catch (e) {}
+}
+
+if (SHEETS_URL) clearLocalLB();
+
+async function sheetsGet() {
+  const res = await fetch(SHEETS_URL + '?action=get&game=' + GAME_TAG + '&key=' + SHEETS_KEY);
+  if (!res.ok) throw new Error('GET failed');
+  return res.json();
+}
+
+async function sheetsPost(entry) {
+  const params = new URLSearchParams({
+    action:     'post',
+    key:        SHEETS_KEY,
+    game:       entry.game,
+    difficulty: entry.difficulty,
+    initials:   entry.initials,
+    score:      entry.score,
+    rankTitle:  entry.rankTitle,
+    ts:         entry.ts,
+    id:         entry.id
+  });
+  const res = await fetch(SHEETS_URL + '?' + params.toString());
+  if (!res.ok) throw new Error('POST-as-GET failed');
+}
+
+async function checkIsTop10(score) {
+  let data;
+  if (SHEETS_URL) {
+    try {
+      data = await sheetsGet();
+      saveLocalLB(data);
+    } catch (e) {
+      console.warn('checkIsTop10: Sheets unreachable, using local cache:', e);
+      data = loadLocalLB();
+    }
+  } else {
+    data = loadLocalLB();
+  }
+  const entries = data[currentDifficulty] || [];
+  if (entries.length < 10) return true;
+  return score > entries[entries.length - 1].score;
+}
+
+async function submitScore(initials, score) {
+  const rankTitle = getRankTitle(score);
+  const id = Date.now() + Math.random().toString(36).slice(2);
+  const entry = { id, initials, score, rankTitle, difficulty: currentDifficulty, game: GAME_TAG, ts: Date.now() };
+  lastNewEntryId = id;
+
+  if (SHEETS_URL) {
+    try {
+      await sheetsPost(entry);
+      const fresh = await sheetsGet();
+      saveLocalLB(fresh);
+    } catch (e) {
+      console.warn('Sheets unavailable, saving locally:', e);
+      const data = loadLocalLB();
+      const bucket = data[currentDifficulty] || [];
+      bucket.push(entry);
+      bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
+      data[currentDifficulty] = bucket.slice(0, 10);
+      saveLocalLB(data);
+    }
+  } else {
+    const data = loadLocalLB();
+    const bucket = data[currentDifficulty] || [];
+    bucket.push(entry);
+    bucket.sort((a, b) => b.score - a.score || a.ts - b.ts);
+    data[currentDifficulty] = bucket.slice(0, 10);
+    saveLocalLB(data);
+  }
+
+  showLeaderboard(true);
+  return Promise.resolve();
+}
+
+async function showLeaderboard(highlightNew) {
+  setScreen('screen-leaderboard');
+  if (!highlightNew) lastNewEntryId = null;
+  ['lb-rows-medium','lb-rows-expert'].forEach(id => {
+    document.getElementById(id).innerHTML = '<div class="lb-loading">Consulting the ancient scrolls...</div>';
+  });
+
+  let data;
+  if (SHEETS_URL) {
+    try {
+      data = await sheetsGet();
+      saveLocalLB(data);
+    } catch (e) {
+      console.warn('Sheets GET failed, using local cache:', e);
+      data = loadLocalLB();
+    }
+  } else {
+    await new Promise(r => setTimeout(r, 300));
+    data = loadLocalLB();
+  }
+
+  renderColumnLeaderboard('lb-rows-medium', data.medium || []);
+  renderColumnLeaderboard('lb-rows-expert', data.expert || []);
+}
+
+function showDifficulty() { setScreen('screen-difficulty'); }
+function selectDifficulty(diff) { currentDifficulty = diff; startGame(); }
+
+// ================================================================
+//  INITIALS ENTRY
+// ================================================================
+function setupInitialInputs() {
+  for (let i = 0; i < 3; i++) {
+    const input = document.getElementById(`init-${i}`);
+    input.value = '';
+    input.oninput = (e) => {
+      const val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+      e.target.value = val ? val[val.length - 1] : '';
+      if (e.target.value && i < 2) document.getElementById(`init-${i+1}`).focus();
+    };
+    input.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !e.target.value && i > 0) document.getElementById(`init-${i-1}`).focus();
+      if (e.key === 'Enter') submitInitials();
+    };
+  }
+  document.getElementById('initials-error').textContent = '';
+}
+
+function getInitialsValue() {
+  return ['init-0','init-1','init-2'].map(id => document.getElementById(id).value.toUpperCase()).join('');
+}
+
+function submitInitials() {
+  if (submitting) return;
+  const initials = getInitialsValue();
+  const errorEl = document.getElementById('initials-error');
+  if (initials.length < 3) { errorEl.textContent = '⚠ Enter all three initials to proceed.'; return; }
+  if (isBlockedInitials(initials)) { errorEl.textContent = '⚠ Those initials are not permitted. Please choose others.'; return; }
+
+  submitting = true;
+  const btn = document.getElementById('claim-glory-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  errorEl.textContent = '';
+
+  submitScore(initials, score).finally(() => {
+    submitting = false;
+    btn.disabled = false;
+    btn.textContent = 'Claim Glory';
+  });
+}
+
+function skipInitials() { showLeaderboard(false); }
+
+// ================================================================
+//  GAME STATE
+// ================================================================
+let score = 0;
+let streak = 0;
+let timeLeft = 60;
+let timerInterval = null;
+let questionPool = [];
+let currentQ = null;
+let busy = false;
+let attempted = 0;
+let chillMode = false;
+let submitting = false;
+let tallyCorrect = 0;
+let tallyWrong = 0;
+let showTotals = false;
+
+function showTitle() {
+  clearInterval(timerInterval);
+  setScreen('screen-title');
+}
+
+function toggleTotals() {
+  showTotals = !showTotals;
+  document.getElementById('chill-totals-wrap').classList.toggle('chill-active', showTotals);
+  document.getElementById('totals-toggle-btn').textContent = showTotals ? 'Hide Totals' : 'Show Totals';
+}
+
+function updateChillDesc() { /* desc always visible */ }
+
+function startGame() {
+  chillMode = document.getElementById('chill-toggle').checked;
+  score = 0; streak = 0; timeLeft = 60; attempted = 0;
+  questionPool = shuffle(buildQuestionPool());
+
+  const diffIcons = { medium: '⚔ Medium', expert: '🌌 Expert' };
+  const chillTag = chillMode ? ' · ❄️ Chill' : '';
+  document.getElementById('difficulty-badge').textContent = (diffIcons[currentDifficulty] || '') + chillTag;
+  document.getElementById('score-display').textContent = '0';
+  document.getElementById('streak-display').textContent = '0';
+  document.getElementById('timer-display').textContent = '60';
+  document.getElementById('timer-bar').style.width = '100%';
+  document.getElementById('timer-bar').className = 'timer-bar';
+  document.getElementById('feedback-msg').textContent = '';
+  document.getElementById('flame-row').classList.remove('active');
+  document.getElementById('continue-btn').classList.remove('visible');
+
+  tallyCorrect = 0; tallyWrong = 0; showTotals = false;
+  document.getElementById('tally-correct').textContent = '0';
+  document.getElementById('tally-wrong').textContent = '0';
+  document.getElementById('chill-totals-wrap').classList.remove('chill-active');
+  const totalsBtn = document.getElementById('totals-toggle-btn');
+  totalsBtn.textContent = 'Show Totals';
+  totalsBtn.classList.toggle('chill-active', chillMode);
+  document.getElementById('chill-menu-btn-wrap').style.display = chillMode ? 'block' : 'none';
+  document.getElementById('restart-btn-wrap').style.display = chillMode ? 'none' : 'block';
+
+  const hudScore  = document.getElementById('score-display').closest('.hud-stat');
+  const hudStreak = document.getElementById('streak-display').closest('.hud-stat');
+  const hudTime   = document.getElementById('timer-display').closest('.hud-stat');
+  const timerBar  = document.querySelector('.timer-bar-wrap');
+  if (chillMode) {
+    hudScore.style.visibility  = 'hidden';
+    hudStreak.style.visibility = 'hidden';
+    hudTime.style.visibility   = 'hidden';
+    timerBar.style.visibility  = 'hidden';
+  } else {
+    hudScore.style.visibility  = '';
+    hudStreak.style.visibility = '';
+    hudTime.style.visibility   = '';
+    timerBar.style.visibility  = '';
+  }
+
+  setScreen('screen-game');
+  nextQuestion();
+  if (!chillMode) startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer-display').textContent = timeLeft;
+    document.getElementById('timer-bar').style.width = (timeLeft / 60 * 100) + '%';
+    if (timeLeft <= 15) document.getElementById('timer-bar').classList.add('warning');
+    if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
+  }, 1000);
+}
+
+function nextQuestion() {
+  if (questionPool.length === 0) questionPool = shuffle(buildQuestionPool());
+  currentQ = questionPool.pop();
+  busy = false;
+
+  document.getElementById('continue-btn').classList.remove('visible');
+  document.getElementById('q-type-tag').textContent = currentQ.tag;
+  document.getElementById('q-text').innerHTML = currentQ.html;
+  document.getElementById('feedback-msg').textContent = '';
+
+  if (document.activeElement) document.activeElement.blur();
+
+  const choices = getChoices(currentQ.answer, currentQ.pool, 4);
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  grid.blur();
+  grid.style.pointerEvents = 'none';
+  setTimeout(() => { grid.style.pointerEvents = ''; }, 120);
+
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => handleAnswer(c, btn);
+    grid.appendChild(btn);
+  });
+}
+
+// ================================================================
+//  MASTER OF INVERSES EASTER EGG
+// ================================================================
+function triggerHypersphereEasterEgg() {
+  const overlay = document.getElementById('hypersphere-overlay');
+  const flamesEl = document.getElementById('hs-flames');
+  overlay.classList.add('active');
+  flamesEl.innerHTML = '';
+
+  let launched = 0;
+  const totalFlames = 120;
+  const duration = 5000;
+
+  function launchFlame() {
+    const span = document.createElement('span');
+    span.className = 'hs-flame-span';
+    const size = (1.5 + Math.random() * 2.5).toFixed(1);
+    const left = Math.random() * 100;
+    const riseDuration = (2.5 + Math.random() * 3).toFixed(1);
+    const delay = (Math.random() * 0.3).toFixed(2);
+    span.style.cssText = `left:${left}%;font-size:${size}rem;animation-duration:${riseDuration}s;animation-delay:${delay}s;`;
+    span.textContent = '✨';
+    flamesEl.appendChild(span);
+    setTimeout(() => span.remove(), (parseFloat(riseDuration) + parseFloat(delay) + 0.5) * 1000);
+  }
+
+  const interval = setInterval(() => {
+    const batch = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < batch; i++) launchFlame();
+    launched += batch;
+    if (launched >= totalFlames) clearInterval(interval);
+  }, duration / (totalFlames / 3));
+
+  setTimeout(async () => {
+    const qualifies = await checkIsTop10(score);
+    if (qualifies) {
+      document.getElementById('initials-score-display').textContent = score;
+      setupInitialInputs();
+    }
+  }, 5500);
+}
+
+async function dismissHypersphereEgg() {
+  document.getElementById('hypersphere-overlay').classList.remove('active');
+  const qualifies = await checkIsTop10(score);
+  if (qualifies && score > 0) {
+    document.getElementById('initials-score-display').textContent = score;
+    setupInitialInputs();
+    setScreen('screen-initials');
+    setTimeout(() => document.getElementById('init-0').focus(), 350);
+  }
+}
+
+// ================================================================
+//  FLAME ROW (streak ≥ 5)
+// ================================================================
+(function buildFlames() {
+  const row = document.getElementById('flame-row');
+  for (let i = 0; i < 18; i++) {
+    const span = document.createElement('span');
+    span.className = 'flame';
+    span.textContent = '🔥';
+    const duration = (0.6 + Math.random() * 0.8).toFixed(2);
+    const delay    = (Math.random() * 1.0).toFixed(2);
+    const fsA = (1.4 + Math.random() * 0.4).toFixed(1);
+    const fsB = (1.9 + Math.random() * 0.4).toFixed(1);
+    const fsC = (1.2 + Math.random() * 0.4).toFixed(1);
+    span.style.cssText = `font-size:${fsA}rem;--fs-a:${fsA}rem;--fs-b:${fsB}rem;--fs-c:${fsC}rem;animation:flameSize ${duration}s ${delay}s ease-in-out infinite;`;
+    row.appendChild(span);
+  }
+})();
+
+function updateFlames() {
+  document.getElementById('flame-row').classList.toggle('active', streak >= 5);
+}
+
+// ================================================================
+//  ANSWER HANDLING
+// ================================================================
+function handleAnswer(choice, btn) {
+  if (busy) return;
+  busy = true;
+  attempted++;
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  // Chill mode
+  if (chillMode) {
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === currentQ.answer) b.classList.add('reveal');
+    });
+    if (choice === currentQ.answer) {
+      btn.classList.add('correct');
+      tallyCorrect++;
+      document.getElementById('feedback-msg').textContent = '✦ Correct!';
+    } else {
+      btn.classList.add('wrong');
+      tallyWrong++;
+      document.getElementById('feedback-msg').textContent = `✗ The answer is ${currentQ.answer}`;
+    }
+    document.getElementById('tally-correct').textContent = tallyCorrect;
+    document.getElementById('tally-wrong').textContent = tallyWrong;
+    document.getElementById('continue-btn').classList.add('visible');
+    return;
+  }
+
+  // Normal mode
+  if (choice === currentQ.answer) {
+    btn.classList.add('correct');
+    streak++;
+    const points = streak;
+    score += points;
+    document.getElementById('score-display').textContent = score;
+    document.getElementById('streak-display').textContent = streak;
+    updateFlames();
+    const msg = streak >= 5 ? `🔥 x${streak} STREAK! +${points}` :
+                streak >= 3 ? `⚡ x${streak} Streak! +${points}` :
+                streak >= 2 ? `✦ x${streak} Streak! +${points}` : `✦ Correct! +${points}`;
+    document.getElementById('feedback-msg').textContent = msg;
+    setTimeout(nextQuestion, 600);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === currentQ.answer) b.classList.add('reveal');
+    });
+    const oldStreak = streak;
+    streak = 0;
+    document.getElementById('streak-display').textContent = '0';
+    updateFlames();
+    const msg = oldStreak >= 2 ? `✗ Streak lost!` : `✗ Wrong!`;
+    document.getElementById('feedback-msg').textContent = `${msg}  →  ${currentQ.answer}`;
+    setTimeout(nextQuestion, 1600);
+  }
+}
+
+// ================================================================
+//  END GAME
+// ================================================================
+async function endGame() {
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('questions-answered').textContent =
+    `${score} correct out of ${attempted} attempted`;
+
+  const { rank, msg } = getRankDisplay(score);
+  document.getElementById('rank-text').textContent = rank;
+  const diffLabels = { medium: '⚔ Medium Mode', expert: '🌌 Expert Mode' };
+  document.getElementById('end-difficulty').textContent = diffLabels[currentDifficulty] || '';
+  document.getElementById('end-message').textContent = msg;
+
+  setScreen('screen-end');
+
+  // Chill mode — no end screen, go straight back to title
+  if (chillMode) { showTitle(); return; }
+
+  // Master of Inverses easter egg
+  if (score >= 100) {
+    setTimeout(triggerHypersphereEasterEgg, 600);
+    return;
+  }
+
+  // Check leaderboard qualification
+  const qualifies = await checkIsTop10(score);
+  if (qualifies && score > 0) {
+    setTimeout(() => {
+      document.getElementById('initials-score-display').textContent = score;
+      setupInitialInputs();
+      setScreen('screen-initials');
+      setTimeout(() => document.getElementById('init-0').focus(), 350);
+    }, 2000);
+  }
+}
+</script>
+</body>
+</html>
