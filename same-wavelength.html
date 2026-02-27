@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAME WAVELENGTH — Synth Lab</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: #0f0f1a;
+    --border: #1a1a2e;
+    --green: #00ff9f;
+    --amber: #ffaa00;
+    --red: #ff3355;
+    --blue: #00aaff;
+    --text: #c8ffd4;
+    --muted: #4a6a4a;
+    --glow: 0 0 10px #00ff9f88, 0 0 20px #00ff9f44;
+    --amber-glow: 0 0 10px #ffaa0088, 0 0 20px #ffaa0044;
+    --red-glow: 0 0 10px #ff335588, 0 0 20px #ff335544;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, #001a0e44 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, #001020 0%, transparent 50%);
+  }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+    pointer-events: none; z-index: 200;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-size: clamp(1rem, 2.5vw, 1.6rem); letter-spacing: 0.3em;
+    color: var(--green); text-shadow: var(--glow); margin-bottom: 2px;
+  }
+  .subtitle { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2em; margin-bottom: 12px; }
+
+  /* ── BATTLE BAR ── */
+  .battle-bar {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; width: 100%; max-width: 1000px;
+    gap: 12px; margin-bottom: 10px;
+  }
+  .ship-status {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 4px; padding: 10px 14px;
+  }
+  .ship-label { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 6px; }
+  .ship-svg-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
+  .health-pips { display: flex; gap: 5px; justify-content: center; }
+  .hp-pip {
+    width: 14px; height: 14px; border-radius: 2px; transform: rotate(45deg);
+    border: 1px solid currentColor; transition: all 0.3s;
+  }
+  .hp-pip.alive-green { background: var(--green); color: var(--green); box-shadow: 0 0 6px #00ff9f88; }
+  .hp-pip.alive-red   { background: var(--red);   color: var(--red);   box-shadow: 0 0 6px #ff335588; }
+  .hp-pip.dead        { background: transparent;  color: #2a2a3a; }
+
+  .round-badge { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--amber); text-shadow: var(--amber-glow); text-align: center; letter-spacing: 0.15em; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-layout { display: grid; grid-template-columns: 1fr 280px; gap: 14px; width: 100%; max-width: 1000px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 14px; position: relative; }
+  .panel-label { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; letter-spacing: 0.25em; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+
+  /* ── SCOPE ── */
+  .scope-wrap { position: relative; }
+  canvas#scope {
+    display: block; width: 100%; border: 1px solid #0f2a1a; border-radius: 3px;
+    background: #020c07; box-shadow: inset 0 0 30px #000a04, 0 0 15px #00ff9f11;
+  }
+  .scope-overlay { position: absolute; top:0;left:0;right:0;bottom:0; pointer-events:none; border-radius:3px; background: radial-gradient(ellipse at 50% 50%, transparent 60%, #020c0799 100%); }
+  .legend { display:flex; gap:16px; margin-top:8px; font-size:0.6rem; }
+  .legend-item { display:flex; align-items:center; gap:5px; color:var(--muted); }
+  .legend-line { width:20px; height:2px; border-radius:1px; }
+  .target-hint { font-size:0.6rem; color:#2a4a3a; margin-top:5px; text-align:right; letter-spacing:0.1em; }
+
+  /* ── CONTROLS ── */
+  .controls-panel { display:flex; flex-direction:column; gap:10px; }
+  .param-block { background:#080812; border:1px solid var(--border); border-radius:3px; padding:12px; }
+  .param-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .param-name { font-family:'Orbitron',sans-serif; font-size:1rem; letter-spacing:0.15em; color:var(--amber); text-shadow:var(--amber-glow); }
+  .param-formula { font-size:0.85rem; color:#6a6a9a; }
+  .param-value { font-size:1rem; color:var(--green); text-shadow:var(--glow); text-align:center; margin-bottom:5px; }
+  input[type=range] { -webkit-appearance:none; width:100%; height:4px; background:#0f2a1a; border-radius:2px; outline:none; cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; background:var(--amber); border-radius:2px; box-shadow:0 0 8px #ffaa0088; cursor:pointer; transform:rotate(45deg); }
+  input[type=range]::-webkit-slider-runnable-track { background:linear-gradient(to right,#0f2a1a,#1a3a2a); border-radius:2px; }
+  .range-ends { display:flex; justify-content:space-between; font-size:0.5rem; color:var(--muted); margin-top:2px; }
+  .equation-display { background:#020c07; border:1px solid #0f2a1a; border-radius:3px; padding:8px; text-align:center; font-size:0.8rem; color:var(--green); text-shadow:var(--glow); }
+
+  /* ── FEEDBACK ── */
+  .feedback { min-height:54px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:3px; }
+  .feedback-score { font-family:'Orbitron',sans-serif; font-size:1.2rem; font-weight:700; }
+  .feedback-msg { font-size:0.6rem; letter-spacing:0.08em; color:var(--muted); }
+  .score-perfect { color:var(--green); text-shadow:var(--glow); }
+  .score-good    { color:var(--amber); text-shadow:var(--amber-glow); }
+  .score-miss    { color:var(--red);   text-shadow:var(--red-glow); }
+  .attempts-row { display:flex; justify-content:space-between; align-items:center; font-size:0.55rem; color:var(--muted); margin-top:6px; }
+  .attempt-pips { display:flex; gap:4px; }
+  .pip { width:8px; height:8px; border-radius:1px; transform:rotate(45deg); border:1px solid var(--muted); }
+  .pip.used { background:var(--amber); border-color:var(--amber); box-shadow:0 0 5px #ffaa0088; }
+  .pip.hit  { background:var(--green); border-color:var(--green); box-shadow:0 0 5px #00ff9f88; }
+
+  /* ── BUTTONS ── */
+  .attempt-btn {
+    font-family:'Orbitron',sans-serif; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase;
+    background:transparent; border:2px solid var(--green); color:var(--green);
+    padding:11px; border-radius:3px; cursor:pointer; width:100%;
+    transition:all 0.15s; text-shadow:var(--glow); box-shadow:var(--glow);
+  }
+  .attempt-btn:hover { background:#00ff9f22; }
+  .attempt-btn:active { transform:scale(0.98); }
+  .attempt-btn:disabled { opacity:0.3; cursor:not-allowed; }
+
+  .new-btn {
+    font-family:'Orbitron',sans-serif; font-size:0.6rem; letter-spacing:0.15em;
+    background:transparent; border:1px solid #2a2a4a; color:#4a4a8a;
+    padding:8px; border-radius:3px; cursor:pointer; width:100%; transition:all 0.2s; margin-top:4px;
+  }
+  .new-btn:hover { border-color:var(--blue); color:var(--blue); box-shadow:0 0 8px #00aaff33; }
+  .new-btn.ready {
+    border:2px solid var(--green); color:var(--green); text-shadow:var(--glow);
+    font-size:0.7rem; padding:11px; animation:pulse 1.4s ease-in-out infinite;
+  }
+  .new-btn.ready:hover { background:#00ff9f22; }
+  @keyframes pulse { 0%,100%{box-shadow:var(--glow);} 50%{box-shadow:0 0 20px #00ff9faa,0 0 40px #00ff9f55;} }
+
+  /* ── STATUS BAR ── */
+  .status-bar { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:1000px; margin-top:10px; padding:7px 12px; background:var(--panel); border:1px solid var(--border); border-radius:3px; font-size:0.55rem; color:var(--muted); }
+  .status-freq { color:var(--green); text-shadow:var(--glow); }
+
+  /* ── FLASH ANIMATIONS ── */
+  @keyframes flashGreen { 0%{box-shadow:0 0 0 #00ff9f;} 50%{box-shadow:0 0 50px #00ff9f99,0 0 100px #00ff9f44;} 100%{box-shadow:0 0 0 #00ff9f;} }
+  @keyframes flashRed   { 0%{box-shadow:0 0 0 #ff3355;} 50%{box-shadow:0 0 50px #ff335599,0 0 100px #ff335544;} 100%{box-shadow:0 0 0 #ff3355;} }
+  .success-flash { animation:flashGreen 0.5s ease; }
+  .damage-flash  { animation:flashRed   0.4s ease; }
+
+  /* ── WIN / LOSE OVERLAYS ── */
+  .overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(5,5,12,0.93); flex-direction:column; align-items:center; justify-content:center; gap:20px; }
+  .overlay.active { display:flex; }
+  .overlay-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(2rem,6vw,3.5rem); letter-spacing:0.2em; text-align:center; }
+  .overlay-title.win  { color:var(--green); text-shadow:0 0 30px #00ff9f,0 0 60px #00ff9f66; }
+  .overlay-title.lose { color:var(--red);   text-shadow:0 0 30px #ff3355,0 0 60px #ff335566; }
+  .overlay-sub { font-size:0.9rem; color:var(--muted); letter-spacing:0.12em; text-align:center; max-width:420px; line-height:1.8; }
+  .overlay-btn { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:0.2em; background:transparent; border:2px solid var(--green); color:var(--green); padding:14px 32px; border-radius:3px; cursor:pointer; text-shadow:var(--glow); box-shadow:var(--glow); transition:all 0.15s; }
+  .overlay-btn:hover { background:#00ff9f22; }
+  .overlay-btn.red-btn { border-color:var(--red); color:var(--red); text-shadow:var(--red-glow); box-shadow:var(--red-glow); }
+  .overlay-btn.red-btn:hover { background:#ff335522; }
+
+  @media (max-width:680px) { .main-layout{grid-template-columns:1fr;} .battle-bar{grid-template-columns:1fr 1fr;} .round-badge{display:none;} }
+</style>
+</head>
+<body>
+
+<!-- WIN OVERLAY -->
+<div class="overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🛸💥</div>
+  <div class="overlay-title win">ALIEN DESTROYED</div>
+  <div class="overlay-sub">Your frequency weapons found every resonance point.<br>The alien vessel has been reduced to space dust.</div>
+  <button class="overlay-btn" onclick="startNewGame()">▸ Play Again</button>
+</div>
+
+<!-- LOSE OVERLAY -->
+<div class="overlay" id="loseOverlay">
+  <div style="font-size:3.5rem;">💀🚀</div>
+  <div class="overlay-title lose">SHIP DESTROYED</div>
+  <div class="overlay-sub" id="loseMsg">Your vessel couldn't survive the assault.<br>The alien signal overwhelmed your systems.</div>
+  <button class="overlay-btn red-btn" onclick="startNewGame()">▸ Try Again</button>
+</div>
+
+<h1>Same Wavelength</h1>
+<p class="subtitle">Synth Lab — Frequency Combat System</p>
+
+<!-- BATTLE BAR -->
+<div class="battle-bar">
+
+  <!-- PLAYER SHIP STATUS -->
+  <div class="ship-status">
+    <div class="ship-label">▸ YOUR VESSEL</div>
+    <div class="ship-svg-wrap">
+      <!-- Player ship: sleek upward-pointing fighter -->
+      <svg id="playerShipSvg" width="90" height="64" viewBox="0 0 90 64">
+        <polygon id="ps-body"   points="45,3 68,52 45,44 22,52"   fill="#041a10" stroke="#00ff9f" stroke-width="1.5"/>
+        <polygon id="ps-lwing"  points="22,52 2,62 18,40"          fill="#031208" stroke="#00cc77" stroke-width="1"/>
+        <polygon id="ps-rwing"  points="68,52 88,62 72,40"          fill="#031208" stroke="#00cc77" stroke-width="1"/>
+        <ellipse id="ps-engine" cx="45" cy="49" rx="9" ry="4"       fill="#00ff9f33" stroke="#00ff9f" stroke-width="1"/>
+        <ellipse                 cx="45" cy="22" rx="5" ry="8"       fill="#00ff9f15" stroke="#00ff9f88" stroke-width="1"/>
+        <circle                  cx="45" cy="20" r="2.5"             fill="#00ff9f" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="health-pips" id="playerHP"></div>
+  </div>
+
+  <!-- CENTER STATUS -->
+  <div style="text-align:center; min-width:90px;">
+    <div class="round-badge" id="roundBadge">WAVE 1 / 4</div>
+    <div style="font-size:2rem; margin:6px 0;" id="battleIcon">⚡</div>
+    <div style="font-size:0.5rem; color:var(--muted); letter-spacing:0.1em; max-width:110px;" id="battleMsg">CALIBRATE YOUR WEAPON</div>
+  </div>
+
+  <!-- ALIEN SHIP STATUS -->
+  <div class="ship-status" style="border-color:#ff335544;">
+    <div class="ship-label" style="color:#ff335577;">◀ ALIEN VESSEL</div>
+    <div class="ship-svg-wrap">
+      <!-- Alien saucer with 4 distinct parts -->
+      <svg id="alienShipSvg" width="110" height="72" viewBox="0 0 110 72">
+        <ellipse id="al-hull"  cx="55" cy="46" rx="48" ry="16"  fill="#1a0407" stroke="#ff3355" stroke-width="1.5"/>
+        <ellipse id="al-dome"  cx="55" cy="30" rx="24" ry="18"  fill="#100205" stroke="#ff3355" stroke-width="1.2"/>
+        <ellipse id="al-lpod"  cx="14" cy="50" rx="11" ry="7"   fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
+        <ellipse id="al-rpod"  cx="96" cy="50" rx="11" ry="7"   fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
+        <!-- Eye -->
+        <ellipse cx="55" cy="30" rx="9" ry="7" fill="#ff335522"/>
+        <ellipse cx="55" cy="30" rx="4" ry="4" fill="#ff3355" opacity="0.85"/>
+        <!-- Underbelly lights -->
+        <circle cx="36" cy="48" r="2.5" fill="#ff335555"/>
+        <circle cx="55" cy="51" r="2.5" fill="#ff335555"/>
+        <circle cx="74" cy="48" r="2.5" fill="#ff335555"/>
+      </svg>
+    </div>
+    <div class="health-pips" id="alienHP"></div>
+  </div>
+
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- OSCILLOSCOPE -->
+  <div class="panel scope-wrap">
+    <div class="panel-label">📡 Oscilloscope — Target Frequency Signal</div>
+    <canvas id="scope" height="300"></canvas>
+    <div class="scope-overlay"></div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div>
+        <span>Target signal</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:#ff335588; border-top:2px dashed #ff335588; height:0;"></div>
+        <span>First shot (miss)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:#ffaa00; border-top:2px dashed #ffaa00; height:0;"></div>
+        <span>Current aim</span>
+      </div>
+    </div>
+    <div class="target-hint" id="targetHint">▸ SET WEAPON FREQUENCY AND FIRE</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-panel">
+    <div class="panel">
+      <div class="panel-label">🎛 Weapon Frequency Parameters</div>
+
+      <div class="param-block">
+        <div class="param-header"><span class="param-name">Amplitude</span><span class="param-formula">A·sin(...)</span></div>
+        <div class="param-value" id="ampVal">1</div>
+        <input type="range" id="ampSlider" min="1" max="5" step="1" value="1">
+        <div class="range-ends"><span>1</span><span>5</span></div>
+      </div>
+
+      <div class="param-block">
+        <div class="param-header"><span class="param-name">Frequency</span><span class="param-formula">sin(B·x)</span></div>
+        <div class="param-value" id="freqVal">1</div>
+        <input type="range" id="freqSlider" min="1" max="6" step="1" value="1">
+        <div class="range-ends"><span>1×</span><span>6×</span></div>
+      </div>
+
+      <div class="param-block">
+        <div class="param-header"><span class="param-name">Phase Shift</span><span class="param-formula">sin(Bx+Cπ)</span></div>
+        <div class="param-value" id="phaseVal">+0</div>
+        <input type="range" id="phaseSlider" min="-4" max="4" step="1" value="0">
+        <div class="range-ends"><span>−4π</span><span>+4π</span></div>
+      </div>
+
+      <div class="param-block">
+        <div class="param-header"><span class="param-name">Vertical Shift</span><span class="param-formula">sin(...)+D</span></div>
+        <div class="param-value" id="shiftVal">+0</div>
+        <input type="range" id="shiftSlider" min="-3" max="3" step="1" value="0">
+        <div class="range-ends"><span>−3</span><span>+3</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">Weapon Equation</div>
+      <div class="equation-display" id="equationDisplay">f(x) = 1·sin(1x)</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">Signal Analysis</div>
+      <div class="feedback" id="feedback">
+        <div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">— AWAITING FIRE —</div>
+      </div>
+      <div class="attempts-row">
+        <span>SHOTS THIS WAVE</span>
+        <div class="attempt-pips" id="pips"></div>
+      </div>
+    </div>
+
+    <button class="attempt-btn" id="attemptBtn" onclick="doAttempt()">⚡ Fire Weapon</button>
+    <button class="new-btn"     id="newBtn"     onclick="nextWave()">▸ Next Target Wave</button>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span>SAME WAVELENGTH v0.14 — SYNTH LAB</span>
+  <span id="targetFreqDisplay" class="status-freq">TARGET: — Hz</span>
+  <span id="roundDisplay">WAVE 1 / 4</span>
+</div>
+
+<script>
+  const canvas = document.getElementById('scope');
+  const ctx    = canvas.getContext('2d');
+
+  const ampSlider   = document.getElementById('ampSlider');
+  const freqSlider  = document.getElementById('freqSlider');
+  const phaseSlider = document.getElementById('phaseSlider');
+  const shiftSlider = document.getElementById('shiftSlider');
+
+  // ── Target ──
+  let targetA, targetB, targetC, targetD, targetCN;
+
+  // ── Player wave values ──
+  let playerA, playerB, playerC, playerD;
+
+  // ── Game state ──
+  let alienHP        = 4;   // 4 ship sections, each worth 1 hit
+  let playerHP       = 4;   // player health pips
+  let currentWave    = 1;   // wave number (1–4 to kill alien, more if lucky shots)
+  let attemptsUsed   = 0;
+  const MAX_ATTEMPTS = 2;   // 2 shots per wave
+  let waveActive     = true;
+  let firstShotMissed = false;
+  let firstShotParams = null;   // { A,B,C,D } of first missed shot
+  let showCurrentAim  = false;  // show amber wave on attempt
+  let alienPartialHits = 0;     // counts half-hits; every 2 = destroy 1 section
+
+  // ── Damage model ──
+  // 1st shot hit  → full hit (1 section destroyed)
+  // 1st shot miss → player loses 1 HP; first shot wave stays on screen in red
+  // 2nd shot hit  → glancing hit (+0.5, i.e. alienPartialHits++)
+  // 2nd shot miss → wave fails, no alien damage
+  // WIN: alienHP reaches 0
+  // LOSE: playerHP reaches 0
+
+  function getPlayerValues() {
+    playerA = Number(ampSlider.value);
+    playerB = Number(freqSlider.value);
+    playerC = Number(phaseSlider.value) * Math.PI;
+    playerD = Number(shiftSlider.value);
+  }
+
+  function isPerfectMatch() {
+    return Number(ampSlider.value)   === targetA  &&
+           Number(freqSlider.value)  === targetB  &&
+           Number(phaseSlider.value) === targetCN &&
+           Number(shiftSlider.value) === targetD;
+  }
+
+  function updateLabels() {
+    getPlayerValues();
+    const cN = Number(phaseSlider.value) | 0;
+    const D  = Number(shiftSlider.value);
+    const B  = Number(freqSlider.value);
+    const A  = Number(ampSlider.value);
+    document.getElementById('ampVal').textContent  = A;
+    document.getElementById('freqVal').textContent = B;
+    const cDisplay = cN === 0 ? '0' : cN === 1 ? 'π' : cN === -1 ? '-π' : `${cN}π`;
+    document.getElementById('phaseVal').textContent = (cN >= 0 ? '+' : '') + cDisplay.replace(/^\+/,'');
+    document.getElementById('shiftVal').textContent = (D >= 0 ? '+' : '') + D;
+    const cStr = cN === 0 ? '' : cN === 1 ? ' + π' : cN === -1 ? ' - π' : cN > 0 ? ` + ${cN}π` : ` - ${Math.abs(cN)}π`;
+    const dStr = D === 0 ? '' : D > 0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
+    document.getElementById('equationDisplay').textContent = `f(x) = ${A}·sin(${B}x${cStr})${dStr}`;
+  }
+
+  [ampSlider, freqSlider, phaseSlider, shiftSlider].forEach(s => s.addEventListener('input', updateLabels));
+
+  // ── Canvas / drawing ──
+  function resizeCanvas() {
+    canvas.width  = canvas.parentElement.getBoundingClientRect().width - 28;
+    canvas.height = 300;
+    drawScope();
+  }
+
+  function drawScope() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#020c07'; ctx.fillRect(0,0,W,H);
+    drawGrid(W, H);
+    // Target wave (green)
+    drawWave(targetA, targetB, targetC, targetD, '#00ff9f', 2.5, false, W, H);
+    drawPeakValleyMarkers(targetA, targetB, targetC, targetD, '#00ff9f', W, H);
+    // First missed shot (dim red dashed, stays up)
+    if (firstShotMissed && firstShotParams) {
+      drawWave(firstShotParams.A, firstShotParams.B, firstShotParams.C, firstShotParams.D, '#ff335577', 1.5, true, W, H);
+    }
+    // Current aim (amber dashed, only shown momentarily after fire)
+    if (showCurrentAim) {
+      drawWave(playerA, playerB, playerC, playerD, '#ffaa00', 2, true, W, H);
+      drawPeakValleyMarkers(playerA, playerB, playerC, playerD, '#ffaa00', W, H);
+    }
+  }
+
+  function drawGrid(W, H) {
+    const ML=44, MB=28, MT=16, MR=16;
+    const plotW=W-ML-MR, plotH=H-MB-MT;
+    const xHalfRange = 3*Math.PI/targetB;
+    canvas._cx     = ML + plotW/2;
+    canvas._cy     = MT + plotH/2;
+    canvas._xScale = plotW/(2*xHalfRange);
+    canvas._yScale = plotH/14;
+    const cx=canvas._cx, cy=canvas._cy, xScale=canvas._xScale, yScale=canvas._yScale;
+
+    ctx.strokeStyle='#0a200f'; ctx.lineWidth=1;
+    const hp=Math.PI/targetB, nHL=Math.ceil(xHalfRange/hp)+1;
+    for(let i=-nHL;i<=nHL;i++){
+      const x=cx+i*hp*xScale; if(x<ML||x>W-MR) continue;
+      ctx.beginPath(); ctx.moveTo(x,MT); ctx.lineTo(x,H-MB); ctx.stroke();
+    }
+    for(let i=-6;i<=6;i++){
+      const y=cy-i*yScale;
+      ctx.beginPath(); ctx.moveTo(ML,y); ctx.lineTo(W-MR,y); ctx.stroke();
+    }
+
+    ctx.strokeStyle='#1a4a2a'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ML,cy); ctx.lineTo(W-MR,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,MT); ctx.lineTo(cx,H-MB); ctx.stroke();
+
+    ctx.fillStyle='#1a4a2a';
+    ctx.beginPath(); ctx.moveTo(W-MR,cy); ctx.lineTo(W-MR-6,cy-4); ctx.lineTo(W-MR-6,cy+4); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx,MT); ctx.lineTo(cx-4,MT+6); ctx.lineTo(cx+4,MT+6); ctx.fill();
+
+    ctx.fillStyle='#00dd88'; ctx.font='bold 16px Share Tech Mono';
+    ctx.textAlign='left';   ctx.fillText('x',W-MR+4,cy+5);
+    ctx.textAlign='center'; ctx.fillText('f(x)',cx,MT-2);
+
+    ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono';
+    ctx.textAlign='center';
+    const fp=2*Math.PI/targetB, nPT=Math.ceil(xHalfRange/fp)+1;
+    for(let i=-nPT;i<=nPT;i++){
+      if(i===0) continue;
+      const xVal=i*fp, x=cx+xVal*xScale;
+      if(x<ML+10||x>W-MR-10) continue;
+      ctx.fillText(formatAsPiFraction(xVal), x, H-MB+16);
+      ctx.strokeStyle='#00aa55'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(x,cy-4); ctx.lineTo(x,cy+4); ctx.stroke();
+    }
+
+    ctx.textAlign='right';
+    [-4,-2,2,4].forEach(n=>{
+      const y=cy-n*yScale;
+      ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono';
+      ctx.fillText(n,ML-6,y+5);
+      ctx.strokeStyle='#00aa55'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(cx-3,y); ctx.lineTo(cx+3,y); ctx.stroke();
+    });
+    ctx.fillStyle='#00cc77'; ctx.textAlign='right'; ctx.font='15px Share Tech Mono';
+    ctx.fillText('0',cx-5,cy+16);
+  }
+
+  function drawWave(A,B,C,D,color,lineWidth,dashed,W,H) {
+    const cx=canvas._cx, cy=canvas._cy, yScale=canvas._yScale, xScale=canvas._xScale;
+    ctx.strokeStyle=color; ctx.lineWidth=lineWidth;
+    ctx.shadowColor=color; ctx.shadowBlur=8;
+    if(dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
+    ctx.beginPath(); let started=false;
+    for(let px=0;px<W;px++){
+      const x=(px-cx)/xScale, y=A*Math.sin(B*x+C)+D, py=cy-y*yScale;
+      if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py);
+    }
+    ctx.stroke(); ctx.shadowBlur=0; ctx.setLineDash([]);
+  }
+
+  function findPeaksValleys(A,B,C,D){
+    const cx=canvas._cx, xScale=canvas._xScale;
+    const xMin=-cx/xScale, xMax=(canvas.width-cx)/xScale;
+    const pts=[];
+    for(let k=-8;k<=8;k++){
+      const xP=(Math.PI/2-C+2*Math.PI*k)/B; if(xP>=xMin&&xP<=xMax) pts.push({x:xP,y:A+D,type:'peak'});
+      const xV=(-Math.PI/2-C+2*Math.PI*k)/B; if(xV>=xMin&&xV<=xMax) pts.push({x:xV,y:-A+D,type:'valley'});
+    }
+    return pts.sort((a,b)=>a.x-b.x);
+  }
+
+  function drawPeakValleyMarkers(A,B,C,D,color,W,H){
+    const cx=canvas._cx, cy=canvas._cy, xScale=canvas._xScale, yScale=canvas._yScale;
+    const all=findPeaksValleys(A,B,C,D);
+    const peaks=all.filter(p=>p.type==='peak').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x));
+    const valleys=all.filter(p=>p.type==='valley').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x));
+    const sel=[...peaks.slice(0,2),...valleys.slice(0,1)];
+    ctx.save(); ctx.shadowBlur=0; ctx.setLineDash([]);
+    sel.forEach(pt=>{
+      const px=cx+pt.x*xScale, py=cy-pt.y*yScale;
+      ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.globalAlpha=0.9; ctx.fill(); ctx.globalAlpha=1;
+      ctx.strokeStyle=color; ctx.lineWidth=1; ctx.globalAlpha=0.3; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(cx,py); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha=1;
+      const xLbl=formatAsPiFraction(pt.x);
+      const yLbl=Number.isInteger(pt.y)?pt.y.toString():pt.y.toFixed(1);
+      const txt=`(${xLbl}, ${yLbl})`;
+      const pad=4; ctx.font='bold 20px Share Tech Mono';
+      const tw=ctx.measureText(txt).width, bW=tw+pad*2, bH=28;
+      let lX=px+8, lY=pt.type==='peak'?py-14:py+32;
+      if(lX+bW>W-4) lX=px-bW-8;
+      if(lY-bH<4) lY=py+32; if(lY>H-4) lY=py-14;
+      ctx.fillStyle='#020c07'; ctx.globalAlpha=0.85;
+      ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.fill(); ctx.globalAlpha=1;
+      ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.globalAlpha=0.6;
+      ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.stroke(); ctx.globalAlpha=1;
+      ctx.fillStyle=color; ctx.textAlign='left'; ctx.fillText(txt,lX,lY-4);
+    });
+    ctx.restore();
+  }
+
+  function formatAsPiFraction(x){
+    if(Math.abs(x)<0.0001) return '0';
+    const sign=x<0?-1:1, absX=Math.abs(x);
+    for(const d of [1,2,3,4,5,6,7,8,9,10,12]){
+      const nRaw=absX*d/Math.PI, n=Math.round(nRaw);
+      if(n>0&&Math.abs(n-nRaw)<0.0001){
+        const g=gcd(n,d), nr=sign*(n/g), dr=d/g;
+        if(dr===1) return nr===1?'π':nr===-1?'-π':`${nr}π`;
+        if(nr===1) return `π/${dr}`; if(nr===-1) return `-π/${dr}`;
+        return `${nr}π/${dr}`;
+      }
+    }
+    return `${(x/Math.PI).toFixed(2)}π`;
+  }
+
+  function gcd(a,b){ return b===0?a:gcd(b,a%b); }
+
+  // ── Target generation ──
+  function generateTarget(){
+    const A=[1,2,3,4,5], B=[1,2,3,4,5,6], C=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
+    targetA = A[Math.floor(Math.random()*A.length)]|0;
+    targetB = B[Math.floor(Math.random()*B.length)]|0;
+    const cN= C[Math.floor(Math.random()*C.length)]|0;
+    targetC = cN*Math.PI; targetCN=cN;
+    targetD = D[Math.floor(Math.random()*D.length)]|0;
+    document.getElementById('targetFreqDisplay').textContent=`TARGET: ${(440*targetB).toFixed(0)} Hz (B=${targetB})`;
+  }
+
+  // ── HP rendering ──
+  function renderPlayerHP(){
+    const c=document.getElementById('playerHP'); c.innerHTML='';
+    for(let i=0;i<4;i++){
+      const p=document.createElement('div');
+      p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
+      c.appendChild(p);
+    }
+    const parts=['ps-body','ps-lwing','ps-rwing','ps-engine'];
+    parts.forEach((id,i)=>{
+      const el=document.getElementById(id);
+      if(el) el.style.opacity=(i<playerHP)?'1':'0.08';
+    });
+  }
+
+  function renderAlienHP(){
+    const c=document.getElementById('alienHP'); c.innerHTML='';
+    for(let i=0;i<4;i++){
+      const p=document.createElement('div');
+      p.className='hp-pip '+(i<alienHP?'alive-red':'dead');
+      c.appendChild(p);
+    }
+    const destroyed=4-alienHP;
+    const parts=['al-hull','al-dome','al-lpod','al-rpod'];
+    parts.forEach((id,i)=>{
+      const el=document.getElementById(id);
+      if(el) el.style.opacity=(i<destroyed)?'0.06':'1';
+    });
+  }
+
+  function buildPips(){
+    const c=document.getElementById('pips'); c.innerHTML='';
+    for(let i=0;i<MAX_ATTEMPTS;i++){
+      const p=document.createElement('div');
+      p.className='pip'; p.id=`pip-${i}`; c.appendChild(p);
+    }
+  }
+
+  // ── Core game action ──
+  function doAttempt(){
+    if(!waveActive||attemptsUsed>=MAX_ATTEMPTS) return;
+    getPlayerValues();
+    const hit=isPerfectMatch();
+    const isFirst=(attemptsUsed===0);
+    const pip=document.getElementById(`pip-${attemptsUsed}`);
+    attemptsUsed++;
+
+    // Show player wave briefly then hide (keep first miss wave up in red)
+    showCurrentAim=true; drawScope();
+    setTimeout(()=>{ showCurrentAim=false; drawScope(); }, 800);
+
+    if(hit){
+      pip.classList.add('hit');
+      firstShotParams=null; firstShotMissed=false;
+
+      if(isFirst){
+        // Full hit
+        alienHP--;
+        renderAlienHP();
+        canvas.classList.add('success-flash');
+        setTimeout(()=>canvas.classList.remove('success-flash'),600);
+        setFeedback('score-perfect','⚡ DIRECT HIT',`Alien section destroyed! ${alienHP} remaining.`);
+        setBattle('💥','DIRECT HIT');
+      } else {
+        // Glancing hit (after first miss)
+        alienPartialHits++;
+        if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
+        renderAlienHP();
+        canvas.classList.add('success-flash');
+        setTimeout(()=>canvas.classList.remove('success-flash'),600);
+        setFeedback('score-good','↯ GLANCING HIT','Partial damage — took two shots to lock.');
+        setBattle('↯','GLANCING HIT');
+      }
+
+      waveActive=false;
+      document.getElementById('attemptBtn').disabled=true;
+
+      if(alienHP<=0){
+        setTimeout(showWinScreen,700);
+      } else {
+        document.getElementById('newBtn').classList.add('ready');
+        updateWaveBadge();
+      }
+
+    } else {
+      // Miss
+      pip.classList.add('used');
+
+      if(isFirst){
+        firstShotMissed=true;
+        firstShotParams={A:playerA,B:playerB,C:playerC,D:playerD};
+        setTimeout(()=>{ showCurrentAim=false; drawScope(); },800); // keep red shot on screen
+
+        playerHP--;
+        renderPlayerHP();
+        canvas.classList.add('damage-flash');
+        setTimeout(()=>canvas.classList.remove('damage-flash'),500);
+        setFeedback('score-miss','✗ MISS — SHIELDS HIT','Your ship took damage. No hints — one shot left!');
+        setBattle('🛡️','SHIELDS DAMAGED');
+
+        if(playerHP<=0){
+          waveActive=false;
+          document.getElementById('attemptBtn').disabled=true;
+          setTimeout(showLoseScreen,600);
+        }
+      } else {
+        // Missed both
+        firstShotParams=null; firstShotMissed=false;
+        setFeedback('score-miss','✗ BOTH SHOTS MISSED','Alien evaded — no damage this wave.');
+        setBattle('👾','ALIEN EVADED');
+        waveActive=false;
+        document.getElementById('attemptBtn').disabled=true;
+        document.getElementById('newBtn').classList.add('ready');
+        updateWaveBadge();
+      }
+    }
+  }
+
+  function setFeedback(cls, title, msg){
+    document.getElementById('feedback').innerHTML=`
+      <div class="feedback-score ${cls}">${title}</div>
+      <div class="feedback-msg">${msg}</div>`;
+  }
+
+  function setBattle(icon, msg){
+    document.getElementById('battleIcon').textContent=icon;
+    document.getElementById('battleMsg').textContent=msg;
+  }
+
+  function updateWaveBadge(){
+    const label=`WAVE ${currentWave} / 4`;
+    document.getElementById('roundBadge').textContent=label;
+    document.getElementById('roundDisplay').textContent=label;
+  }
+
+  function nextWave(){
+    if(alienHP<=0){ showWinScreen(); return; }
+    currentWave++;
+    attemptsUsed=0; waveActive=true;
+    firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+
+    ampSlider.value=1; freqSlider.value=1; phaseSlider.value=0; shiftSlider.value=0;
+    updateLabels(); generateTarget(); buildPips(); drawScope();
+
+    document.getElementById('attemptBtn').disabled=false;
+    document.getElementById('newBtn').classList.remove('ready');
+    setFeedback('','','');
+    document.getElementById('feedback').innerHTML=`<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">— AWAITING FIRE —</div>`;
+    document.getElementById('targetHint').textContent='▸ SET WEAPON FREQUENCY AND FIRE';
+    setBattle('⚡','CALIBRATE YOUR WEAPON');
+    updateWaveBadge();
+  }
+
+  function showWinScreen(){  document.getElementById('winOverlay').classList.add('active'); }
+  function showLoseScreen(){ document.getElementById('loseOverlay').classList.add('active'); }
+
+  function startNewGame(){
+    document.getElementById('winOverlay').classList.remove('active');
+    document.getElementById('loseOverlay').classList.remove('active');
+    alienHP=4; playerHP=4; alienPartialHits=0; currentWave=1;
+    attemptsUsed=0; waveActive=true; firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+    renderPlayerHP(); renderAlienHP();
+    ampSlider.value=1; freqSlider.value=1; phaseSlider.value=0; shiftSlider.value=0;
+    updateLabels(); generateTarget(); buildPips(); drawScope();
+    document.getElementById('attemptBtn').disabled=false;
+    document.getElementById('newBtn').classList.remove('ready');
+    document.getElementById('feedback').innerHTML=`<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">— AWAITING FIRE —</div>`;
+    document.getElementById('targetHint').textContent='▸ SET WEAPON FREQUENCY AND FIRE';
+    setBattle('⚡','CALIBRATE YOUR WEAPON');
+    updateWaveBadge();
+  }
+
+  // ── Init ──
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  generateTarget(); buildPips(); updateLabels(); renderPlayerHP(); renderAlienHP(); updateWaveBadge(); drawScope();
+</script>
+</body>
+</html>
