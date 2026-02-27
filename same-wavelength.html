@@ -243,22 +243,6 @@
 
   @media (max-width:680px) { .main-layout{grid-template-columns:1fr;} .battle-bar{grid-template-columns:1fr 1fr;} .round-badge{display:none;} }
 
-  /* ── AUDIO BUTTONS ── */
-  .audio-row {
-    display: flex; gap: 8px; margin-top: 10px; align-items: center;
-  }
-  .tone-btn {
-    font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em;
-    background: transparent; border: 1px solid #1a2a4a; color: #4a8aaa;
-    padding: 7px 10px; border-radius: 3px; cursor: pointer; flex: 1;
-    transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px;
-  }
-  .tone-btn:hover { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 8px #00aaff33; }
-  .tone-btn.playing { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 10px #00aaff55; animation: pulse 0.8s ease-in-out infinite; }
-  .tone-btn.target-tone { border-color: #00ff9f66; color: var(--green); }
-  .tone-btn.target-tone:hover { border-color: var(--green); box-shadow: var(--glow); }
-  .tone-btn.target-tone.playing { border-color: var(--green); color: var(--green); box-shadow: var(--glow); }
-  .tone-hz { font-size: 0.6rem; opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -363,18 +347,6 @@
       <div class="equation-bar-text" id="equationDisplay">f(x) = 1·sin(1x)</div>
     </div>
 
-    <!-- TONE BUTTONS -->
-    <div class="audio-row">
-      <button class="tone-btn target-tone" id="targetToneBtn" onclick="playTone('target')" title="Play the target wave as an audio tone (x-axis = milliseconds)">
-        &#9835; Target &nbsp;<span class="tone-hz" id="targetToneHz"></span>
-      </button>
-      <button class="tone-btn" id="playerToneBtn" onclick="playTone('player')" title="Play your current wave as an audio tone (x-axis = milliseconds)">
-        &#9835; My Wave &nbsp;<span class="tone-hz" id="playerToneHz"></span>
-      </button>
-    </div>
-    <div style="font-size:0.62rem; color:#2a4a3a; text-align:center; margin-top:4px; letter-spacing:0.08em;">
-      x-axis as milliseconds &rarr; audible frequency
-    </div>
   </div>
 
   <!-- CONTROLS -->
@@ -496,7 +468,6 @@
     const cStr = cN === 0 ? '' : cN === 1 ? ' + π' : cN === -1 ? ' - π' : cN > 0 ? ` + ${cN}π` : ` - ${Math.abs(cN)}π`;
     const dStr = D === 0 ? '' : D > 0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
     document.getElementById('equationDisplay').textContent = `f(x) = ${A}·sin(${B}x${cStr})${dStr}`;
-    updateToneLabels();
   }
 
   [ampSlider, freqSlider, phaseSlider, shiftSlider].forEach(s => s.addEventListener('input', updateLabels));
@@ -666,7 +637,6 @@
     targetC = cN*Math.PI; targetCN=cN;
     targetD = D[Math.floor(Math.random()*D.length)]|0;
     document.getElementById('targetFreqDisplay').textContent=`${(440*targetB).toFixed(0)} Hz`;
-    updateToneLabels();
   }
 
   // ── HP rendering ──
@@ -806,7 +776,6 @@
 
   function nextWave(){
     if(alienHP<=0){ showWinScreen(); return; }
-    stopActiveTone();
     currentWave++;
     attemptsUsed=0; waveActive=true;
     firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
@@ -829,7 +798,6 @@
   function startNewGame(){
     document.getElementById('winOverlay').classList.remove('active');
     document.getElementById('loseOverlay').classList.remove('active');
-    stopActiveTone();
     alienHP=4; playerHP=4; alienPartialHits=0; currentWave=1;
     attemptsUsed=0; waveActive=true; firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
     renderPlayerHP(); renderAlienHP();
@@ -843,73 +811,10 @@
     updateWaveBadge();
   }
 
-  // ── Audio Engine ──
-  let audioCtx = null;
-  let activeToneSource = null;
-  let activeToneGain   = null;
-  let activeToneWhich  = null; // 'target' | 'player'
-  const TONE_DURATION  = 2.0; // seconds
-
-  // Convert wave frequency parameter B to Hz assuming x-axis in milliseconds
-  // Period = 2π/B ms → frequency = B/(2π) kHz = B*1000/(2π) Hz
-  function bToHz(B) { return Math.round(B * 1000 / (2 * Math.PI)); }
-
-  function updateToneLabels() {
-    document.getElementById('targetToneHz').textContent = bToHz(targetB) + ' Hz';
-    const pb = Number(freqSlider.value);
-    document.getElementById('playerToneHz').textContent = bToHz(pb) + ' Hz';
-  }
-
-  function stopActiveTone() {
-    if (activeToneSource) {
-      try { activeToneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05); }
-      catch(e){}
-      setTimeout(() => { try { activeToneSource.stop(); } catch(e){} }, 200);
-      activeToneSource = null; activeToneGain = null;
-    }
-    document.getElementById('targetToneBtn').classList.remove('playing');
-    document.getElementById('playerToneBtn').classList.remove('playing');
-    activeToneWhich = null;
-  }
-
-  function playTone(which) {
-    // Toggle off if same button pressed again
-    if (activeToneWhich === which) { stopActiveTone(); return; }
-    stopActiveTone();
-
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    const B   = which === 'target' ? targetB : Number(freqSlider.value);
-    const hz  = B * 1000 / (2 * Math.PI);
-
-    const osc  = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.type      = 'sine';
-    osc.frequency.value = hz;
-    gain.gain.setValueAtTime(0, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.04);
-    gain.gain.setValueAtTime(0.35, audioCtx.currentTime + TONE_DURATION - 0.08);
-    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + TONE_DURATION);
-
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + TONE_DURATION + 0.1);
-
-    activeToneSource = osc; activeToneGain = gain; activeToneWhich = which;
-    const btn = document.getElementById(which === 'target' ? 'targetToneBtn' : 'playerToneBtn');
-    btn.classList.add('playing');
-    osc.onended = () => {
-      btn.classList.remove('playing');
-      if (activeToneWhich === which) { activeToneSource = null; activeToneGain = null; activeToneWhich = null; }
-    };
-  }
-
   // ── Init ──
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
-  generateTarget(); buildPips(); updateLabels(); updateToneLabels(); renderPlayerHP(); renderAlienHP(); updateWaveBadge(); drawScope();
+  generateTarget(); buildPips(); updateLabels(); renderPlayerHP(); renderAlienHP(); updateWaveBadge(); drawScope();
 </script>
 </body>
 </html>
