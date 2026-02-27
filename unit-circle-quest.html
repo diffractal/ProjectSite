@@ -605,7 +605,7 @@
   <div class="frame">
     <span class="corner-tr">✦</span>
     <span class="corner-bl">✦</span>
-    <span class="version-tag">v1.1.0</span>
+    <span class="version-tag">v1.1.2</span>
 
     <!-- ===== TITLE SCREEN ===== -->
     <div id="screen-title">
@@ -865,24 +865,25 @@ function buildQuestionPool() {
   for (const a of ANGLES) {
     const deg = a.deg + '°';
     const rad = a.deg === 0 ? '0' : a.rad;
-    // Easy+: angle conversions
+
+    // Easy+: angle conversions (all difficulties)
     pool.push({ tag:'Degrees → Radians', html:`Convert <span class="angle-val">${deg}</span> to radians`, answer:rad, pool:RAD_POOL });
     pool.push({ tag:'Radians → Degrees', html:`Convert <span class="angle-val">${rad}</span> radians to degrees`, answer:deg, pool:DEG_POOL });
-    // Medium+: sine and cosine
+
+    // Medium+: sine and cosine (degrees and radians, skipping 0 for radian form)
     if (currentDifficulty === 'medium' || currentDifficulty === 'expert') {
       pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${deg})</span>`, answer:a.sin, pool:SIN_COS_POOL });
       pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${deg})</span>`, answer:a.cos, pool:SIN_COS_POOL });
-      pool.push({ tag:'Tangent', html:`Find <span class="angle-val">tan(${deg})</span>`, answer:a.tan, pool:TAN_POOL });
       if (a.deg !== 0) {
         pool.push({ tag:'Sine',   html:`Find <span class="angle-val">sin(${rad})</span>`, answer:a.sin, pool:SIN_COS_POOL });
         pool.push({ tag:'Cosine', html:`Find <span class="angle-val">cos(${rad})</span>`, answer:a.cos, pool:SIN_COS_POOL });
       }
     }
-    // Expert: tangent (already included above in medium+ block, but only for expert we keep it)
-  }
-  // Remove tangent from medium
-  if (currentDifficulty === 'medium') {
-    return pool.filter(q => q.tag !== 'Tangent');
+
+    // Expert only: tangent
+    if (currentDifficulty === 'expert') {
+      pool.push({ tag:'Tangent', html:`Find <span class="angle-val">tan(${deg})</span>`, answer:a.tan, pool:TAN_POOL });
+    }
   }
   return pool;
 }
@@ -1023,8 +1024,19 @@ async function sheetsPost(entry) {
 }
 
 // ---------- Public API used by the rest of the game ----------
-function checkIsTop10(score) {
-  const data = loadLocalLB();
+async function checkIsTop10(score) {
+  let data;
+  if (SHEETS_URL) {
+    try {
+      data = await sheetsGet();
+      saveLocalLB(data); // keep local cache fresh
+    } catch (e) {
+      console.warn('checkIsTop10: Sheets unreachable, using local cache:', e);
+      data = loadLocalLB();
+    }
+  } else {
+    data = loadLocalLB();
+  }
   const entries = data[currentDifficulty] || [];
   if (entries.length < 10) return true;
   return score > entries[entries.length - 1].score;
@@ -1094,6 +1106,7 @@ async function showLeaderboard(highlightNew) {
 }
 
 function showDifficulty() {
+  clearInterval(timerInterval);
   setScreen('screen-difficulty');
 }
 
@@ -1335,8 +1348,8 @@ function triggerHypersphereEasterEgg() {
   }, duration / (totalFlames / 3));
 
   // After egg, prompt for initials if top 10
-  setTimeout(() => {
-    const qualifies = checkIsTop10(score);
+  setTimeout(async () => {
+    const qualifies = await checkIsTop10(score);
     if (qualifies) {
       document.getElementById('initials-score-display').textContent = score;
       setupInitialInputs();
@@ -1345,10 +1358,10 @@ function triggerHypersphereEasterEgg() {
   }, 5500);
 }
 
-function dismissHypersphereEgg() {
+async function dismissHypersphereEgg() {
   document.getElementById('hypersphere-overlay').classList.remove('active');
   // Now check leaderboard
-  const qualifies = checkIsTop10(score);
+  const qualifies = await checkIsTop10(score);
   if (qualifies && score > 0) {
     document.getElementById('initials-score-display').textContent = score;
     setupInitialInputs();
@@ -1439,7 +1452,7 @@ function handleAnswer(choice, btn) {
   }
 }
 
-function endGame() {
+async function endGame() {
   document.getElementById('final-score').textContent = score;
   document.getElementById('questions-answered').textContent =
     `${score} correct out of ${attempted} attempted`;
@@ -1452,8 +1465,8 @@ function endGame() {
 
   setScreen('screen-end');
 
-  // Chill mode — no leaderboard, no easter egg
-  if (chillMode) return;
+  // Chill mode — no end screen, no leaderboard, no easter egg; just return to title
+  if (chillMode) { showTitle(); return; }
 
   // Lord of Hyperspheres easter egg
   if (score >= 100) {
@@ -1462,7 +1475,7 @@ function endGame() {
   }
 
   // Check if score qualifies for top 10
-  const qualifies = checkIsTop10(score);
+  const qualifies = await checkIsTop10(score);
   if (qualifies && score > 0) {
     setTimeout(() => {
       document.getElementById('initials-score-display').textContent = score;
