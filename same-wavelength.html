@@ -84,13 +84,30 @@
 
   /* ── WORLD MAP SCREEN ── */
   #mapScreen { gap: 16px; padding: 20px 0; }
-  .map-title { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.3em; color: var(--muted); }
-  .map-hp-row { display: flex; gap: 6px; align-items: center; }
-  .map-hp-label { font-size: 0.72rem; color: var(--muted); margin-right: 4px; letter-spacing: 0.1em; }
+  .map-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
+    letter-spacing: 0.3em;
+    color: var(--green);
+    text-shadow: var(--glow);
+  }
+  .map-hp-row { display: flex; gap: 8px; align-items: center; }
+  .map-hp-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    color: var(--text);
+    margin-right: 6px;
+    letter-spacing: 0.15em;
+  }
   .map-container { position: relative; width: 100%; max-width: 800px; height: 320px; }
   .map-svg { width: 100%; height: 100%; }
-  .map-legend { display: flex; gap: 24px; font-size: 0.72rem; }
-  .map-legend span { display: flex; align-items: center; gap: 6px; }
+  .map-menu-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em;
+    background: transparent; border: 1px solid #2a3a2a; color: var(--muted);
+    padding: 8px 16px; border-radius: 3px; cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .map-menu-btn:hover { border-color: var(--green); color: var(--green); box-shadow: var(--glow); }
 
   /* ── GAME SCREEN ── */
   #gameScreen { gap: 0; }
@@ -133,6 +150,7 @@
   }
   .equation-bar-label { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; }
   .equation-bar-text { font-family: 'Share Tech Mono', monospace; font-size: clamp(1.3rem, 3vw, 2rem); color: var(--green); text-shadow: var(--glow); letter-spacing: 0.06em; text-align: center; }
+  .equation-bar-text .frac { font-size: 1.45em; line-height: 0.85; vertical-align: -0.05em; }
 
   /* ── BATTLE BAR ── */
   .battle-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%; max-width: 1000px; gap: 12px; margin-bottom: 10px; }
@@ -166,7 +184,8 @@
   .param-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
   .param-name { font-family:'Orbitron',sans-serif; font-size:1rem; letter-spacing:0.15em; color:var(--amber); text-shadow:var(--amber-glow); }
   .param-formula { font-size:0.85rem; color:#6a6a9a; }
-  .param-value { font-size:1rem; color:var(--green); text-shadow:var(--glow); text-align:center; margin-bottom:5px; }
+  .param-value { font-size:1.4rem; color:var(--green); text-shadow:var(--glow); text-align:center; margin-bottom:5px; line-height:1.2; }
+  .param-value .frac { font-size:1.8rem; }
   input[type=range] { -webkit-appearance:none; width:100%; height:4px; background:#0f2a1a; border-radius:2px; outline:none; cursor:pointer; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; background:var(--amber); border-radius:2px; box-shadow:0 0 8px #ffaa0088; cursor:pointer; transform:rotate(45deg); }
   input[type=range]::-webkit-slider-runnable-track { background:linear-gradient(to right,#0f2a1a,#1a3a2a); border-radius:2px; }
@@ -235,7 +254,7 @@
   .overlay.active { display:flex; }
   .overlay-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(2rem,6vw,3rem); letter-spacing:0.2em; }
   .overlay-title.win  { color:var(--green); text-shadow:0 0 30px #00ff9f,0 0 60px #00ff9f66; }
-  .overlay-sub { font-size:0.88rem; color:var(--muted); letter-spacing:0.1em; max-width:400px; line-height:2; }
+  .overlay-sub { font-size: clamp(1rem, 2.5vw, 1.3rem); color: var(--text); letter-spacing: 0.08em; max-width: 500px; line-height: 1.9; }
   .overlay-btn { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:0.2em; background:transparent; padding:14px 32px; border-radius:3px; cursor:pointer; transition:all 0.15s; }
   .overlay-btn.green-btn { border:2px solid var(--green); color:var(--green); text-shadow:var(--glow); box-shadow:var(--glow); }
   .overlay-btn.green-btn:hover { background:#00ff9f22; }
@@ -260,6 +279,14 @@
     .round-badge{display:none;}
     .map-container{height:240px;}
   }
+
+  /* ── DEBUG MODE ── */
+  .debug-world-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em;
+    background: transparent; border: 1px solid; padding: 10px 20px;
+    border-radius: 3px; cursor: pointer; transition: all 0.15s; min-width: 120px;
+  }
+  .debug-world-btn:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
 </style>
 </head>
 <body>
@@ -289,7 +316,10 @@
 
 <!-- ══════ WORLD MAP SCREEN ══════ -->
 <div class="screen" id="mapScreen">
-  <div class="map-title">Saturn System — Mission Map</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:800px;">
+    <div class="map-title">Saturn System — Mission Map</div>
+    <button class="map-menu-btn" onclick="showScreen('titleScreen')">Main Menu</button>
+  </div>
 
   <div class="map-hp-row">
     <span class="map-hp-label">Hull Integrity</span>
@@ -326,12 +356,17 @@
       <g id="worldNodes"></g>
     </svg>
   </div>
+</div>
 
-  <div class="map-legend">
-    <span style="color:var(--green);">◆ Current</span>
-    <span style="color:#4a6a4a;">◆ Cleared</span>
-    <span style="color:#2a2a4a;">◆ Locked</span>
+<!-- ══════ DEBUG BAR ══════ -->
+<div id="debugBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;
+  background:#050510ee;border-top:1px solid #ff335544;padding:14px 24px;
+  flex-direction:column;align-items:center;gap:10px;backdrop-filter:blur(6px);">
+  <div style="font-family:'Orbitron',sans-serif;font-size:0.65rem;letter-spacing:0.35em;color:#ff335599;">
+    ⚠ DEBUG MODE — SELECT LEVEL
   </div>
+  <div id="debugWorldList" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;"></div>
+  <div style="font-size:0.6rem;color:#2a2a4a;letter-spacing:0.2em;">ESC or Shift+` to close</div>
 </div>
 
 <!-- ══════ GAME SCREEN ══════ -->
@@ -409,6 +444,10 @@
       <div class="equation-bar">
         <div class="equation-bar-label">f(x)</div>
         <div class="equation-bar-text" id="equationDisplay">f(x) = sin(x)</div>
+      </div>
+      <div class="equation-bar shot1-bar" id="shot1Bar" style="display:none;border-color:#ff335544;box-shadow:0 0 20px #ff335511,inset 0 0 30px #1a0008;">
+        <div class="equation-bar-label" style="color:#ff335588;">Shot 1 (miss)</div>
+        <div class="equation-bar-text" id="shot1Display" style="color:#ff3355;text-shadow:0 0 10px #ff335588,0 0 20px #ff335544;font-size:clamp(1rem,2.2vw,1.5rem);"></div>
       </div>
     </div>
 
@@ -544,9 +583,14 @@ const phaseSlider = document.getElementById('phaseSlider');
 const shiftSlider = document.getElementById('shiftSlider');
 
 // ═══════════════════════════════════════════════
+// GAME PARAMETERS
+// ═══════════════════════════════════════════════
+const MAX_PLAYER_HP = 3;
+
+// ═══════════════════════════════════════════════
 // RUN STATE (persists across worlds)
 // ═══════════════════════════════════════════════
-let playerHP      = 5;
+let playerHP      = MAX_PLAYER_HP;
 let currentWorld  = 0;
 let worldsCleared = [];
 
@@ -556,6 +600,7 @@ let worldsCleared = [];
 let alienHP=0, alienMaxHP=0, alienPartialHits=0;
 let currentWave=1, attemptsUsed=0, maxAttempts=2;
 let waveActive=true, firstShotMissed=false, firstShotParams=null, showCurrentAim=false;
+let aimTimer=null;
 let targetA, targetB, targetC, targetD, targetCN;
 let playerA, playerB, playerC, playerD;
 
@@ -568,7 +613,7 @@ function showScreen(id){
 }
 
 function returnToTitle(){
-  playerHP=5; currentWorld=0; worldsCleared=[];
+  playerHP=MAX_PLAYER_HP; currentWorld=0; worldsCleared=[];
   showScreen('titleScreen');
 }
 
@@ -588,6 +633,120 @@ function returnToMap(){
 // ═══════════════════════════════════════════════
 // WORLD MAP
 // ═══════════════════════════════════════════════
+// ── Moon SVG content generators (drawn inside map nodes) ──
+function moonContent(ns, worldIdx, cx, cy, r){
+  const g = document.createElementNS(ns,'g');
+  const clip = document.createElementNS(ns,'clipPath');
+  const clipId = `moonClip${worldIdx}`;
+  clip.setAttribute('id', clipId);
+  const clipCirc = document.createElementNS(ns,'circle');
+  clipCirc.setAttribute('cx',cx); clipCirc.setAttribute('cy',cy); clipCirc.setAttribute('r',r-2);
+  clip.appendChild(clipCirc);
+  g.appendChild(clip);
+
+  const wrap = document.createElementNS(ns,'g');
+  wrap.setAttribute('clip-path',`url(#${clipId})`);
+
+  if(worldIdx===0){
+    // TITAN — orange/amber hazy sphere with atmospheric banding
+    const base=document.createElementNS(ns,'circle');
+    base.setAttribute('cx',cx); base.setAttribute('cy',cy); base.setAttribute('r',r-2);
+    base.setAttribute('fill','#7a4010'); wrap.appendChild(base);
+    // Haze layers
+    [[0,'#c8620a',0.5],[1,'#d97820',0.35],[-3,'#b05010',0.3],[4,'#e08830',0.2]].forEach(([dy,col,op])=>{
+      const e=document.createElementNS(ns,'ellipse');
+      e.setAttribute('cx',cx); e.setAttribute('cy',cy+dy); e.setAttribute('rx',r-2); e.setAttribute('ry',3+Math.abs(dy));
+      e.setAttribute('fill',col); e.setAttribute('opacity',op); wrap.appendChild(e);
+    });
+    // Atmospheric glow rim
+    const rim=document.createElementNS(ns,'circle');
+    rim.setAttribute('cx',cx); rim.setAttribute('cy',cy); rim.setAttribute('r',r-2);
+    rim.setAttribute('fill','none'); rim.setAttribute('stroke','#ffa030'); rim.setAttribute('stroke-width','4'); rim.setAttribute('opacity','0.4');
+    wrap.appendChild(rim);
+    // Highlight
+    const hl=document.createElementNS(ns,'ellipse');
+    hl.setAttribute('cx',cx-5); hl.setAttribute('cy',cy-5); hl.setAttribute('rx',5); hl.setAttribute('ry',3);
+    hl.setAttribute('fill','#ffcc88'); hl.setAttribute('opacity','0.25'); wrap.appendChild(hl);
+
+  } else if(worldIdx===1){
+    // ENCELADUS — bright white icy sphere, blue cracks
+    const base=document.createElementNS(ns,'circle');
+    base.setAttribute('cx',cx); base.setAttribute('cy',cy); base.setAttribute('r',r-2);
+    base.setAttribute('fill','#cce8f0'); wrap.appendChild(base);
+    // Ice cracks
+    [[-4,-6,8,4],[-2,2,-5,8],[3,-3,6,-7],[0,5,-8,2]].forEach(([x1,y1,x2,y2])=>{
+      const l=document.createElementNS(ns,'line');
+      l.setAttribute('x1',cx+x1); l.setAttribute('y1',cy+y1); l.setAttribute('x2',cx+x2); l.setAttribute('y2',cy+y2);
+      l.setAttribute('stroke','#5090b0'); l.setAttribute('stroke-width','1.2'); l.setAttribute('opacity','0.7');
+      wrap.appendChild(l);
+    });
+    // Geyser hint at south
+    const gy=document.createElementNS(ns,'ellipse');
+    gy.setAttribute('cx',cx); gy.setAttribute('cy',cy+r-4); gy.setAttribute('rx',4); gy.setAttribute('ry',2);
+    gy.setAttribute('fill','#aaddee'); gy.setAttribute('opacity','0.5'); wrap.appendChild(gy);
+    // Specular highlight
+    const hl=document.createElementNS(ns,'ellipse');
+    hl.setAttribute('cx',cx-4); hl.setAttribute('cy',cy-5); hl.setAttribute('rx',6); hl.setAttribute('ry',4);
+    hl.setAttribute('fill','white'); hl.setAttribute('opacity','0.5'); wrap.appendChild(hl);
+
+  } else if(worldIdx===2){
+    // MIMAS — grey, with massive Herschel crater (Death Star)
+    const base=document.createElementNS(ns,'circle');
+    base.setAttribute('cx',cx); base.setAttribute('cy',cy); base.setAttribute('r',r-2);
+    base.setAttribute('fill','#6a6a72'); wrap.appendChild(base);
+    // Surface texture shading
+    const shade=document.createElementNS(ns,'circle');
+    shade.setAttribute('cx',cx+4); shade.setAttribute('cy',cy+3); shade.setAttribute('r',r-4);
+    shade.setAttribute('fill','#505058'); shade.setAttribute('opacity','0.4'); wrap.appendChild(shade);
+    // Small craters
+    [[-5,-4,2],[4,-6,1.5],[6,5,1.5],[-3,5,2]].forEach(([dx,dy,cr])=>{
+      const c2=document.createElementNS(ns,'circle');
+      c2.setAttribute('cx',cx+dx); c2.setAttribute('cy',cy+dy); c2.setAttribute('r',cr);
+      c2.setAttribute('fill','none'); c2.setAttribute('stroke','#888898'); c2.setAttribute('stroke-width','0.8'); c2.setAttribute('opacity','0.6');
+      wrap.appendChild(c2);
+    });
+    // Herschel crater — the big one, slightly off-center
+    const hOuter=document.createElementNS(ns,'circle');
+    hOuter.setAttribute('cx',cx-5); hOuter.setAttribute('cy',cy-2); hOuter.setAttribute('r',7);
+    hOuter.setAttribute('fill','#454550'); hOuter.setAttribute('stroke','#909098'); hOuter.setAttribute('stroke-width','1.5'); hOuter.setAttribute('opacity','0.9');
+    wrap.appendChild(hOuter);
+    const hInner=document.createElementNS(ns,'circle');
+    hInner.setAttribute('cx',cx-5); hInner.setAttribute('cy',cy-2); hInner.setAttribute('r',2.5);
+    hInner.setAttribute('fill','#8888a0'); hInner.setAttribute('opacity','0.8');
+    wrap.appendChild(hInner);
+    // Highlight
+    const hl=document.createElementNS(ns,'ellipse');
+    hl.setAttribute('cx',cx-6); hl.setAttribute('cy',cy-7); hl.setAttribute('rx',4); hl.setAttribute('ry',2.5);
+    hl.setAttribute('fill','white'); hl.setAttribute('opacity','0.2'); wrap.appendChild(hl);
+
+  } else if(worldIdx===3){
+    // HYPERION — irregular spongy dark shape, chaotic pits
+    const base=document.createElementNS(ns,'circle');
+    base.setAttribute('cx',cx); base.setAttribute('cy',cy); base.setAttribute('r',r-2);
+    base.setAttribute('fill','#2d1e10'); wrap.appendChild(base);
+    // Irregular outline suggestion via blobs
+    [[0,-10,9,6,0.5],[8,-4,7,5,0.4],[-8,-2,6,7,0.4],[4,8,8,5,0.45],[-5,7,6,4,0.4]].forEach(([dx,dy,rx,ry,op])=>{
+      const e=document.createElementNS(ns,'ellipse');
+      e.setAttribute('cx',cx+dx); e.setAttribute('cy',cy+dy); e.setAttribute('rx',rx); e.setAttribute('ry',ry);
+      e.setAttribute('fill','#3d2a15'); e.setAttribute('opacity',op); wrap.appendChild(e);
+    });
+    // Deep pits
+    [[-4,-3,4],[-1,5,3.5],[6,-1,3],[2,-7,2.5],[-7,3,2.5],[5,6,2]].forEach(([dx,dy,pr])=>{
+      const pit=document.createElementNS(ns,'circle');
+      pit.setAttribute('cx',cx+dx); pit.setAttribute('cy',cy+dy); pit.setAttribute('r',pr);
+      pit.setAttribute('fill','#0a0604'); pit.setAttribute('stroke','#4a3020'); pit.setAttribute('stroke-width','0.8'); pit.setAttribute('opacity','0.9');
+      wrap.appendChild(pit);
+    });
+    // Rusty highlight
+    const hl=document.createElementNS(ns,'ellipse');
+    hl.setAttribute('cx',cx-4); hl.setAttribute('cy',cy-6); hl.setAttribute('rx',5); hl.setAttribute('ry',3);
+    hl.setAttribute('fill','#8a5530'); hl.setAttribute('opacity','0.25'); wrap.appendChild(hl);
+  }
+
+  g.appendChild(wrap);
+  return g;
+}
+
 function renderMap(){
   const g = document.getElementById('worldNodes');
   g.innerHTML = '';
@@ -595,18 +754,20 @@ function renderMap(){
   WORLDS.forEach((world, i) => {
     const pos      = NODE_POS[i];
     const cleared  = worldsCleared.includes(i);
-    const locked   = i > currentWorld && !cleared;
+    // Only current world is clickable; all others locked
     const isCur    = (i === currentWorld) && !cleared;
+    const locked   = !isCur && !cleared;
 
-    const strokeCol = cleared ? '#2a5a2a' : locked ? '#1a1a3a' : world.color;
-    const textCol   = cleared ? '#4a7a4a' : locked ? '#2a2a5a' : world.color;
-    const r         = isCur ? 28 : 24;
-
+    const r = isCur ? 28 : 24;
     const ns = 'http://www.w3.org/2000/svg';
     const grp = document.createElementNS(ns,'g');
-    grp.setAttribute('class','world-node'+(locked?' locked':'')+(isCur?' current':''));
-    if(!locked) grp.onclick = () => enterWorld(i);
-    grp.style.cursor = locked ? 'default' : 'pointer';
+
+    if(isCur){
+      grp.style.cursor = 'pointer';
+      grp.onclick = () => enterWorld(i);
+    } else {
+      grp.style.cursor = 'default';
+    }
 
     // Pulse ring for current world
     if(isCur){
@@ -620,89 +781,114 @@ function renderMap(){
       grp.appendChild(ring);
     }
 
-    // Main circle
+    // Main circle background
     const circ = document.createElementNS(ns,'circle');
     circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-    circ.setAttribute('fill', cleared?'#0a180a': locked?'#08080f':'#090914');
-    circ.setAttribute('stroke',strokeCol);
-    circ.setAttribute('stroke-width',isCur?'2.5':'1.5');
+    if(cleared){
+      circ.setAttribute('fill','#0a180a');
+      circ.setAttribute('stroke','#2a6a2a');
+      circ.setAttribute('stroke-width','2');
+    } else if(locked){
+      circ.setAttribute('fill','#08080f');
+      circ.setAttribute('stroke','#1a1a3a');
+      circ.setAttribute('stroke-width','1.5');
+    } else {
+      circ.setAttribute('fill','#090914');
+      circ.setAttribute('stroke',world.color);
+      circ.setAttribute('stroke-width','2.5');
+    }
     grp.appendChild(circ);
 
-    // Inner content
+    // Moon illustration (always, dimmed when locked/cleared)
+    const moonGrp = moonContent(ns, i, pos.x, pos.y, r);
+    if(cleared) moonGrp.setAttribute('opacity','0.35');
+    else if(locked) moonGrp.setAttribute('opacity','0.18');
+    else moonGrp.setAttribute('opacity','1');
+    grp.appendChild(moonGrp);
+
+    // Overlay for cleared: green tint + checkmark
     if(cleared){
-      // Checkmark
-      const t = document.createElementNS(ns,'text');
-      t.setAttribute('x',pos.x); t.setAttribute('y',pos.y+5);
-      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','16');
-      t.setAttribute('fill','#4a7a4a'); t.textContent='✓';
-      grp.appendChild(t);
-    } else if(locked){
-      // Lock
-      const t = document.createElementNS(ns,'text');
-      t.setAttribute('x',pos.x); t.setAttribute('y',pos.y+6);
-      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','15');
-      t.setAttribute('fill','#2a2a5a'); t.textContent='🔒';
-      grp.appendChild(t);
-    } else {
-      // HP dots arranged in a ring inside the circle
+      const tint=document.createElementNS(ns,'circle');
+      tint.setAttribute('cx',pos.x); tint.setAttribute('cy',pos.y); tint.setAttribute('r',r-2);
+      tint.setAttribute('fill','#00ff9f'); tint.setAttribute('opacity','0.08');
+      grp.appendChild(tint);
+      const ck=document.createElementNS(ns,'text');
+      ck.setAttribute('x',pos.x); ck.setAttribute('y',pos.y+6);
+      ck.setAttribute('text-anchor','middle'); ck.setAttribute('font-size','18');
+      ck.setAttribute('fill','#00ff9f'); ck.setAttribute('opacity','0.9');
+      ck.textContent='✓';
+      grp.appendChild(ck);
+    }
+
+    // Overlay for locked: dark veil + lock icon
+    if(locked){
+      const veil=document.createElementNS(ns,'circle');
+      veil.setAttribute('cx',pos.x); veil.setAttribute('cy',pos.y); veil.setAttribute('r',r-2);
+      veil.setAttribute('fill','#08080f'); veil.setAttribute('opacity','0.55');
+      grp.appendChild(veil);
+      const lk=document.createElementNS(ns,'text');
+      lk.setAttribute('x',pos.x); lk.setAttribute('y',pos.y+6);
+      lk.setAttribute('text-anchor','middle'); lk.setAttribute('font-size','14');
+      lk.setAttribute('fill','#2a2a5a');
+      lk.textContent='🔒';
+      grp.appendChild(lk);
+    }
+
+    // HP dots for current world (shown as ring of dots around the circle)
+    if(isCur){
       for(let h=0; h<world.bossHP; h++){
         const angle = (h/world.bossHP)*2*Math.PI - Math.PI/2;
         const dot = document.createElementNS(ns,'circle');
-        dot.setAttribute('cx', pos.x + Math.cos(angle)*13);
-        dot.setAttribute('cy', pos.y + Math.sin(angle)*13);
+        dot.setAttribute('cx', pos.x + Math.cos(angle)*(r+8));
+        dot.setAttribute('cy', pos.y + Math.sin(angle)*(r+8));
         dot.setAttribute('r','3');
         dot.setAttribute('fill',world.color);
-        dot.setAttribute('opacity','0.5');
+        dot.setAttribute('opacity','0.6');
         grp.appendChild(dot);
       }
     }
 
-    // World name label
+    // World name label — bigger and brighter
+    const textCol = cleared ? '#4a9a4a' : locked ? '#2a2a5a' : world.color;
     const lbl = document.createElementNS(ns,'text');
-    lbl.setAttribute('x',pos.x); lbl.setAttribute('y',pos.y+r+16);
+    lbl.setAttribute('x',pos.x); lbl.setAttribute('y',pos.y+r+18);
     lbl.setAttribute('text-anchor','middle');
     lbl.setAttribute('font-family','Orbitron,sans-serif');
-    lbl.setAttribute('font-size','11'); lbl.setAttribute('fill',textCol);
-    lbl.setAttribute('letter-spacing','1');
+    lbl.setAttribute('font-size','13'); lbl.setAttribute('fill',textCol);
+    lbl.setAttribute('font-weight','700');
+    lbl.setAttribute('letter-spacing','1.5');
     lbl.textContent = world.name;
     grp.appendChild(lbl);
 
-    // Param hint below name
-    if(!locked){
-      const params=[];
-      if(world.unlocks.amp)   params.push('A');
-      if(world.unlocks.freq)  params.push('B');
-      if(world.unlocks.phase) params.push('h');
-      if(world.unlocks.shift) params.push('D');
+    // Equation form hint for current world (replaces A B D param list)
+    if(isCur){
+      // Build general form string based on unlocked params
+      const u = world.unlocks;
+      const A = u.amp   ? 'A' : '1';
+      const B = u.freq  ? 'B' : '';
+      const h = u.phase ? '+h' : '';
+      const D = u.shift ? '+D' : '';
+      const inner = B ? `${B}x${h}` : `x${h}`;
+      const eqStr = `f(x) = ${A}sin(${inner})${D}`;
+
       const ph = document.createElementNS(ns,'text');
-      ph.setAttribute('x',pos.x); ph.setAttribute('y',pos.y+r+30);
+      ph.setAttribute('x',pos.x); ph.setAttribute('y',pos.y+r+34);
       ph.setAttribute('text-anchor','middle');
-      ph.setAttribute('font-family','monospace'); ph.setAttribute('font-size','9');
-      ph.setAttribute('fill',textCol); ph.setAttribute('opacity','0.6');
-      ph.textContent = params.join('  ');
+      ph.setAttribute('font-family','Share Tech Mono,monospace'); ph.setAttribute('font-size','11');
+      ph.setAttribute('fill',world.color); ph.setAttribute('opacity','0.85');
+      ph.textContent = eqStr;
       grp.appendChild(ph);
-    }
 
-    // Boss HP count for unlocked worlds
-    if(!locked && !cleared){
-      const hpT = document.createElementNS(ns,'text');
-      hpT.setAttribute('x',pos.x); hpT.setAttribute('y',pos.y+5);
-      hpT.setAttribute('text-anchor','middle');
-      hpT.setAttribute('font-family','Orbitron,sans-serif'); hpT.setAttribute('font-size','9');
-      hpT.setAttribute('fill',world.color); hpT.setAttribute('opacity','0.5');
-      hpT.textContent = `${world.bossHP}HP`;
-      grp.appendChild(hpT);
-    }
-
-    // Shot restriction badge for Hyperion
-    if(i===3 && !locked && !cleared){
-      const badge = document.createElementNS(ns,'text');
-      badge.setAttribute('x',pos.x); badge.setAttribute('y',pos.y+r+44);
-      badge.setAttribute('text-anchor','middle');
-      badge.setAttribute('font-family','monospace'); badge.setAttribute('font-size','8');
-      badge.setAttribute('fill','#ff335588');
-      badge.textContent='1 shot only';
-      grp.appendChild(badge);
+      // 1-shot badge for Hyperion
+      if(i===3){
+        const badge = document.createElementNS(ns,'text');
+        badge.setAttribute('x',pos.x); badge.setAttribute('y',pos.y+r+50);
+        badge.setAttribute('text-anchor','middle');
+        badge.setAttribute('font-family','monospace'); badge.setAttribute('font-size','9');
+        badge.setAttribute('fill','#ff335588');
+        badge.textContent='— 1 shot only —';
+        grp.appendChild(badge);
+      }
     }
 
     g.appendChild(grp);
@@ -712,7 +898,7 @@ function renderMap(){
 function renderMapHP(){
   const c = document.getElementById('mapPlayerHP');
   c.innerHTML='';
-  for(let i=0;i<5;i++){
+  for(let i=0;i<MAX_PLAYER_HP;i++){
     const p=document.createElement('div');
     p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
     c.appendChild(p);
@@ -760,6 +946,7 @@ function enterWorld(worldIdx){
 
   document.getElementById('attemptBtn').disabled=false;
   hideQuitConfirm();
+  hideFirstShotBar();
   document.getElementById('feedback').innerHTML='<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>';
   document.getElementById('targetHint').textContent='';
   setBattle('·','');
@@ -807,6 +994,11 @@ function isPerfectMatch(){
 // ═══════════════════════════════════════════════
 // LABELS
 // ═══════════════════════════════════════════════
+function wrapFrac(str){
+  // Wrap Unicode fraction characters in a .frac span so CSS can enlarge them
+  return str.replace(/[¼⅓½¾⅔¾]/g, m=>`<span class="frac">${m}</span>`);
+}
+
 function updateLabels(){
   getPlayerValues();
   const w    = WORLDS[currentWorld];
@@ -817,7 +1009,8 @@ function updateLabels(){
   const bStr = FREQ_LABELS[bIdx];
 
   document.getElementById('ampVal').textContent  = A;
-  document.getElementById('freqVal').textContent = bStr;
+  // Use innerHTML for freq so fraction glyphs get the .frac treatment
+  document.getElementById('freqVal').innerHTML = wrapFrac(bStr);
 
   const hDisp = h===0?'0':h===1?'π':h===-1?'-π':`${h}π`;
   document.getElementById('phaseVal').textContent = (h>=0?'+':'')+hDisp.replace(/^-/,'-');
@@ -837,7 +1030,9 @@ function updateLabels(){
     const cVal=den===1?(absN===1?'π':`${absN}π`):(absN===1?`π/${den}`:`${absN}π/${den}`);
     cStr=sign+cVal;
   }
-  document.getElementById('equationDisplay').textContent=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
+  // Use innerHTML so fraction glyphs in bEqStr get enlarged
+  document.getElementById('equationDisplay').innerHTML =
+    wrapFrac(`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`);
 }
 
 [ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',updateLabels));
@@ -1000,15 +1195,18 @@ function gcd(a,b){ return b===0?a:gcd(b,a%b); }
 // ═══════════════════════════════════════════════
 function renderPlayerHP(){
   const c=document.getElementById('playerHP'); c.innerHTML='';
-  for(let i=0;i<5;i++){
+  for(let i=0;i<MAX_PLAYER_HP;i++){
     const p=document.createElement('div');
     p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
     c.appendChild(p);
   }
+  // Scale ship part damage: parts fade proportionally as HP drops
   const parts=['ps-body','ps-lwing','ps-rwing','ps-engine'];
+  const damaged = MAX_PLAYER_HP - playerHP; // 0=full, MAX=dead
+  const threshold = MAX_PLAYER_HP / parts.length;
   parts.forEach((id,i)=>{
     const el=document.getElementById(id);
-    if(el) el.style.opacity=(i<playerHP)?'1':'0.08';
+    if(el) el.style.opacity=(damaged < (i+1)*threshold)?'1':'0.08';
   });
 }
 
@@ -1045,13 +1243,76 @@ function doAttempt(){
   const pip=document.getElementById(`pip-${attemptsUsed}`);
   attemptsUsed++;
 
-  showCurrentAim=true; drawScope();
-  setTimeout(()=>{ showCurrentAim=false; drawScope(); }, 800);
+  // Cancel any in-flight aim timer before starting a new one
+  if(aimTimer){ clearTimeout(aimTimer); aimTimer=null; }
 
-  if(hit){
-    pip.classList.add('hit');
+  showCurrentAim=true; drawScope();
+  aimTimer=setTimeout(()=>{ showCurrentAim=false; aimTimer=null; drawScope(); }, 800);
+
+  if(isFirst){
+    // ── FIRST SHOT ──
+    if(hit){
+      pip.classList.add('hit');
+      firstShotParams=null; firstShotMissed=false;
+      alienHP--;
+      renderAlienHP();
+      canvas.classList.add('success-flash');
+      setTimeout(()=>canvas.classList.remove('success-flash'),600);
+      setFeedback('score-perfect','Hit',`${alienHP} section${alienHP!==1?'s':''} remaining.`);
+      setBattle('✦','');
+      waveActive=false;
+      document.getElementById('attemptBtn').disabled=true;
+      hideFirstShotBar();
+      if(alienHP<=0) setTimeout(onWorldWon,700);
+      else setTimeout(nextWave,1400);
+
+    } else {
+      // Miss on first shot — lose HP, show equation, give second shot (unless single-shot world)
+      pip.classList.add('used');
+      firstShotMissed=true;
+      firstShotParams={A:playerA,B:playerB,C:playerC,D:playerD};
+      showFirstShotBar();
+
+      if(maxAttempts===1){
+        // Hyperion: single-shot — miss costs HP
+        playerHP--;
+        renderPlayerHP();
+        canvas.classList.add('damage-flash');
+        setTimeout(()=>canvas.classList.remove('damage-flash'),500);
+        setFeedback('score-miss','Miss','No second shot here.');
+        setBattle('·','');
+        waveActive=false;
+        document.getElementById('attemptBtn').disabled=true;
+        firstShotMissed=false; firstShotParams=null;
+        if(playerHP<=0){
+          setTimeout(()=>{ hideFirstShotBar(); onGameOver(); }, 800);
+        } else {
+          setTimeout(()=>{ hideFirstShotBar(); nextWave(); }, 1400);
+        }
+      } else {
+        playerHP--;
+        renderPlayerHP();
+        canvas.classList.add('damage-flash');
+        setTimeout(()=>canvas.classList.remove('damage-flash'),500);
+        if(playerHP<=0){
+          setFeedback('score-miss','Miss','Hull critical!');
+          setBattle('·','');
+          waveActive=false;
+          document.getElementById('attemptBtn').disabled=true;
+          setTimeout(()=>{ hideFirstShotBar(); onGameOver(); }, 800);
+        } else {
+          setFeedback('score-miss','Miss',`Hull at ${playerHP}. One shot remaining.`);
+          setBattle('·','');
+          // leave waveActive=true so second shot can fire
+        }
+      }
+    }
+
+  } else {
+    // ── SECOND SHOT ──
     firstShotParams=null; firstShotMissed=false;
-    if(isFirst){
+    if(hit){
+      pip.classList.add('hit');
       alienHP--;
       renderAlienHP();
       canvas.classList.add('success-flash');
@@ -1059,61 +1320,15 @@ function doAttempt(){
       setFeedback('score-perfect','Hit',`${alienHP} section${alienHP!==1?'s':''} remaining.`);
       setBattle('✦','');
     } else {
-      alienPartialHits++;
-      if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
-      renderAlienHP();
-      canvas.classList.add('success-flash');
-      setTimeout(()=>canvas.classList.remove('success-flash'),600);
-      setFeedback('score-good','Partial hit','Two shots to lock.');
-      setBattle('◈','');
+      pip.classList.add('used');
+      setFeedback('score-miss','Miss','Signal lost. New wave.');
+      setBattle('·','');
     }
     waveActive=false;
     document.getElementById('attemptBtn').disabled=true;
+    hideFirstShotBar();
     if(alienHP<=0) setTimeout(onWorldWon,700);
-    else setTimeout(nextWave, 1400);
-
-  } else {
-    pip.classList.add('used');
-    if(isFirst){
-      firstShotMissed=true;
-      firstShotParams={A:playerA,B:playerB,C:playerC,D:playerD};
-      playerHP--;
-      renderPlayerHP();
-      canvas.classList.add('damage-flash');
-      setTimeout(()=>canvas.classList.remove('damage-flash'),500);
-
-      if(playerHP<=0){
-        waveActive=false;
-        document.getElementById('attemptBtn').disabled=true;
-        setTimeout(onGameOver,600);
-        return;
-      }
-
-      if(maxAttempts===1){
-        // Hyperion single-shot: miss = wave over, auto-advance
-        setFeedback('score-miss','Miss','No second shot here.');
-        setBattle('·','');
-        waveActive=false;
-        document.getElementById('attemptBtn').disabled=true;
-        setTimeout(nextWave, 1400);
-      } else {
-        setFeedback('score-miss','Miss','One shot remaining.');
-        setBattle('·','');
-      }
-
-    } else {
-      // Missed both — glancing hit on enemy
-      firstShotParams=null; firstShotMissed=false;
-      alienPartialHits++;
-      if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
-      renderAlienHP();
-      setFeedback('score-miss','Miss','Glancing hit on enemy.');
-      setBattle('◈','');
-      waveActive=false;
-      document.getElementById('attemptBtn').disabled=true;
-      if(alienHP<=0) setTimeout(onWorldWon,700);
-      else setTimeout(nextWave, 1400);
-    }
+    else setTimeout(nextWave,1400);
   }
 }
 
@@ -1122,6 +1337,8 @@ function nextWave(){
   currentWave++;
   attemptsUsed=0; waveActive=true;
   firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+  if(aimTimer){ clearTimeout(aimTimer); aimTimer=null; }
+  hideFirstShotBar();
   ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
   updateLabels(); generateTarget(); buildPips(); drawScope();
   document.getElementById('attemptBtn').disabled=false;
@@ -1147,6 +1364,37 @@ function confirmQuit(){
 function setFeedback(cls,title,msg){
   document.getElementById('feedback').innerHTML=
     `<div class="feedback-score ${cls}">${title}</div><div class="feedback-msg">${msg}</div>`;
+}
+
+function showFirstShotBar(){
+  const bar=document.getElementById('shot1Bar');
+  const disp=document.getElementById('shot1Display');
+  // Build equation string from current player values at time of first shot
+  const w=WORLDS[currentWorld];
+  const A=playerA, B=playerB, h=w.unlocks.phase?Number(phaseSlider.value):0;
+  const D=playerD;
+  const bIdx=w.unlocks.freq?Number(freqSlider.value):3;
+  const bStr=FREQ_LABELS[bIdx];
+  const aStr=A===1?'':`${A}·`;
+  const bEqStr=bStr==='1'?'':bStr;
+  let cStr='';
+  if(h!==0){
+    const frac=FREQ_FRACS[bIdx];
+    let num=h*frac[0],den=frac[1];
+    const g=gcd(Math.abs(num),den); num/=g; den/=g;
+    const sign=num<0?' - ':' + ';
+    const absN=Math.abs(num);
+    const cVal=den===1?(absN===1?'π':`${absN}π`):(absN===1?`π/${den}`:`${absN}π/${den}`);
+    cStr=sign+cVal;
+  }
+  const dStr=D===0?'':D>0?` + ${D}`:` - ${Math.abs(D)}`;
+  disp.textContent=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
+  bar.style.display='flex';
+}
+
+function hideFirstShotBar(){
+  document.getElementById('shot1Bar').style.display='none';
+  document.getElementById('shot1Display').textContent='';
 }
 
 function setBattle(icon,msg){
@@ -1183,7 +1431,17 @@ function onWorldWon(){
 }
 
 function onGameOver(){
-  showEndScreen(false);
+  // Respawn: restore full HP and return to map, keeping cleared worlds and staying on current world
+  playerHP = MAX_PLAYER_HP;
+  const world = WORLDS[currentWorld];
+  document.getElementById('worldClearTitle').textContent = 'Ship Destroyed';
+  document.getElementById('worldClearTitle').className = 'overlay-title'; // remove .win
+  document.getElementById('worldClearTitle').style.color = 'var(--red)';
+  document.getElementById('worldClearTitle').style.textShadow = '0 0 30px #ff3355, 0 0 60px #ff335566';
+  document.getElementById('worldClearSub').innerHTML =
+    `Hull breached over <span style="color:${world.color};font-family:Orbitron,sans-serif;">${world.name}</span>.<br>
+     <span style="font-size:0.8rem;color:var(--muted);">Hull restored. Retrying from this position.</span>`;
+  document.getElementById('worldClearOverlay').classList.add('active');
 }
 
 function showEndScreen(victory){
@@ -1209,7 +1467,7 @@ function showEndScreen(victory){
     <hr class="end-divider">
     <div class="end-stat">
       <span class="end-stat-label">Hull Integrity</span>
-      <span class="end-stat-value ${hpLeft<=1?'red':''}">${hpLeft} / 5</span>
+      <span class="end-stat-value ${hpLeft<=1?'red':''}">${hpLeft} / ${MAX_PLAYER_HP}</span>
     </div>
     <div class="end-stat">
       <span class="end-stat-label">Waves Survived</span>
@@ -1218,6 +1476,49 @@ function showEndScreen(victory){
   `;
   showScreen('endScreen');
 }
+
+// ═══════════════════════════════════════════════
+// DEBUG MODE  (Shift + ` while on map screen)
+// ═══════════════════════════════════════════════
+let debugMode = false;
+
+function toggleDebugMode(){
+  debugMode = !debugMode;
+  const bar = document.getElementById('debugBar');
+  bar.style.display = debugMode ? 'flex' : 'none';
+  if(debugMode) renderDebugBar();
+}
+
+function renderDebugBar(){
+  const list = document.getElementById('debugWorldList');
+  list.innerHTML = '';
+  WORLDS.forEach((world, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'debug-world-btn';
+    btn.style.borderColor = world.color;
+    btn.style.color = world.color;
+    btn.innerHTML = `<span style="font-size:0.6rem;opacity:0.6;display:block;letter-spacing:0.15em;">${i===currentWorld?'► ':''}</span>${world.name}`;
+    btn.onclick = () => {
+      // Unlock target world without resetting cleared worlds
+      currentWorld = i;
+      playerHP = MAX_PLAYER_HP;
+      toggleDebugMode();
+      enterWorld(i);
+    };
+    list.appendChild(btn);
+  });
+}
+
+window.addEventListener('keydown', e => {
+  if(e.shiftKey && (e.key === '`' || e.key === '~')){
+    if(document.getElementById('mapScreen').classList.contains('active')){
+      toggleDebugMode();
+    }
+  }
+  if(e.key === 'Escape' && debugMode){
+    toggleDebugMode();
+  }
+});
 
 // ═══════════════════════════════════════════════
 // INIT
