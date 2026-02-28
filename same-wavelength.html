@@ -15,6 +15,7 @@
     --amber: #ffaa00;
     --red: #ff3355;
     --blue: #00aaff;
+    --purple: #aa55ff;
     --text: #c8ffd4;
     --muted: #4a6a4a;
     --glow: 0 0 10px #00ff9f88, 0 0 20px #00ff9f44;
@@ -47,82 +48,101 @@
     font-size: clamp(1rem, 2.5vw, 1.6rem); letter-spacing: 0.3em;
     color: var(--green); text-shadow: var(--glow); margin-bottom: 2px;
   }
-  .subtitle { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.2em; margin-bottom: 12px; }
 
-  /* ── MATH DECORATIONS ── */
-  /* Tiny sine wave SVG border along top of scope panel */
-  .scope-sine-border {
-    width: 100%;
-    height: 12px;
-    margin-bottom: 8px;
-    opacity: 0.25;
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; max-width: 1000px; flex-direction: column; align-items: center; }
+  .screen.active { display: flex; }
+
+  /* ── TITLE SCREEN ── */
+  #titleScreen { min-height: 80vh; justify-content: center; gap: 28px; text-align: center; }
+  .title-logo {
+    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-size: clamp(2rem, 6vw, 4rem); letter-spacing: 0.3em;
+    color: var(--green); text-shadow: var(--glow); line-height: 1.1;
+  }
+  .title-sub { font-size: 0.85rem; letter-spacing: 0.3em; color: var(--muted); margin-top: -16px; }
+  .title-sine { width: 100%; max-width: 500px; opacity: 0.3; margin: 0 auto; }
+  .instructions {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+    padding: 24px 32px; max-width: 560px; text-align: left;
+    line-height: 2; font-size: 0.82rem; color: #8aaa8a;
+  }
+  .instructions h3 {
+    font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+    letter-spacing: 0.3em; color: var(--amber); margin-bottom: 12px; text-shadow: var(--amber-glow);
+  }
+  .instructions .hl  { color: var(--green); }
+  .instructions .warn{ color: var(--red); }
+  .big-btn {
+    font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 0.25em;
+    background: transparent; border: 2px solid var(--green); color: var(--green);
+    padding: 16px 48px; border-radius: 4px; cursor: pointer;
+    text-shadow: var(--glow); box-shadow: var(--glow); transition: all 0.15s;
+  }
+  .big-btn:hover { background: #00ff9f22; box-shadow: 0 0 30px #00ff9faa, 0 0 60px #00ff9f44; }
+  .big-btn:active { transform: scale(0.98); }
+
+  /* ── WORLD MAP SCREEN ── */
+  #mapScreen { gap: 16px; padding: 20px 0; }
+  .map-title { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.3em; color: var(--muted); }
+  .map-hp-row { display: flex; gap: 6px; align-items: center; }
+  .map-hp-label { font-size: 0.72rem; color: var(--muted); margin-right: 4px; letter-spacing: 0.1em; }
+  .map-container { position: relative; width: 100%; max-width: 800px; height: 320px; }
+  .map-svg { width: 100%; height: 100%; }
+  .map-legend { display: flex; gap: 24px; font-size: 0.72rem; }
+  .map-legend span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── GAME SCREEN ── */
+  #gameScreen { gap: 0; }
+  .game-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    width: 100%; max-width: 1000px; margin-bottom: 4px;
+  }
+  .world-badge {
+    font-family: 'Orbitron', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em;
   }
 
-  /* Math glyph watermark in ship panels */
+  /* ── SHIP PANELS ── */
   .ship-status {
     background: var(--panel); border: 1px solid var(--border);
-    border-radius: 4px; padding: 10px 14px;
-    position: relative; overflow: hidden;
+    border-radius: 4px; padding: 10px 14px; position: relative; overflow: hidden;
   }
   .ship-status::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='4' y='18' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3Esin%3C/text%3E%3Ctext x='30' y='36' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3E2π%3C/text%3E%3Ctext x='8' y='52' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3E∫%3C/text%3E%3Ctext x='42' y='14' font-size='8' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3Eω%3C/text%3E%3C/svg%3E");
-    background-size: 60px 60px;
-    pointer-events: none;
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='4' y='18' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3Esin%3C/text%3E%3Ctext x='30' y='36' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3E2π%3C/text%3E%3Ctext x='8' y='52' font-size='9' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3E∫%3C/text%3E%3Ctext x='42' y='14' font-size='8' fill='%2300ff9f' opacity='0.06' font-family='monospace'%3Eω%3C/text%3E%3C/svg%3E");
+    background-size: 60px 60px; pointer-events: none;
   }
-  /* Alien panel gets red tint glyphs */
   .ship-status.enemy::before {
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='4' y='18' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3Esin%3C/text%3E%3Ctext x='30' y='36' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3E2π%3C/text%3E%3Ctext x='8' y='52' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3E∫%3C/text%3E%3Ctext x='42' y='14' font-size='8' fill='%23ff3355' opacity='0.07' font-family='monospace'%3Eω%3C/text%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='4' y='18' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3Esin%3C/text%3E%3Ctext x='30' y='36' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3E2π%3C/text%3E%3Ctext x='8' y='52' font-size='9' fill='%23ff3355' opacity='0.07' font-family='monospace'%3E∫%3C/text%3E%3Ctext x='42' y='14' font-size='8' fill='%23ff3355' opacity='0.07' font-family='monospace'%3Eω%3C/text%3E%3C/svg%3E");
   }
 
-  /* Equation bar gets a faint geometric grid behind it */
-  .equation-bar {
-    position: relative; overflow: hidden;
-  }
+  /* ── EQUATION BAR ── */
+  .equation-bar { position: relative; overflow: hidden; }
   .equation-bar::before {
-    content: '';
-    position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0;
     background-image:
       linear-gradient(rgba(0,255,159,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,159,0.03) 1px, transparent 1px);
-    background-size: 20px 20px;
-    pointer-events: none;
+    background-size: 20px 20px; pointer-events: none;
   }
+  .equation-bar {
+    width: 100%; margin-top: 12px; background: #020c07;
+    border: 1px solid #00ff9f44; border-radius: 4px; padding: 14px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 0 20px #00ff9f11, inset 0 0 30px #001a0a;
+  }
+  .equation-bar-label { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; }
+  .equation-bar-text { font-family: 'Share Tech Mono', monospace; font-size: clamp(1.3rem, 3vw, 2rem); color: var(--green); text-shadow: var(--glow); letter-spacing: 0.06em; text-align: center; }
 
-  /* Status bar math pattern */
-  .status-bar {
-    position: relative; overflow: hidden;
-  }
-  .status-bar::after {
-    content: 'π  ∑  ∫  ω  sin  cos  2π  Δ  λ  f(x)  π  ∑  ∫  ω  sin  cos  2π  Δ  λ  f(x)  π  ∑  ∫  ω  sin  cos';
-    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-    font-size: 0.5rem; color: var(--muted); opacity: 0.18;
-    letter-spacing: 0.4em; white-space: nowrap;
-    pointer-events: none;
-    /* fade out left edge */
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 30%);
-    mask-image: linear-gradient(to right, transparent 0%, black 30%);
-  }
   /* ── BATTLE BAR ── */
-  .battle-bar {
-    display: grid; grid-template-columns: 1fr auto 1fr;
-    align-items: center; width: 100%; max-width: 1000px;
-    gap: 12px; margin-bottom: 10px;
-  }
+  .battle-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%; max-width: 1000px; gap: 12px; margin-bottom: 10px; }
   .ship-label { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 6px; }
   .ship-svg-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
-  .health-pips { display: flex; gap: 5px; justify-content: center; }
-  .hp-pip {
-    width: 14px; height: 14px; border-radius: 2px; transform: rotate(45deg);
-    border: 1px solid currentColor; transition: all 0.3s;
-  }
+  .health-pips { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+  .hp-pip { width: 14px; height: 14px; border-radius: 2px; transform: rotate(45deg); border: 1px solid currentColor; transition: all 0.3s; }
   .hp-pip.alive-green { background: var(--green); color: var(--green); box-shadow: 0 0 6px #00ff9f88; }
   .hp-pip.alive-red   { background: var(--red);   color: var(--red);   box-shadow: 0 0 6px #ff335588; }
   .hp-pip.dead        { background: transparent;  color: #2a2a3a; }
-
   .round-badge { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: var(--amber); text-shadow: var(--amber-glow); text-align: center; letter-spacing: 0.15em; }
 
   /* ── MAIN LAYOUT ── */
@@ -132,43 +152,13 @@
 
   /* ── SCOPE ── */
   .scope-wrap { position: relative; }
-  canvas#scope {
-    display: block; width: 100%; border: 1px solid #0f2a1a; border-radius: 3px;
-    background: #020c07; box-shadow: inset 0 0 30px #000a04, 0 0 15px #00ff9f11;
-  }
+  canvas#scope { display: block; width: 100%; border: 1px solid #0f2a1a; border-radius: 3px; background: #020c07; box-shadow: inset 0 0 30px #000a04, 0 0 15px #00ff9f11; }
   .scope-overlay { position: absolute; top:0;left:0;right:0;bottom:0; pointer-events:none; border-radius:3px; background: radial-gradient(ellipse at 50% 50%, transparent 60%, #020c0799 100%); }
-  .legend { display:flex; gap:16px; margin-top:8px; font-size:0.75rem; }
+  .scope-sine-border { width:100%; height:12px; margin-bottom:8px; opacity:0.25; }
+  .legend { display:flex; gap:16px; margin-top:8px; font-size:0.75rem; flex-wrap:wrap; }
   .legend-item { display:flex; align-items:center; gap:5px; color:var(--muted); }
   .legend-line { width:20px; height:2px; border-radius:1px; }
   .target-hint { font-size:0.72rem; color:#2a5a3a; margin-top:5px; text-align:right; letter-spacing:0.1em; }
-
-  /* ── BIG EQUATION BAR (under graph, inside scope panel) ── */
-  .equation-bar {
-    width: 100%;
-    margin-top: 12px;
-    background: #020c07;
-    border: 1px solid #00ff9f44;
-    border-radius: 4px;
-    padding: 14px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    box-shadow: 0 0 20px #00ff9f11, inset 0 0 30px #001a0a;
-  }
-  .equation-bar-label {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.65rem; letter-spacing: 0.3em;
-    color: var(--muted); text-transform: uppercase;
-  }
-  .equation-bar-text {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(1.3rem, 3vw, 2rem);
-    color: var(--green);
-    text-shadow: var(--glow);
-    letter-spacing: 0.06em;
-    text-align: center;
-  }
 
   /* ── CONTROLS ── */
   .controls-panel { display:flex; flex-direction:column; gap:10px; }
@@ -205,23 +195,34 @@
   .attempt-btn:hover { background:#00ff9f22; }
   .attempt-btn:active { transform:scale(0.98); }
   .attempt-btn:disabled { opacity:0.3; cursor:not-allowed; }
-
-  .new-btn {
-    font-family:'Orbitron',sans-serif; font-size:0.72rem; letter-spacing:0.15em;
-    background:transparent; border:1px solid #2a2a4a; color:#4a4a8a;
+  .quit-btn {
+    font-family:'Orbitron',sans-serif; font-size:0.65rem; letter-spacing:0.15em;
+    background:transparent; border:1px solid #2a1a1a; color:#4a2a2a;
     padding:8px; border-radius:3px; cursor:pointer; width:100%; transition:all 0.2s; margin-top:4px;
   }
-  .new-btn:hover { border-color:var(--blue); color:var(--blue); box-shadow:0 0 8px #00aaff33; }
-  .new-btn.ready {
-    border:2px solid var(--green); color:var(--green); text-shadow:var(--glow);
-    font-size:0.75rem; padding:11px; animation:pulse 1.4s ease-in-out infinite;
-  }
-  .new-btn.ready:hover { background:#00ff9f22; }
-  @keyframes pulse { 0%,100%{box-shadow:var(--glow);} 50%{box-shadow:0 0 20px #00ff9faa,0 0 40px #00ff9f55;} }
+  .quit-btn:hover { border-color:var(--red); color:var(--red); box-shadow:0 0 8px #ff335533; }
 
-  /* ── STATUS BAR ── */
-  .status-bar { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:1000px; margin-top:10px; padding:7px 12px; background:var(--panel); border:1px solid var(--border); border-radius:3px; font-size:0.7rem; color:var(--muted); }
-  .status-freq { color:var(--green); text-shadow:var(--glow); }
+  /* Inline quit confirm */
+  .quit-confirm {
+    display:none; background:#0f0810; border:1px solid #ff335544;
+    border-radius:3px; padding:10px; margin-top:4px; text-align:center;
+  }
+  .quit-confirm.visible { display:block; }
+  .quit-confirm p { font-size:0.7rem; color:#aa6666; letter-spacing:0.05em; margin-bottom:8px; line-height:1.6; }
+  .quit-confirm-btns { display:flex; gap:6px; }
+  .quit-yes {
+    flex:1; font-family:'Orbitron',sans-serif; font-size:0.65rem; letter-spacing:0.1em;
+    background:transparent; border:1px solid var(--red); color:var(--red);
+    padding:7px; border-radius:3px; cursor:pointer; transition:all 0.15s;
+  }
+  .quit-yes:hover { background:#ff335522; }
+  .quit-no {
+    flex:1; font-family:'Orbitron',sans-serif; font-size:0.65rem; letter-spacing:0.1em;
+    background:transparent; border:1px solid #2a2a4a; color:#4a4a8a;
+    padding:7px; border-radius:3px; cursor:pointer; transition:all 0.15s;
+  }
+  .quit-no:hover { border-color:#6a6aaa; color:#8a8acc; }
+  @keyframes pulse { 0%,100%{box-shadow:var(--glow);} 50%{box-shadow:0 0 20px #00ff9faa,0 0 40px #00ff9f55;} }
 
   /* ── FLASH ANIMATIONS ── */
   @keyframes flashGreen { 0%{box-shadow:0 0 0 #00ff9f;} 50%{box-shadow:0 0 50px #00ff9f99,0 0 100px #00ff9f44;} 100%{box-shadow:0 0 0 #00ff9f;} }
@@ -229,592 +230,1001 @@
   .success-flash { animation:flashGreen 0.5s ease; }
   .damage-flash  { animation:flashRed   0.4s ease; }
 
-  /* ── WIN / LOSE OVERLAYS ── */
-  .overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(5,5,12,0.93); flex-direction:column; align-items:center; justify-content:center; gap:20px; }
+  /* ── OVERLAYS ── */
+  .overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(5,5,12,0.95); flex-direction:column; align-items:center; justify-content:center; gap:24px; text-align:center; }
   .overlay.active { display:flex; }
-  .overlay-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(2rem,6vw,3.5rem); letter-spacing:0.2em; text-align:center; }
+  .overlay-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(2rem,6vw,3rem); letter-spacing:0.2em; }
   .overlay-title.win  { color:var(--green); text-shadow:0 0 30px #00ff9f,0 0 60px #00ff9f66; }
-  .overlay-title.lose { color:var(--red);   text-shadow:0 0 30px #ff3355,0 0 60px #ff335566; }
-  .overlay-sub { font-size:0.9rem; color:var(--muted); letter-spacing:0.12em; text-align:center; max-width:420px; line-height:1.8; }
-  .overlay-btn { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:0.2em; background:transparent; border:2px solid var(--green); color:var(--green); padding:14px 32px; border-radius:3px; cursor:pointer; text-shadow:var(--glow); box-shadow:var(--glow); transition:all 0.15s; }
-  .overlay-btn:hover { background:#00ff9f22; }
-  .overlay-btn.red-btn { border-color:var(--red); color:var(--red); text-shadow:var(--red-glow); box-shadow:var(--red-glow); }
-  .overlay-btn.red-btn:hover { background:#ff335522; }
+  .overlay-sub { font-size:0.88rem; color:var(--muted); letter-spacing:0.1em; max-width:400px; line-height:2; }
+  .overlay-btn { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:0.2em; background:transparent; padding:14px 32px; border-radius:3px; cursor:pointer; transition:all 0.15s; }
+  .overlay-btn.green-btn { border:2px solid var(--green); color:var(--green); text-shadow:var(--glow); box-shadow:var(--glow); }
+  .overlay-btn.green-btn:hover { background:#00ff9f22; }
+  .overlay-btn.amber-btn { border:2px solid var(--amber); color:var(--amber); text-shadow:var(--amber-glow); box-shadow:var(--amber-glow); }
+  .overlay-btn.amber-btn:hover { background:#ffaa0022; }
 
-  @media (max-width:680px) { .main-layout{grid-template-columns:1fr;} .battle-bar{grid-template-columns:1fr 1fr;} .round-badge{display:none;} }
+  /* ── END SCREEN ── */
+  #endScreen { min-height: 80vh; justify-content: center; gap: 28px; text-align: center; }
+  .end-title { font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(2rem,5vw,3rem); letter-spacing:0.2em; }
+  .end-title.victory { color:var(--green); text-shadow:0 0 30px #00ff9f,0 0 60px #00ff9f66; }
+  .end-title.defeat  { color:var(--red);   text-shadow:0 0 30px #ff3355,0 0 60px #ff335566; }
+  .end-stats { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:28px 40px; display:flex; flex-direction:column; gap:14px; min-width:340px; }
+  .end-stat { display:flex; justify-content:space-between; align-items:baseline; gap:24px; }
+  .end-stat-label { font-size:0.75rem; letter-spacing:0.2em; color:var(--muted); }
+  .end-stat-value { font-family:'Orbitron',sans-serif; font-size:1.1rem; color:var(--green); text-shadow:var(--glow); }
+  .end-stat-value.red { color:var(--red); text-shadow:var(--red-glow); }
+  .end-divider { border:none; border-top:1px solid var(--border); }
 
+  @media (max-width:680px) {
+    .main-layout{grid-template-columns:1fr;}
+    .battle-bar{grid-template-columns:1fr 1fr;}
+    .round-badge{display:none;}
+    .map-container{height:240px;}
+  }
 </style>
 </head>
 <body>
 
-<!-- WIN OVERLAY -->
-<div class="overlay" id="winOverlay">
-  <div class="overlay-title win">Victory</div>
-  <button class="overlay-btn" onclick="startNewGame()">Play Again</button>
-</div>
+<!-- ══════ TITLE SCREEN ══════ -->
+<div class="screen active" id="titleScreen">
+  <div class="title-logo">Same<br>Wavelength</div>
+  <div class="title-sub">Synth Lab · Signal Combat</div>
 
-<!-- LOSE OVERLAY -->
-<div class="overlay" id="loseOverlay">
-  <div class="overlay-title lose">Destroyed</div>
-  <button class="overlay-btn red-btn" onclick="startNewGame()">Try Again</button>
-</div>
+  <svg class="title-sine" viewBox="0 0 500 40" preserveAspectRatio="none">
+    <path d="M0,20 C15,0 15,40 30,20 C45,0 45,40 60,20 C75,0 75,40 90,20 C105,0 105,40 120,20 C135,0 135,40 150,20 C165,0 165,40 180,20 C195,0 195,40 210,20 C225,0 225,40 240,20 C255,0 255,40 270,20 C285,0 285,40 300,20 C315,0 315,40 330,20 C345,0 345,40 360,20 C375,0 375,40 390,20 C405,0 405,40 420,20 C435,0 435,40 450,20 C465,0 465,40 480,20 C495,0 495,40 500,20"
+      fill="none" stroke="#00ff9f" stroke-width="1.5"/>
+  </svg>
 
-<h1>Same Wavelength</h1>
-
-<!-- BATTLE BAR -->
-<div class="battle-bar">
-
-  <!-- PLAYER SHIP STATUS -->
-  <div class="ship-status">
-    <div class="ship-label">Player</div>
-    <div class="ship-svg-wrap">
-      <!-- Player ship: sleek upward-pointing fighter -->
-      <svg id="playerShipSvg" width="90" height="64" viewBox="0 0 90 64">
-        <polygon id="ps-body"   points="45,3 68,52 45,44 22,52"   fill="#041a10" stroke="#00ff9f" stroke-width="1.5"/>
-        <polygon id="ps-lwing"  points="22,52 2,62 18,40"          fill="#031208" stroke="#00cc77" stroke-width="1"/>
-        <polygon id="ps-rwing"  points="68,52 88,62 72,40"          fill="#031208" stroke="#00cc77" stroke-width="1"/>
-        <ellipse id="ps-engine" cx="45" cy="49" rx="9" ry="4"       fill="#00ff9f33" stroke="#00ff9f" stroke-width="1"/>
-        <ellipse                 cx="45" cy="22" rx="5" ry="8"       fill="#00ff9f15" stroke="#00ff9f88" stroke-width="1"/>
-        <circle                  cx="45" cy="20" r="2.5"             fill="#00ff9f" opacity="0.7"/>
-      </svg>
-    </div>
-    <div class="health-pips" id="playerHP"></div>
+  <div class="instructions">
+    <h3>Mission Briefing</h3>
+    An alien fleet is advancing through the Saturn system. Your only weapon: <span class="hl">signal matching</span>.<br><br>
+    Each wave, the enemy broadcasts an encrypted signal. Tune your parameters to <span class="hl">match the target waveform</span> exactly, then fire.<br><br>
+    A <span class="hl">direct hit</span> destroys one enemy section. A <span class="warn">miss on your first shot</span> costs you 1 HP — but earns a second shot for a glancing hit.<br><br>
+    You begin at <span class="hl">Titan</span> with limited controls. Defeat each boss to advance and unlock new parameters.<br><br>
+    <span class="warn">Roguelike rules: die and you start over. HP carries between worlds.</span>
   </div>
 
-  <!-- CENTER STATUS -->
-  <div style="text-align:center; min-width:90px;">
-    <div class="round-badge" id="roundBadge">Wave 1 / 4</div>
-    <div style="font-size:2rem; margin:6px 0;" id="battleIcon">·</div>
-    <div style="font-size:0.6rem; color:var(--muted); letter-spacing:0.08em; max-width:110px;" id="battleMsg"></div>
-  </div>
-
-  <!-- ALIEN SHIP STATUS -->
-  <div class="ship-status enemy" style="border-color:#ff335544;">
-    <div class="ship-label" style="color:#ff335577;">Enemy</div>
-    <div class="ship-svg-wrap">
-      <!-- Alien saucer with 4 distinct parts -->
-      <svg id="alienShipSvg" width="110" height="72" viewBox="0 0 110 72">
-        <ellipse id="al-hull"  cx="55" cy="46" rx="48" ry="16"  fill="#1a0407" stroke="#ff3355" stroke-width="1.5"/>
-        <ellipse id="al-dome"  cx="55" cy="30" rx="24" ry="18"  fill="#100205" stroke="#ff3355" stroke-width="1.2"/>
-        <ellipse id="al-lpod"  cx="14" cy="50" rx="11" ry="7"   fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
-        <ellipse id="al-rpod"  cx="96" cy="50" rx="11" ry="7"   fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
-        <!-- Eye -->
-        <ellipse cx="55" cy="30" rx="9" ry="7" fill="#ff335522"/>
-        <ellipse cx="55" cy="30" rx="4" ry="4" fill="#ff3355" opacity="0.85"/>
-        <!-- Underbelly lights -->
-        <circle cx="36" cy="48" r="2.5" fill="#ff335555"/>
-        <circle cx="55" cy="51" r="2.5" fill="#ff335555"/>
-        <circle cx="74" cy="48" r="2.5" fill="#ff335555"/>
-      </svg>
-    </div>
-    <div class="health-pips" id="alienHP"></div>
-  </div>
-
+  <button class="big-btn" onclick="showMapScreen()">Launch Mission</button>
+  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.15</div>
 </div>
 
-<!-- MAIN LAYOUT -->
-<div class="main-layout">
+<!-- ══════ WORLD MAP SCREEN ══════ -->
+<div class="screen" id="mapScreen">
+  <div class="map-title">Saturn System — Mission Map</div>
 
-  <!-- OSCILLOSCOPE -->
-  <div class="panel scope-wrap">
-    <div class="panel-label">Oscilloscope</div>
-    <!-- decorative sine wave border -->
-    <svg class="scope-sine-border" viewBox="0 0 400 12" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,6 C12.5,0 12.5,12 25,6 C37.5,0 37.5,12 50,6 C62.5,0 62.5,12 75,6 C87.5,0 87.5,12 100,6 C112.5,0 112.5,12 125,6 C137.5,0 137.5,12 150,6 C162.5,0 162.5,12 175,6 C187.5,0 187.5,12 200,6 C212.5,0 212.5,12 225,6 C237.5,0 237.5,12 250,6 C262.5,0 262.5,12 275,6 C287.5,0 287.5,12 300,6 C312.5,0 312.5,12 325,6 C337.5,0 337.5,12 350,6 C362.5,0 362.5,12 375,6 C387.5,0 387.5,12 400,6"
-        fill="none" stroke="#00ff9f" stroke-width="1"/>
+  <div class="map-hp-row">
+    <span class="map-hp-label">Hull Integrity</span>
+    <div id="mapPlayerHP" style="display:flex;gap:5px;"></div>
+  </div>
+
+  <div class="map-container">
+    <svg class="map-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+      <!-- Stars -->
+      <g opacity="0.5">
+        <circle cx="50"  cy="30"  r="1"   fill="white"/>
+        <circle cx="130" cy="65"  r="0.8" fill="white"/>
+        <circle cx="230" cy="22"  r="1.2" fill="white"/>
+        <circle cx="320" cy="75"  r="0.7" fill="white"/>
+        <circle cx="415" cy="18"  r="1"   fill="white"/>
+        <circle cx="510" cy="58"  r="0.9" fill="white"/>
+        <circle cx="605" cy="28"  r="1.1" fill="white"/>
+        <circle cx="710" cy="72"  r="0.8" fill="white"/>
+        <circle cx="760" cy="38"  r="1"   fill="white"/>
+        <circle cx="75"  cy="210" r="0.9" fill="white"/>
+        <circle cx="165" cy="250" r="1"   fill="white"/>
+        <circle cx="360" cy="230" r="0.8" fill="white"/>
+        <circle cx="555" cy="210" r="1.2" fill="white"/>
+        <circle cx="660" cy="265" r="0.7" fill="white"/>
+        <circle cx="762" cy="185" r="1"   fill="white"/>
+        <circle cx="425" cy="268" r="0.9" fill="white"/>
+        <circle cx="290" cy="150" r="0.7" fill="white"/>
+        <circle cx="490" cy="140" r="0.8" fill="white"/>
+      </g>
+      <!-- Curved path -->
+      <path d="M 100,200 C 200,200 220,100 340,110 C 440,118 460,220 565,200 C 648,184 668,104 700,104"
+        fill="none" stroke="#1a3a2a" stroke-width="3" stroke-dasharray="8,6"/>
+      <!-- World nodes rendered by JS -->
+      <g id="worldNodes"></g>
     </svg>
-    <canvas id="scope" height="300"></canvas>
-    <div class="scope-overlay"></div>
-    <div class="legend">
-      <div class="legend-item">
-        <div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div>
-        <span>Target signal</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-line" style="background:#ff335588; border-top:2px dashed #ff335588; height:0;"></div>
-        <span>First shot (miss)</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-line" style="background:#ffaa00; border-top:2px dashed #ffaa00; height:0;"></div>
-        <span>Current aim</span>
-      </div>
-    </div>
-    <div class="target-hint" id="targetHint"></div>
-
-    <!-- EQUATION BAR — same width as graph, directly under it -->
-    <div class="equation-bar">
-      <div class="equation-bar-label">f(x)</div>
-      <div class="equation-bar-text" id="equationDisplay">f(x) = 1·sin(1x)</div>
-    </div>
-
   </div>
 
-  <!-- CONTROLS -->
-  <div class="controls-panel">
-    <div class="panel">
-      <div class="panel-label">Parameters</div>
-
-      <div class="param-block">
-        <div class="param-header"><span class="param-name">Amplitude</span><span class="param-formula">A·sin(...)</span></div>
-        <div class="param-value" id="ampVal">1</div>
-        <input type="range" id="ampSlider" min="1" max="5" step="1" value="1">
-        <div class="range-ends"><span>1</span><span>5</span></div>
-      </div>
-
-      <div class="param-block">
-        <div class="param-header"><span class="param-name">Frequency</span><span class="param-formula">sin(B·x)</span></div>
-        <div class="param-value" id="freqVal">1</div>
-        <input type="range" id="freqSlider" min="1" max="6" step="1" value="1">
-        <div class="range-ends"><span>1×</span><span>6×</span></div>
-      </div>
-
-      <div class="param-block">
-        <div class="param-header"><span class="param-name">Phase Shift</span><span class="param-formula">sin(Bx+Cπ)</span></div>
-        <div class="param-value" id="phaseVal">+0</div>
-        <input type="range" id="phaseSlider" min="-4" max="4" step="1" value="0">
-        <div class="range-ends"><span>−4π</span><span>+4π</span></div>
-      </div>
-
-      <div class="param-block">
-        <div class="param-header"><span class="param-name">Vertical Shift</span><span class="param-formula">sin(...)+D</span></div>
-        <div class="param-value" id="shiftVal">+0</div>
-        <input type="range" id="shiftSlider" min="-3" max="3" step="1" value="0">
-        <div class="range-ends"><span>−3</span><span>+3</span></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-label">Result</div>
-      <div class="feedback" id="feedback">
-        <div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>
-      </div>
-      <div class="attempts-row">
-        <span>Shots</span>
-        <div class="attempt-pips" id="pips"></div>
-      </div>
-    </div>
-
-    <button class="attempt-btn" id="attemptBtn" onclick="doAttempt()">Fire</button>
-    <button class="new-btn"     id="newBtn"     onclick="nextWave()">Next Wave</button>
+  <div class="map-legend">
+    <span style="color:var(--green);">◆ Current</span>
+    <span style="color:#4a6a4a;">◆ Cleared</span>
+    <span style="color:#2a2a4a;">◆ Locked</span>
   </div>
 </div>
 
-<div class="status-bar">
-  <span>Same Wavelength</span>
-  <span id="targetFreqDisplay" class="status-freq"></span>
-  <span id="roundDisplay">Wave 1 / 4</span>
+<!-- ══════ GAME SCREEN ══════ -->
+<div class="screen" id="gameScreen">
+
+  <div class="game-header">
+    <div style="display:flex;align-items:baseline;gap:16px;">
+      <h1>Same Wavelength</h1>
+      <span class="world-badge" id="worldBadge"></span>
+    </div>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.15</span>
+  </div>
+
+  <span id="targetFreqDisplay" style="display:none;"></span>
+  <span id="roundDisplay"      style="display:none;">Wave 1</span>
+
+  <!-- Battle Bar -->
+  <div class="battle-bar">
+    <div class="ship-status">
+      <div class="ship-label">Player</div>
+      <div class="ship-svg-wrap">
+        <svg width="90" height="64" viewBox="0 0 90 64">
+          <polygon id="ps-body"   points="45,3 68,52 45,44 22,52"  fill="#041a10" stroke="#00ff9f" stroke-width="1.5"/>
+          <polygon id="ps-lwing"  points="22,52 2,62 18,40"         fill="#031208" stroke="#00cc77" stroke-width="1"/>
+          <polygon id="ps-rwing"  points="68,52 88,62 72,40"         fill="#031208" stroke="#00cc77" stroke-width="1"/>
+          <ellipse id="ps-engine" cx="45" cy="49" rx="9" ry="4"     fill="#00ff9f33" stroke="#00ff9f" stroke-width="1"/>
+          <ellipse cx="45" cy="22" rx="5" ry="8" fill="#00ff9f15" stroke="#00ff9f88" stroke-width="1"/>
+          <circle  cx="45" cy="20" r="2.5" fill="#00ff9f" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="health-pips" id="playerHP"></div>
+    </div>
+
+    <div style="text-align:center;min-width:90px;">
+      <div class="round-badge" id="roundBadge">Wave 1</div>
+      <div style="font-size:2rem;margin:6px 0;" id="battleIcon">·</div>
+      <div style="font-size:0.6rem;color:var(--muted);letter-spacing:0.08em;max-width:110px;" id="battleMsg"></div>
+    </div>
+
+    <div class="ship-status enemy" id="enemyPanel" style="border-color:#ff335544;">
+      <div class="ship-label" id="enemyLabel" style="color:#ff335577;">Enemy</div>
+      <div class="ship-svg-wrap">
+        <svg width="110" height="72" viewBox="0 0 110 72">
+          <ellipse id="al-hull" cx="55" cy="46" rx="48" ry="16" fill="#1a0407" stroke="#ff3355" stroke-width="1.5"/>
+          <ellipse id="al-dome" cx="55" cy="30" rx="24" ry="18" fill="#100205" stroke="#ff3355" stroke-width="1.2"/>
+          <ellipse id="al-lpod" cx="14" cy="50" rx="11" ry="7"  fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
+          <ellipse id="al-rpod" cx="96" cy="50" rx="11" ry="7"  fill="#1a0407" stroke="#ff3355" stroke-width="1"/>
+          <ellipse cx="55" cy="30" rx="9" ry="7" fill="#ff335522"/>
+          <ellipse cx="55" cy="30" rx="4" ry="4" fill="#ff3355" opacity="0.85"/>
+          <circle cx="36" cy="48" r="2.5" fill="#ff335555"/>
+          <circle cx="55" cy="51" r="2.5" fill="#ff335555"/>
+          <circle cx="74" cy="48" r="2.5" fill="#ff335555"/>
+        </svg>
+      </div>
+      <div class="health-pips" id="alienHP"></div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <div class="panel scope-wrap">
+      <div class="panel-label">Oscilloscope</div>
+      <svg class="scope-sine-border" viewBox="0 0 400 12" preserveAspectRatio="none">
+        <path d="M0,6 C12.5,0 12.5,12 25,6 C37.5,0 37.5,12 50,6 C62.5,0 62.5,12 75,6 C87.5,0 87.5,12 100,6 C112.5,0 112.5,12 125,6 C137.5,0 137.5,12 150,6 C162.5,0 162.5,12 175,6 C187.5,0 187.5,12 200,6 C212.5,0 212.5,12 225,6 C237.5,0 237.5,12 250,6 C262.5,0 262.5,12 275,6 C287.5,0 287.5,12 300,6 C312.5,0 312.5,12 325,6 C337.5,0 337.5,12 350,6 C362.5,0 362.5,12 375,6 C387.5,0 387.5,12 400,6"
+          fill="none" stroke="#00ff9f" stroke-width="1"/>
+      </svg>
+      <canvas id="scope" height="300"></canvas>
+      <div class="scope-overlay"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div><span>Target signal</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#ff335588;border-top:2px dashed #ff335588;height:0;"></div><span>First shot (miss)</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#ffaa00;border-top:2px dashed #ffaa00;height:0;"></div><span>Current aim</span></div>
+      </div>
+      <div class="target-hint" id="targetHint"></div>
+      <div class="equation-bar">
+        <div class="equation-bar-label">f(x)</div>
+        <div class="equation-bar-text" id="equationDisplay">f(x) = sin(x)</div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="panel">
+        <div class="panel-label">Parameters</div>
+        <div class="param-block" id="ampBlock">
+          <div class="param-header"><span class="param-name">Amplitude</span><span class="param-formula">A·sin(...)</span></div>
+          <div class="param-value" id="ampVal">1</div>
+          <input type="range" id="ampSlider" min="1" max="5" step="1" value="1">
+          <div class="range-ends"><span>1</span><span>5</span></div>
+        </div>
+        <div class="param-block" id="freqBlock">
+          <div class="param-header"><span class="param-name">Frequency</span><span class="param-formula">sin(B·x)</span></div>
+          <div class="param-value" id="freqVal">1</div>
+          <input type="range" id="freqSlider" min="0" max="6" step="1" value="3">
+          <div class="range-ends"><span>¼×</span><span>4×</span></div>
+        </div>
+        <div class="param-block" id="phaseBlock">
+          <div class="param-header"><span class="param-name">Phase Shift</span><span class="param-formula">sin(B(x+h))</span></div>
+          <div class="param-value" id="phaseVal">+0</div>
+          <input type="range" id="phaseSlider" min="-4" max="4" step="1" value="0">
+          <div class="range-ends"><span>−4π</span><span>+4π</span></div>
+        </div>
+        <div class="param-block" id="shiftBlock">
+          <div class="param-header"><span class="param-name">Vertical Shift</span><span class="param-formula">sin(...)+D</span></div>
+          <div class="param-value" id="shiftVal">+0</div>
+          <input type="range" id="shiftSlider" min="-3" max="3" step="1" value="0">
+          <div class="range-ends"><span>−3</span><span>+3</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">Result</div>
+        <div class="feedback" id="feedback">
+          <div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>
+        </div>
+        <div class="attempts-row">
+          <span>Shots</span>
+          <div class="attempt-pips" id="pips"></div>
+        </div>
+      </div>
+
+      <button class="attempt-btn" id="attemptBtn" onclick="doAttempt()">Fire</button>
+      <button class="quit-btn" onclick="showQuitConfirm()">Quit Mission</button>
+      <div class="quit-confirm" id="quitConfirm">
+        <p>Abandon mission?<br>Your run will end.</p>
+        <div class="quit-confirm-btns">
+          <button class="quit-yes" onclick="confirmQuit()">Quit</button>
+          <button class="quit-no"  onclick="hideQuitConfirm()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ END SCREEN ══════ -->
+<div class="screen" id="endScreen">
+  <div class="end-title" id="endTitle">Mission Complete</div>
+  <div style="font-size:0.8rem;letter-spacing:0.15em;color:var(--muted);margin-top:-12px;" id="endSubtitle"></div>
+  <div class="end-stats" id="endStats"></div>
+  <button class="big-btn" onclick="returnToTitle()">Return to Base</button>
+</div>
+
+<!-- ══════ WORLD CLEAR OVERLAY ══════ -->
+<div class="overlay" id="worldClearOverlay">
+  <div class="overlay-title win" id="worldClearTitle">World Cleared!</div>
+  <div class="overlay-sub" id="worldClearSub"></div>
+  <button class="overlay-btn amber-btn" onclick="returnToMap()">Return to Map</button>
 </div>
 
 <script>
-  const canvas = document.getElementById('scope');
-  const ctx    = canvas.getContext('2d');
+// ═══════════════════════════════════════════════
+// WORLD DEFINITIONS
+// ═══════════════════════════════════════════════
+const FREQ_VALUES = [1/4, 1/3, 1/2, 1, 2, 3, 4];
+const FREQ_LABELS = ['¼','⅓','½','1','2','3','4'];
+const FREQ_FRACS  = [[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1]];
 
-  const ampSlider   = document.getElementById('ampSlider');
-  const freqSlider  = document.getElementById('freqSlider');
-  const phaseSlider = document.getElementById('phaseSlider');
-  const shiftSlider = document.getElementById('shiftSlider');
-
-  // ── Target ──
-  let targetA, targetB, targetC, targetD, targetCN;
-
-  // ── Player wave values ──
-  let playerA, playerB, playerC, playerD;
-
-  // ── Game state ──
-  let alienHP        = 4;   // 4 ship sections, each worth 1 hit
-  let playerHP       = 4;   // player health pips
-  let currentWave    = 1;   // wave number (1–4 to kill alien, more if lucky shots)
-  let attemptsUsed   = 0;
-  const MAX_ATTEMPTS = 2;   // 2 shots per wave
-  let waveActive     = true;
-  let firstShotMissed = false;
-  let firstShotParams = null;   // { A,B,C,D } of first missed shot
-  let showCurrentAim  = false;  // show amber wave on attempt
-  let alienPartialHits = 0;     // counts half-hits; every 2 = destroy 1 section
-
-  // ── Damage model ──
-  // 1st shot hit  → full hit (1 section destroyed)
-  // 1st shot miss → player loses 1 HP; first shot wave stays on screen in red
-  // 2nd shot hit  → glancing hit (+0.5, i.e. alienPartialHits++)
-  // 2nd shot miss → wave fails, no alien damage
-  // WIN: alienHP reaches 0
-  // LOSE: playerHP reaches 0
-
-  function getPlayerValues() {
-    playerA = Number(ampSlider.value);
-    playerB = Number(freqSlider.value);
-    playerC = Number(phaseSlider.value) * Math.PI;
-    playerD = Number(shiftSlider.value);
-  }
-
-  function isPerfectMatch() {
-    return Number(ampSlider.value)   === targetA  &&
-           Number(freqSlider.value)  === targetB  &&
-           Number(phaseSlider.value) === targetCN &&
-           Number(shiftSlider.value) === targetD;
-  }
-
-  function updateLabels() {
-    getPlayerValues();
-    const cN = Number(phaseSlider.value) | 0;
-    const D  = Number(shiftSlider.value);
-    const B  = Number(freqSlider.value);
-    const A  = Number(ampSlider.value);
-    document.getElementById('ampVal').textContent  = A;
-    document.getElementById('freqVal').textContent = B;
-    const cDisplay = cN === 0 ? '0' : cN === 1 ? 'π' : cN === -1 ? '-π' : `${cN}π`;
-    document.getElementById('phaseVal').textContent = (cN >= 0 ? '+' : '') + cDisplay.replace(/^\+/,'');
-    document.getElementById('shiftVal').textContent = (D >= 0 ? '+' : '') + D;
-    const cStr = cN === 0 ? '' : cN === 1 ? ' + π' : cN === -1 ? ' - π' : cN > 0 ? ` + ${cN}π` : ` - ${Math.abs(cN)}π`;
-    const dStr = D === 0 ? '' : D > 0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
-    document.getElementById('equationDisplay').textContent = `f(x) = ${A}·sin(${B}x${cStr})${dStr}`;
-  }
-
-  [ampSlider, freqSlider, phaseSlider, shiftSlider].forEach(s => s.addEventListener('input', updateLabels));
-
-  // ── Canvas / drawing ──
-  function resizeCanvas() {
-    canvas.width  = canvas.parentElement.getBoundingClientRect().width - 28;
-    canvas.height = 300;
-    drawScope();
-  }
-
-  function drawScope() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#020c07'; ctx.fillRect(0,0,W,H);
-    drawGrid(W, H);
-    // Target wave (green)
-    drawWave(targetA, targetB, targetC, targetD, '#00ff9f', 2.5, false, W, H);
-    drawPeakValleyMarkers(targetA, targetB, targetC, targetD, '#00ff9f', W, H);
-    // First missed shot (dim red dashed, stays up)
-    if (firstShotMissed && firstShotParams) {
-      drawWave(firstShotParams.A, firstShotParams.B, firstShotParams.C, firstShotParams.D, '#ff335577', 1.5, true, W, H);
+const WORLDS = [
+  {
+    id:0, name:'Titan', color:'#ffaa00', bossHP:3, maxAttempts:2,
+    unlocks:{amp:true, freq:false, phase:false, shift:true},
+    generate(){
+      const A=[1,2,3,4,5], D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B:1, h:0, D:pick(D) };
     }
-    // Current aim (amber dashed, only shown momentarily after fire)
-    if (showCurrentAim) {
-      drawWave(playerA, playerB, playerC, playerD, '#ffaa00', 2, true, W, H);
-      drawPeakValleyMarkers(playerA, playerB, playerC, playerD, '#ffaa00', W, H);
+  },
+  {
+    id:1, name:'Enceladus', color:'#00aaff', bossHP:4, maxAttempts:2,
+    unlocks:{amp:true, freq:true, phase:false, shift:true},
+    generate(){
+      const A=[1,2,3,4,5], D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B:pick(FREQ_VALUES), h:0, D:pick(D) };
+    }
+  },
+  {
+    id:2, name:'Mimas', color:'#aa55ff', bossHP:4, maxAttempts:2,
+    unlocks:{amp:true, freq:true, phase:true, shift:true},
+    generate(){
+      const A=[1,2,3,4,5], H=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D) };
+    }
+  },
+  {
+    id:3, name:'Hyperion', color:'#ff3355', bossHP:5, maxAttempts:1,
+    unlocks:{amp:true, freq:true, phase:true, shift:true},
+    generate(){
+      const A=[1,2,3,4,5], H=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D) };
     }
   }
+];
 
-  function drawGrid(W, H) {
-    const ML=44, MB=28, MT=16, MR=16;
-    const plotW=W-ML-MR, plotH=H-MB-MT;
-    const xHalfRange = 3*Math.PI/targetB;
-    canvas._cx     = ML + plotW/2;
-    canvas._cy     = MT + plotH/2;
-    canvas._xScale = plotW/(2*xHalfRange);
-    canvas._yScale = plotH/14;
-    const cx=canvas._cx, cy=canvas._cy, xScale=canvas._xScale, yScale=canvas._yScale;
+// Map node positions (in SVG viewBox 800×300)
+const NODE_POS = [
+  {x:100, y:200},
+  {x:340, y:110},
+  {x:565, y:200},
+  {x:700, y:104}
+];
 
-    ctx.strokeStyle='#0a200f'; ctx.lineWidth=1;
-    const hp=Math.PI/targetB, nHL=Math.ceil(xHalfRange/hp)+1;
-    for(let i=-nHL;i<=nHL;i++){
-      const x=cx+i*hp*xScale; if(x<ML||x>W-MR) continue;
-      ctx.beginPath(); ctx.moveTo(x,MT); ctx.lineTo(x,H-MB); ctx.stroke();
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ═══════════════════════════════════════════════
+// CANVAS & SLIDERS
+// ═══════════════════════════════════════════════
+const canvas    = document.getElementById('scope');
+const ctx       = canvas.getContext('2d');
+const ampSlider   = document.getElementById('ampSlider');
+const freqSlider  = document.getElementById('freqSlider');
+const phaseSlider = document.getElementById('phaseSlider');
+const shiftSlider = document.getElementById('shiftSlider');
+
+// ═══════════════════════════════════════════════
+// RUN STATE (persists across worlds)
+// ═══════════════════════════════════════════════
+let playerHP      = 5;
+let currentWorld  = 0;
+let worldsCleared = [];
+
+// ═══════════════════════════════════════════════
+// BATTLE STATE (resets each world)
+// ═══════════════════════════════════════════════
+let alienHP=0, alienMaxHP=0, alienPartialHits=0;
+let currentWave=1, attemptsUsed=0, maxAttempts=2;
+let waveActive=true, firstShotMissed=false, firstShotParams=null, showCurrentAim=false;
+let targetA, targetB, targetC, targetD, targetCN;
+let playerA, playerB, playerC, playerD;
+
+// ═══════════════════════════════════════════════
+// SCREEN NAV
+// ═══════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function returnToTitle(){
+  playerHP=5; currentWorld=0; worldsCleared=[];
+  showScreen('titleScreen');
+}
+
+function showMapScreen(){
+  renderMap();
+  renderMapHP();
+  showScreen('mapScreen');
+}
+
+function returnToMap(){
+  document.getElementById('worldClearOverlay').classList.remove('active');
+  renderMap();
+  renderMapHP();
+  showScreen('mapScreen');
+}
+
+// ═══════════════════════════════════════════════
+// WORLD MAP
+// ═══════════════════════════════════════════════
+function renderMap(){
+  const g = document.getElementById('worldNodes');
+  g.innerHTML = '';
+
+  WORLDS.forEach((world, i) => {
+    const pos      = NODE_POS[i];
+    const cleared  = worldsCleared.includes(i);
+    const locked   = i > currentWorld && !cleared;
+    const isCur    = (i === currentWorld) && !cleared;
+
+    const strokeCol = cleared ? '#2a5a2a' : locked ? '#1a1a3a' : world.color;
+    const textCol   = cleared ? '#4a7a4a' : locked ? '#2a2a5a' : world.color;
+    const r         = isCur ? 28 : 24;
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const grp = document.createElementNS(ns,'g');
+    grp.setAttribute('class','world-node'+(locked?' locked':'')+(isCur?' current':''));
+    if(!locked) grp.onclick = () => enterWorld(i);
+    grp.style.cursor = locked ? 'default' : 'pointer';
+
+    // Pulse ring for current world
+    if(isCur){
+      const ring = document.createElementNS(ns,'circle');
+      ring.setAttribute('cx',pos.x); ring.setAttribute('cy',pos.y);
+      ring.setAttribute('r',r+10);
+      ring.setAttribute('fill','none');
+      ring.setAttribute('stroke',world.color);
+      ring.setAttribute('stroke-width','1.5');
+      ring.setAttribute('opacity','0.25');
+      grp.appendChild(ring);
     }
-    for(let i=-6;i<=6;i++){
-      const y=cy-i*yScale;
-      ctx.beginPath(); ctx.moveTo(ML,y); ctx.lineTo(W-MR,y); ctx.stroke();
-    }
 
-    ctx.strokeStyle='#1a4a2a'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(ML,cy); ctx.lineTo(W-MR,cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,MT); ctx.lineTo(cx,H-MB); ctx.stroke();
+    // Main circle
+    const circ = document.createElementNS(ns,'circle');
+    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
+    circ.setAttribute('fill', cleared?'#0a180a': locked?'#08080f':'#090914');
+    circ.setAttribute('stroke',strokeCol);
+    circ.setAttribute('stroke-width',isCur?'2.5':'1.5');
+    grp.appendChild(circ);
 
-    ctx.fillStyle='#1a4a2a';
-    ctx.beginPath(); ctx.moveTo(W-MR,cy); ctx.lineTo(W-MR-6,cy-4); ctx.lineTo(W-MR-6,cy+4); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(cx,MT); ctx.lineTo(cx-4,MT+6); ctx.lineTo(cx+4,MT+6); ctx.fill();
-
-    ctx.fillStyle='#00dd88'; ctx.font='bold 16px Share Tech Mono';
-    ctx.textAlign='left';   ctx.fillText('x',W-MR+4,cy+5);
-    ctx.textAlign='center'; ctx.fillText('f(x)',cx,MT-2);
-
-    ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono';
-    ctx.textAlign='center';
-    const fp=2*Math.PI/targetB, nPT=Math.ceil(xHalfRange/fp)+1;
-    for(let i=-nPT;i<=nPT;i++){
-      if(i===0) continue;
-      const xVal=i*fp, x=cx+xVal*xScale;
-      if(x<ML+10||x>W-MR-10) continue;
-      ctx.fillText(formatAsPiFraction(xVal), x, H-MB+16);
-      ctx.strokeStyle='#00aa55'; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.moveTo(x,cy-4); ctx.lineTo(x,cy+4); ctx.stroke();
-    }
-
-    ctx.textAlign='right';
-    [-4,-2,2,4].forEach(n=>{
-      const y=cy-n*yScale;
-      ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono';
-      ctx.fillText(n,ML-6,y+5);
-      ctx.strokeStyle='#00aa55'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(cx-3,y); ctx.lineTo(cx+3,y); ctx.stroke();
-    });
-    ctx.fillStyle='#00cc77'; ctx.textAlign='right'; ctx.font='15px Share Tech Mono';
-    ctx.fillText('0',cx-5,cy+16);
-  }
-
-  function drawWave(A,B,C,D,color,lineWidth,dashed,W,H) {
-    const cx=canvas._cx, cy=canvas._cy, yScale=canvas._yScale, xScale=canvas._xScale;
-    ctx.strokeStyle=color; ctx.lineWidth=lineWidth;
-    ctx.shadowColor=color; ctx.shadowBlur=8;
-    if(dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
-    ctx.beginPath(); let started=false;
-    for(let px=0;px<W;px++){
-      const x=(px-cx)/xScale, y=A*Math.sin(B*x+C)+D, py=cy-y*yScale;
-      if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py);
-    }
-    ctx.stroke(); ctx.shadowBlur=0; ctx.setLineDash([]);
-  }
-
-  function findPeaksValleys(A,B,C,D){
-    const cx=canvas._cx, xScale=canvas._xScale;
-    const xMin=-cx/xScale, xMax=(canvas.width-cx)/xScale;
-    const pts=[];
-    for(let k=-8;k<=8;k++){
-      const xP=(Math.PI/2-C+2*Math.PI*k)/B; if(xP>=xMin&&xP<=xMax) pts.push({x:xP,y:A+D,type:'peak'});
-      const xV=(-Math.PI/2-C+2*Math.PI*k)/B; if(xV>=xMin&&xV<=xMax) pts.push({x:xV,y:-A+D,type:'valley'});
-    }
-    return pts.sort((a,b)=>a.x-b.x);
-  }
-
-  function drawPeakValleyMarkers(A,B,C,D,color,W,H){
-    const cx=canvas._cx, cy=canvas._cy, xScale=canvas._xScale, yScale=canvas._yScale;
-    const all=findPeaksValleys(A,B,C,D);
-    const peaks=all.filter(p=>p.type==='peak').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x));
-    const valleys=all.filter(p=>p.type==='valley').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x));
-    const sel=[...peaks.slice(0,2),...valleys.slice(0,1)];
-    ctx.save(); ctx.shadowBlur=0; ctx.setLineDash([]);
-    sel.forEach(pt=>{
-      const px=cx+pt.x*xScale, py=cy-pt.y*yScale;
-      ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
-      ctx.fillStyle=color; ctx.globalAlpha=0.9; ctx.fill(); ctx.globalAlpha=1;
-      ctx.strokeStyle=color; ctx.lineWidth=1; ctx.globalAlpha=0.3; ctx.setLineDash([3,3]);
-      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,cy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(cx,py); ctx.stroke();
-      ctx.setLineDash([]); ctx.globalAlpha=1;
-      const xLbl=formatAsPiFraction(pt.x);
-      const yLbl=Number.isInteger(pt.y)?pt.y.toString():pt.y.toFixed(1);
-      const txt=`(${xLbl}, ${yLbl})`;
-      const pad=4; ctx.font='bold 20px Share Tech Mono';
-      const tw=ctx.measureText(txt).width, bW=tw+pad*2, bH=28;
-      let lX=px+8, lY=pt.type==='peak'?py-14:py+32;
-      if(lX+bW>W-4) lX=px-bW-8;
-      if(lY-bH<4) lY=py+32; if(lY>H-4) lY=py-14;
-      ctx.fillStyle='#020c07'; ctx.globalAlpha=0.85;
-      ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.fill(); ctx.globalAlpha=1;
-      ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.globalAlpha=0.6;
-      ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.stroke(); ctx.globalAlpha=1;
-      ctx.fillStyle=color; ctx.textAlign='left'; ctx.fillText(txt,lX,lY-4);
-    });
-    ctx.restore();
-  }
-
-  function formatAsPiFraction(x){
-    if(Math.abs(x)<0.0001) return '0';
-    const sign=x<0?-1:1, absX=Math.abs(x);
-    for(const d of [1,2,3,4,5,6,7,8,9,10,12]){
-      const nRaw=absX*d/Math.PI, n=Math.round(nRaw);
-      if(n>0&&Math.abs(n-nRaw)<0.0001){
-        const g=gcd(n,d), nr=sign*(n/g), dr=d/g;
-        if(dr===1) return nr===1?'π':nr===-1?'-π':`${nr}π`;
-        if(nr===1) return `π/${dr}`; if(nr===-1) return `-π/${dr}`;
-        return `${nr}π/${dr}`;
-      }
-    }
-    return `${(x/Math.PI).toFixed(2)}π`;
-  }
-
-  function gcd(a,b){ return b===0?a:gcd(b,a%b); }
-
-  // ── Target generation ──
-  function generateTarget(){
-    const A=[1,2,3,4,5], B=[1,2,3,4,5,6], C=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
-    targetA = A[Math.floor(Math.random()*A.length)]|0;
-    targetB = B[Math.floor(Math.random()*B.length)]|0;
-    const cN= C[Math.floor(Math.random()*C.length)]|0;
-    targetC = cN*Math.PI; targetCN=cN;
-    targetD = D[Math.floor(Math.random()*D.length)]|0;
-    document.getElementById('targetFreqDisplay').textContent=`${(440*targetB).toFixed(0)} Hz`;
-  }
-
-  // ── HP rendering ──
-  function renderPlayerHP(){
-    const c=document.getElementById('playerHP'); c.innerHTML='';
-    for(let i=0;i<4;i++){
-      const p=document.createElement('div');
-      p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
-      c.appendChild(p);
-    }
-    const parts=['ps-body','ps-lwing','ps-rwing','ps-engine'];
-    parts.forEach((id,i)=>{
-      const el=document.getElementById(id);
-      if(el) el.style.opacity=(i<playerHP)?'1':'0.08';
-    });
-  }
-
-  function renderAlienHP(){
-    const c=document.getElementById('alienHP'); c.innerHTML='';
-    for(let i=0;i<4;i++){
-      const p=document.createElement('div');
-      p.className='hp-pip '+(i<alienHP?'alive-red':'dead');
-      c.appendChild(p);
-    }
-    const destroyed=4-alienHP;
-    const parts=['al-hull','al-dome','al-lpod','al-rpod'];
-    parts.forEach((id,i)=>{
-      const el=document.getElementById(id);
-      if(el) el.style.opacity=(i<destroyed)?'0.06':'1';
-    });
-  }
-
-  function buildPips(){
-    const c=document.getElementById('pips'); c.innerHTML='';
-    for(let i=0;i<MAX_ATTEMPTS;i++){
-      const p=document.createElement('div');
-      p.className='pip'; p.id=`pip-${i}`; c.appendChild(p);
-    }
-  }
-
-  // ── Core game action ──
-  function doAttempt(){
-    if(!waveActive||attemptsUsed>=MAX_ATTEMPTS) return;
-    getPlayerValues();
-    const hit=isPerfectMatch();
-    const isFirst=(attemptsUsed===0);
-    const pip=document.getElementById(`pip-${attemptsUsed}`);
-    attemptsUsed++;
-
-    // Show player wave briefly then hide (keep first miss wave up in red)
-    showCurrentAim=true; drawScope();
-    setTimeout(()=>{ showCurrentAim=false; drawScope(); }, 800);
-
-    if(hit){
-      pip.classList.add('hit');
-      firstShotParams=null; firstShotMissed=false;
-
-      if(isFirst){
-        // Full hit
-        alienHP--;
-        renderAlienHP();
-        canvas.classList.add('success-flash');
-        setTimeout(()=>canvas.classList.remove('success-flash'),600);
-        setFeedback('score-perfect','Hit',`${alienHP} section${alienHP!==1?'s':''} remaining.`);
-        setBattle('✦','');
-      } else {
-        // Glancing hit (after first miss)
-        alienPartialHits++;
-        if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
-        renderAlienHP();
-        canvas.classList.add('success-flash');
-        setTimeout(()=>canvas.classList.remove('success-flash'),600);
-        setFeedback('score-good','Partial hit','Two shots to lock.');
-        setBattle('◈','');
-      }
-
-      waveActive=false;
-      document.getElementById('attemptBtn').disabled=true;
-
-      if(alienHP<=0){
-        setTimeout(showWinScreen,700);
-      } else {
-        document.getElementById('newBtn').classList.add('ready');
-        updateWaveBadge();
-      }
-
+    // Inner content
+    if(cleared){
+      // Checkmark
+      const t = document.createElementNS(ns,'text');
+      t.setAttribute('x',pos.x); t.setAttribute('y',pos.y+5);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','16');
+      t.setAttribute('fill','#4a7a4a'); t.textContent='✓';
+      grp.appendChild(t);
+    } else if(locked){
+      // Lock
+      const t = document.createElementNS(ns,'text');
+      t.setAttribute('x',pos.x); t.setAttribute('y',pos.y+6);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','15');
+      t.setAttribute('fill','#2a2a5a'); t.textContent='🔒';
+      grp.appendChild(t);
     } else {
-      // Miss
-      pip.classList.add('used');
+      // HP dots arranged in a ring inside the circle
+      for(let h=0; h<world.bossHP; h++){
+        const angle = (h/world.bossHP)*2*Math.PI - Math.PI/2;
+        const dot = document.createElementNS(ns,'circle');
+        dot.setAttribute('cx', pos.x + Math.cos(angle)*13);
+        dot.setAttribute('cy', pos.y + Math.sin(angle)*13);
+        dot.setAttribute('r','3');
+        dot.setAttribute('fill',world.color);
+        dot.setAttribute('opacity','0.5');
+        grp.appendChild(dot);
+      }
+    }
 
-      if(isFirst){
-        firstShotMissed=true;
-        firstShotParams={A:playerA,B:playerB,C:playerC,D:playerD};
-        setTimeout(()=>{ showCurrentAim=false; drawScope(); },800); // keep red shot on screen
+    // World name label
+    const lbl = document.createElementNS(ns,'text');
+    lbl.setAttribute('x',pos.x); lbl.setAttribute('y',pos.y+r+16);
+    lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('font-family','Orbitron,sans-serif');
+    lbl.setAttribute('font-size','11'); lbl.setAttribute('fill',textCol);
+    lbl.setAttribute('letter-spacing','1');
+    lbl.textContent = world.name;
+    grp.appendChild(lbl);
 
-        playerHP--;
-        renderPlayerHP();
-        canvas.classList.add('damage-flash');
-        setTimeout(()=>canvas.classList.remove('damage-flash'),500);
-        setFeedback('score-miss','Miss','One shot remaining.');
-        setBattle('·','');
+    // Param hint below name
+    if(!locked){
+      const params=[];
+      if(world.unlocks.amp)   params.push('A');
+      if(world.unlocks.freq)  params.push('B');
+      if(world.unlocks.phase) params.push('h');
+      if(world.unlocks.shift) params.push('D');
+      const ph = document.createElementNS(ns,'text');
+      ph.setAttribute('x',pos.x); ph.setAttribute('y',pos.y+r+30);
+      ph.setAttribute('text-anchor','middle');
+      ph.setAttribute('font-family','monospace'); ph.setAttribute('font-size','9');
+      ph.setAttribute('fill',textCol); ph.setAttribute('opacity','0.6');
+      ph.textContent = params.join('  ');
+      grp.appendChild(ph);
+    }
 
-        if(playerHP<=0){
-          waveActive=false;
-          document.getElementById('attemptBtn').disabled=true;
-          setTimeout(showLoseScreen,600);
-        }
-      } else {
-        // Missed both
-        firstShotParams=null; firstShotMissed=false;
-        setFeedback('score-miss','Miss','No damage this wave.');
+    // Boss HP count for unlocked worlds
+    if(!locked && !cleared){
+      const hpT = document.createElementNS(ns,'text');
+      hpT.setAttribute('x',pos.x); hpT.setAttribute('y',pos.y+5);
+      hpT.setAttribute('text-anchor','middle');
+      hpT.setAttribute('font-family','Orbitron,sans-serif'); hpT.setAttribute('font-size','9');
+      hpT.setAttribute('fill',world.color); hpT.setAttribute('opacity','0.5');
+      hpT.textContent = `${world.bossHP}HP`;
+      grp.appendChild(hpT);
+    }
+
+    // Shot restriction badge for Hyperion
+    if(i===3 && !locked && !cleared){
+      const badge = document.createElementNS(ns,'text');
+      badge.setAttribute('x',pos.x); badge.setAttribute('y',pos.y+r+44);
+      badge.setAttribute('text-anchor','middle');
+      badge.setAttribute('font-family','monospace'); badge.setAttribute('font-size','8');
+      badge.setAttribute('fill','#ff335588');
+      badge.textContent='1 shot only';
+      grp.appendChild(badge);
+    }
+
+    g.appendChild(grp);
+  });
+}
+
+function renderMapHP(){
+  const c = document.getElementById('mapPlayerHP');
+  c.innerHTML='';
+  for(let i=0;i<5;i++){
+    const p=document.createElement('div');
+    p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
+    c.appendChild(p);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// ENTER WORLD
+// ═══════════════════════════════════════════════
+function enterWorld(worldIdx){
+  currentWorld     = worldIdx;
+  const world      = WORLDS[worldIdx];
+  alienHP          = world.bossHP;
+  alienMaxHP       = world.bossHP;
+  alienPartialHits = 0;
+  currentWave      = 1;
+  attemptsUsed     = 0;
+  maxAttempts      = world.maxAttempts;
+  waveActive       = true;
+  firstShotMissed  = false;
+  firstShotParams  = null;
+  showCurrentAim   = false;
+
+  // Show/hide sliders
+  document.getElementById('ampBlock').style.display   = world.unlocks.amp   ? '' : 'none';
+  document.getElementById('freqBlock').style.display  = world.unlocks.freq  ? '' : 'none';
+  document.getElementById('phaseBlock').style.display = world.unlocks.phase ? '' : 'none';
+  document.getElementById('shiftBlock').style.display = world.unlocks.shift ? '' : 'none';
+
+  // Badge
+  const wb = document.getElementById('worldBadge');
+  wb.textContent = world.name.toUpperCase();
+  wb.style.color = world.color;
+
+  // Enemy label color
+  document.getElementById('enemyLabel').textContent  = world.name;
+  document.getElementById('enemyLabel').style.color  = world.color+'aa';
+  document.getElementById('enemyPanel').style.borderColor = world.color+'44';
+
+  // Reset sliders
+  ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
+
+  updateLabels(); generateTarget(); buildPips();
+  renderPlayerHP(); renderAlienHP(); updateWaveBadge();
+
+  document.getElementById('attemptBtn').disabled=false;
+  hideQuitConfirm();
+  document.getElementById('feedback').innerHTML='<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>';
+  document.getElementById('targetHint').textContent='';
+  setBattle('·','');
+
+  showScreen('gameScreen');
+  resizeCanvas();
+}
+
+// ═══════════════════════════════════════════════
+// TARGET GENERATION
+// ═══════════════════════════════════════════════
+function generateTarget(){
+  const world = WORLDS[currentWorld];
+  const t = world.generate();
+  targetA  = t.A;
+  targetB  = t.B;
+  targetCN = t.h;
+  targetC  = t.h * t.B * Math.PI;
+  targetD  = t.D;
+}
+
+// ═══════════════════════════════════════════════
+// PLAYER VALUES & MATCH
+// ═══════════════════════════════════════════════
+function getPlayerValues(){
+  const w = WORLDS[currentWorld];
+  playerA = w.unlocks.amp   ? Number(ampSlider.value)               : 1;
+  playerB = w.unlocks.freq  ? FREQ_VALUES[Number(freqSlider.value)] : 1;
+  const h = w.unlocks.phase ? Number(phaseSlider.value)             : 0;
+  playerC = h * playerB * Math.PI;
+  playerD = w.unlocks.shift ? Number(shiftSlider.value)             : 0;
+}
+
+function isPerfectMatch(){
+  const w  = WORLDS[currentWorld];
+  const pA = w.unlocks.amp   ? Number(ampSlider.value)               : 1;
+  const pB = w.unlocks.freq  ? FREQ_VALUES[Number(freqSlider.value)] : 1;
+  const pH = w.unlocks.phase ? Number(phaseSlider.value)             : 0;
+  const pD = w.unlocks.shift ? Number(shiftSlider.value)             : 0;
+  if(pA!==targetA || pB!==targetB || pD!==targetD) return false;
+  const hDiff = (pH-targetCN)*pB;
+  return Math.abs(hDiff%2)<0.0001 || Math.abs(Math.abs(hDiff%2)-2)<0.0001;
+}
+
+// ═══════════════════════════════════════════════
+// LABELS
+// ═══════════════════════════════════════════════
+function updateLabels(){
+  getPlayerValues();
+  const w    = WORLDS[currentWorld];
+  const h    = w.unlocks.phase ? (Number(phaseSlider.value)|0) : 0;
+  const D    = w.unlocks.shift ? Number(shiftSlider.value)     : 0;
+  const bIdx = w.unlocks.freq  ? Number(freqSlider.value)      : 3;
+  const A    = w.unlocks.amp   ? Number(ampSlider.value)       : 1;
+  const bStr = FREQ_LABELS[bIdx];
+
+  document.getElementById('ampVal').textContent  = A;
+  document.getElementById('freqVal').textContent = bStr;
+
+  const hDisp = h===0?'0':h===1?'π':h===-1?'-π':`${h}π`;
+  document.getElementById('phaseVal').textContent = (h>=0?'+':'')+hDisp.replace(/^-/,'-');
+  document.getElementById('shiftVal').textContent = (D>=0?'+':'')+D;
+
+  const aStr   = A===1 ? '' : `${A}·`;
+  const bEqStr = bStr==='1' ? '' : bStr;
+  const dStr   = D===0 ? '' : D>0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
+
+  let cStr='';
+  if(h!==0){
+    const frac=FREQ_FRACS[bIdx];
+    let num=h*frac[0], den=frac[1];
+    const g=gcd(Math.abs(num),den); num/=g; den/=g;
+    const sign=num<0?' - ':' + ';
+    const absN=Math.abs(num);
+    const cVal=den===1?(absN===1?'π':`${absN}π`):(absN===1?`π/${den}`:`${absN}π/${den}`);
+    cStr=sign+cVal;
+  }
+  document.getElementById('equationDisplay').textContent=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
+}
+
+[ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',updateLabels));
+
+// ═══════════════════════════════════════════════
+// CANVAS DRAWING
+// ═══════════════════════════════════════════════
+function resizeCanvas(){
+  canvas.width  = canvas.parentElement.getBoundingClientRect().width - 28;
+  canvas.height = 300;
+  drawScope();
+}
+
+function drawScope(){
+  if(!targetA) return;
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#020c07'; ctx.fillRect(0,0,W,H);
+  drawGrid(W,H);
+  drawWave(targetA,targetB,targetC,targetD,'#00ff9f',2.5,false,W,H);
+  drawPeakValleyMarkers(targetA,targetB,targetC,targetD,'#00ff9f',W,H);
+  if(firstShotMissed&&firstShotParams)
+    drawWave(firstShotParams.A,firstShotParams.B,firstShotParams.C,firstShotParams.D,'#ff335577',1.5,true,W,H);
+  if(showCurrentAim){
+    drawWave(playerA,playerB,playerC,playerD,'#ffaa00',2,true,W,H);
+    drawPeakValleyMarkers(playerA,playerB,playerC,playerD,'#ffaa00',W,H);
+  }
+}
+
+function drawGrid(W,H){
+  const ML=44,MB=28,MT=16,MR=16;
+  const plotW=W-ML-MR, plotH=H-MB-MT;
+  const xHalfRange=3*Math.PI/targetB;
+  canvas._cx     = ML+plotW/2;
+  canvas._cy     = MT+plotH/2;
+  canvas._xScale = plotW/(2*xHalfRange);
+  canvas._yScale = plotH/18;
+  const cx=canvas._cx,cy=canvas._cy,xScale=canvas._xScale,yScale=canvas._yScale;
+
+  ctx.strokeStyle='#0a200f'; ctx.lineWidth=1;
+  const hp=Math.PI/targetB, nHL=Math.ceil(xHalfRange/hp)+1;
+  for(let i=-nHL;i<=nHL;i++){
+    const x=cx+i*hp*xScale; if(x<ML||x>W-MR) continue;
+    ctx.beginPath(); ctx.moveTo(x,MT); ctx.lineTo(x,H-MB); ctx.stroke();
+  }
+  for(let i=-8;i<=8;i++){
+    const y=cy-i*yScale;
+    ctx.beginPath(); ctx.moveTo(ML,y); ctx.lineTo(W-MR,y); ctx.stroke();
+  }
+  ctx.strokeStyle='#1a4a2a'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(ML,cy); ctx.lineTo(W-MR,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,MT); ctx.lineTo(cx,H-MB); ctx.stroke();
+
+  ctx.fillStyle='#1a4a2a';
+  ctx.beginPath(); ctx.moveTo(W-MR,cy); ctx.lineTo(W-MR-6,cy-4); ctx.lineTo(W-MR-6,cy+4); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx,MT);   ctx.lineTo(cx-4,MT+6);    ctx.lineTo(cx+4,MT+6);    ctx.fill();
+
+  ctx.fillStyle='#00dd88'; ctx.font='bold 16px Share Tech Mono';
+  ctx.textAlign='left';   ctx.fillText('x',W-MR+4,cy+5);
+  ctx.textAlign='center'; ctx.fillText('f(x)',cx,MT-2);
+
+  ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono'; ctx.textAlign='center';
+  const fp=2*Math.PI/targetB, nPT=Math.ceil(xHalfRange/fp)+1;
+  for(let i=-nPT;i<=nPT;i++){
+    if(i===0) continue;
+    const xVal=i*fp, x=cx+xVal*xScale;
+    if(x<ML+10||x>W-MR-10) continue;
+    ctx.fillText(formatAsPiFraction(xVal),x,H-MB+16);
+    ctx.strokeStyle='#00aa55'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x,cy-4); ctx.lineTo(x,cy+4); ctx.stroke();
+  }
+  ctx.textAlign='right';
+  [-8,-6,-4,-2,2,4,6,8].forEach(n=>{
+    const y=cy-n*yScale;
+    if(y<MT||y>H-MB) return;
+    ctx.fillStyle='#00cc77'; ctx.font='15px Share Tech Mono';
+    ctx.fillText(n,ML-6,y+5);
+    ctx.strokeStyle='#00aa55'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx-3,y); ctx.lineTo(cx+3,y); ctx.stroke();
+  });
+  ctx.fillStyle='#00cc77'; ctx.textAlign='right'; ctx.font='15px Share Tech Mono';
+  ctx.fillText('0',cx-5,cy+16);
+}
+
+function drawWave(A,B,C,D,color,lw,dashed,W,H){
+  const cx=canvas._cx,cy=canvas._cy,yScale=canvas._yScale,xScale=canvas._xScale;
+  ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.shadowColor=color; ctx.shadowBlur=8;
+  if(dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
+  ctx.beginPath(); let started=false;
+  for(let px=0;px<W;px++){
+    const x=(px-cx)/xScale, y=A*Math.sin(B*x+C)+D, py=cy-y*yScale;
+    if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py);
+  }
+  ctx.stroke(); ctx.shadowBlur=0; ctx.setLineDash([]);
+}
+
+function findPeaksValleys(A,B,C,D){
+  const cx=canvas._cx,xScale=canvas._xScale;
+  const xMin=-cx/xScale, xMax=(canvas.width-cx)/xScale;
+  const pts=[];
+  for(let k=-8;k<=8;k++){
+    const xP=(Math.PI/2-C+2*Math.PI*k)/B; if(xP>=xMin&&xP<=xMax) pts.push({x:xP,y:A+D,type:'peak'});
+    const xV=(-Math.PI/2-C+2*Math.PI*k)/B; if(xV>=xMin&&xV<=xMax) pts.push({x:xV,y:-A+D,type:'valley'});
+  }
+  return pts.sort((a,b)=>a.x-b.x);
+}
+
+function drawPeakValleyMarkers(A,B,C,D,color,W,H){
+  const cx=canvas._cx,cy=canvas._cy,xScale=canvas._xScale,yScale=canvas._yScale;
+  const all=findPeaksValleys(A,B,C,D);
+  const sel=[
+    ...all.filter(p=>p.type==='peak').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x)).slice(0,2),
+    ...all.filter(p=>p.type==='valley').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x)).slice(0,1)
+  ];
+  ctx.save(); ctx.shadowBlur=0; ctx.setLineDash([]);
+  sel.forEach(pt=>{
+    const px=cx+pt.x*xScale, py=cy-pt.y*yScale;
+    ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.globalAlpha=0.9; ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle=color; ctx.lineWidth=1; ctx.globalAlpha=0.3; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(cx,py); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+    const xLbl=formatAsPiFraction(pt.x);
+    const yLbl=Number.isInteger(pt.y)?pt.y.toString():pt.y.toFixed(1);
+    const txt=`(${xLbl}, ${yLbl})`;
+    ctx.font='bold 20px Share Tech Mono';
+    const tw=ctx.measureText(txt).width, pad=4, bW=tw+pad*2, bH=28;
+    let lX=px+8, lY=pt.type==='peak'?py-14:py+32;
+    if(lX+bW>W-4) lX=px-bW-8;
+    if(lY-bH<4) lY=py+32; if(lY>H-4) lY=py-14;
+    ctx.fillStyle='#020c07'; ctx.globalAlpha=0.85;
+    ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.globalAlpha=0.6;
+    ctx.beginPath(); ctx.roundRect(lX-pad,lY-22,bW,bH,3); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.fillStyle=color; ctx.textAlign='left'; ctx.fillText(txt,lX,lY-4);
+  });
+  ctx.restore();
+}
+
+function formatAsPiFraction(x){
+  if(Math.abs(x)<0.0001) return '0';
+  const sign=x<0?-1:1, absX=Math.abs(x);
+  for(const d of [1,2,3,4,5,6,7,8,9,10,12]){
+    const nRaw=absX*d/Math.PI, n=Math.round(nRaw);
+    if(n>0&&Math.abs(n-nRaw)<0.0001){
+      const g=gcd(n,d), nr=sign*(n/g), dr=d/g;
+      if(dr===1) return nr===1?'π':nr===-1?'-π':`${nr}π`;
+      if(nr===1) return `π/${dr}`; if(nr===-1) return `-π/${dr}`;
+      return `${nr}π/${dr}`;
+    }
+  }
+  return `${(x/Math.PI).toFixed(2)}π`;
+}
+
+function gcd(a,b){ return b===0?a:gcd(b,a%b); }
+
+// ═══════════════════════════════════════════════
+// HP RENDERING
+// ═══════════════════════════════════════════════
+function renderPlayerHP(){
+  const c=document.getElementById('playerHP'); c.innerHTML='';
+  for(let i=0;i<5;i++){
+    const p=document.createElement('div');
+    p.className='hp-pip '+(i<playerHP?'alive-green':'dead');
+    c.appendChild(p);
+  }
+  const parts=['ps-body','ps-lwing','ps-rwing','ps-engine'];
+  parts.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.style.opacity=(i<playerHP)?'1':'0.08';
+  });
+}
+
+function renderAlienHP(){
+  const c=document.getElementById('alienHP'); c.innerHTML='';
+  for(let i=0;i<alienMaxHP;i++){
+    const p=document.createElement('div');
+    p.className='hp-pip '+(i<alienHP?'alive-red':'dead');
+    c.appendChild(p);
+  }
+  const destroyed=alienMaxHP-alienHP;
+  ['al-hull','al-dome','al-lpod','al-rpod'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.style.opacity=(i < Math.floor(destroyed*4/alienMaxHP))?'0.06':'1';
+  });
+}
+
+function buildPips(){
+  const c=document.getElementById('pips'); c.innerHTML='';
+  for(let i=0;i<maxAttempts;i++){
+    const p=document.createElement('div');
+    p.className='pip'; p.id=`pip-${i}`; c.appendChild(p);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GAME LOOP
+// ═══════════════════════════════════════════════
+function doAttempt(){
+  if(!waveActive||attemptsUsed>=maxAttempts) return;
+  getPlayerValues();
+  const hit=isPerfectMatch();
+  const isFirst=(attemptsUsed===0);
+  const pip=document.getElementById(`pip-${attemptsUsed}`);
+  attemptsUsed++;
+
+  showCurrentAim=true; drawScope();
+  setTimeout(()=>{ showCurrentAim=false; drawScope(); }, 800);
+
+  if(hit){
+    pip.classList.add('hit');
+    firstShotParams=null; firstShotMissed=false;
+    if(isFirst){
+      alienHP--;
+      renderAlienHP();
+      canvas.classList.add('success-flash');
+      setTimeout(()=>canvas.classList.remove('success-flash'),600);
+      setFeedback('score-perfect','Hit',`${alienHP} section${alienHP!==1?'s':''} remaining.`);
+      setBattle('✦','');
+    } else {
+      alienPartialHits++;
+      if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
+      renderAlienHP();
+      canvas.classList.add('success-flash');
+      setTimeout(()=>canvas.classList.remove('success-flash'),600);
+      setFeedback('score-good','Partial hit','Two shots to lock.');
+      setBattle('◈','');
+    }
+    waveActive=false;
+    document.getElementById('attemptBtn').disabled=true;
+    if(alienHP<=0) setTimeout(onWorldWon,700);
+    else setTimeout(nextWave, 1400);
+
+  } else {
+    pip.classList.add('used');
+    if(isFirst){
+      firstShotMissed=true;
+      firstShotParams={A:playerA,B:playerB,C:playerC,D:playerD};
+      playerHP--;
+      renderPlayerHP();
+      canvas.classList.add('damage-flash');
+      setTimeout(()=>canvas.classList.remove('damage-flash'),500);
+
+      if(playerHP<=0){
+        waveActive=false;
+        document.getElementById('attemptBtn').disabled=true;
+        setTimeout(onGameOver,600);
+        return;
+      }
+
+      if(maxAttempts===1){
+        // Hyperion single-shot: miss = wave over, auto-advance
+        setFeedback('score-miss','Miss','No second shot here.');
         setBattle('·','');
         waveActive=false;
         document.getElementById('attemptBtn').disabled=true;
-        document.getElementById('newBtn').classList.add('ready');
-        updateWaveBadge();
+        setTimeout(nextWave, 1400);
+      } else {
+        setFeedback('score-miss','Miss','One shot remaining.');
+        setBattle('·','');
       }
+
+    } else {
+      // Missed both — glancing hit on enemy
+      firstShotParams=null; firstShotMissed=false;
+      alienPartialHits++;
+      if(alienPartialHits>=2){ alienHP--; alienPartialHits=0; }
+      renderAlienHP();
+      setFeedback('score-miss','Miss','Glancing hit on enemy.');
+      setBattle('◈','');
+      waveActive=false;
+      document.getElementById('attemptBtn').disabled=true;
+      if(alienHP<=0) setTimeout(onWorldWon,700);
+      else setTimeout(nextWave, 1400);
     }
   }
+}
 
-  function setFeedback(cls, title, msg){
-    document.getElementById('feedback').innerHTML=`
-      <div class="feedback-score ${cls}">${title}</div>
-      <div class="feedback-msg">${msg}</div>`;
+function nextWave(){
+  if(alienHP<=0){ onWorldWon(); return; }
+  currentWave++;
+  attemptsUsed=0; waveActive=true;
+  firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+  ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
+  updateLabels(); generateTarget(); buildPips(); drawScope();
+  document.getElementById('attemptBtn').disabled=false;
+  document.getElementById('feedback').innerHTML='<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>';
+  document.getElementById('targetHint').textContent='';
+  setBattle('·','');
+  updateWaveBadge();
+}
+
+function showQuitConfirm(){
+  document.getElementById('quitConfirm').classList.add('visible');
+}
+
+function hideQuitConfirm(){
+  document.getElementById('quitConfirm').classList.remove('visible');
+}
+
+function confirmQuit(){
+  hideQuitConfirm();
+  showEndScreen(false);
+}
+
+function setFeedback(cls,title,msg){
+  document.getElementById('feedback').innerHTML=
+    `<div class="feedback-score ${cls}">${title}</div><div class="feedback-msg">${msg}</div>`;
+}
+
+function setBattle(icon,msg){
+  document.getElementById('battleIcon').textContent=icon;
+  document.getElementById('battleMsg').textContent=msg;
+}
+
+function updateWaveBadge(){
+  const label=`Wave ${currentWave}`;
+  document.getElementById('roundBadge').textContent=label;
+  document.getElementById('roundDisplay').textContent=label;
+}
+
+// ═══════════════════════════════════════════════
+// WIN / LOSE
+// ═══════════════════════════════════════════════
+function onWorldWon(){
+  worldsCleared.push(currentWorld);
+  const world  = WORLDS[currentWorld];
+  const isLast = currentWorld === WORLDS.length-1;
+
+  if(isLast){
+    showEndScreen(true);
+  } else {
+    currentWorld++;
+    const next = WORLDS[currentWorld];
+    const unlockMsgs = ['','Frequency controls unlocked.','Phase Shift unlocked.','Final boss — one shot only. No mercy.'];
+    document.getElementById('worldClearTitle').textContent = world.name+' Cleared!';
+    document.getElementById('worldClearSub').innerHTML =
+      `Advancing to <span style="color:${next.color};font-family:Orbitron,sans-serif;">${next.name}</span>.<br>
+       <span style="font-size:0.8rem;">${unlockMsgs[currentWorld]}</span>`;
+    document.getElementById('worldClearOverlay').classList.add('active');
   }
+}
 
-  function setBattle(icon, msg){
-    document.getElementById('battleIcon').textContent=icon;
-    document.getElementById('battleMsg').textContent=msg;
-  }
+function onGameOver(){
+  showEndScreen(false);
+}
 
-  function updateWaveBadge(){
-    const label=`Wave ${currentWave} / 4`;
-    document.getElementById('roundBadge').textContent=label;
-    document.getElementById('roundDisplay').textContent=label;
-  }
+function showEndScreen(victory){
+  const beaten    = worldsCleared.length;
+  const names     = worldsCleared.map(i=>WORLDS[i].name).join(', ') || 'None';
+  const hpLeft    = playerHP;
 
-  function nextWave(){
-    if(alienHP<=0){ showWinScreen(); return; }
-    currentWave++;
-    attemptsUsed=0; waveActive=true;
-    firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+  document.getElementById('endTitle').textContent = victory ? 'Fleet Defeated' : 'Ship Destroyed';
+  document.getElementById('endTitle').className   = 'end-title '+(victory?'victory':'defeat');
+  document.getElementById('endSubtitle').textContent = victory
+    ? 'The Saturn system is secure. Mission accomplished.'
+    : 'Your signal went dark. The enemy advances.';
 
-    ampSlider.value=1; freqSlider.value=1; phaseSlider.value=0; shiftSlider.value=0;
-    updateLabels(); generateTarget(); buildPips(); drawScope();
+  document.getElementById('endStats').innerHTML = `
+    <div class="end-stat">
+      <span class="end-stat-label">Worlds Cleared</span>
+      <span class="end-stat-value">${beaten} / ${WORLDS.length}</span>
+    </div>
+    <div class="end-stat">
+      <span class="end-stat-label">Planets</span>
+      <span class="end-stat-value" style="font-size:0.82rem;">${names}</span>
+    </div>
+    <hr class="end-divider">
+    <div class="end-stat">
+      <span class="end-stat-label">Hull Integrity</span>
+      <span class="end-stat-value ${hpLeft<=1?'red':''}">${hpLeft} / 5</span>
+    </div>
+    <div class="end-stat">
+      <span class="end-stat-label">Waves Survived</span>
+      <span class="end-stat-value">${currentWave}</span>
+    </div>
+  `;
+  showScreen('endScreen');
+}
 
-    document.getElementById('attemptBtn').disabled=false;
-    document.getElementById('newBtn').classList.remove('ready');
-    setFeedback('','','');
-    document.getElementById('feedback').innerHTML=`<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>`;
-    document.getElementById('targetHint').textContent='';
-    setBattle('·','');
-    updateWaveBadge();
-  }
-
-  function showWinScreen(){  document.getElementById('winOverlay').classList.add('active'); }
-  function showLoseScreen(){ document.getElementById('loseOverlay').classList.add('active'); }
-
-  function startNewGame(){
-    document.getElementById('winOverlay').classList.remove('active');
-    document.getElementById('loseOverlay').classList.remove('active');
-    alienHP=4; playerHP=4; alienPartialHits=0; currentWave=1;
-    attemptsUsed=0; waveActive=true; firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
-    renderPlayerHP(); renderAlienHP();
-    ampSlider.value=1; freqSlider.value=1; phaseSlider.value=0; shiftSlider.value=0;
-    updateLabels(); generateTarget(); buildPips(); drawScope();
-    document.getElementById('attemptBtn').disabled=false;
-    document.getElementById('newBtn').classList.remove('ready');
-    document.getElementById('feedback').innerHTML=`<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>`;
-    document.getElementById('targetHint').textContent='';
-    setBattle('·','');
-    updateWaveBadge();
-  }
-
-  // ── Init ──
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  generateTarget(); buildPips(); updateLabels(); renderPlayerHP(); renderAlienHP(); updateWaveBadge(); drawScope();
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('resize', ()=>{
+  if(document.getElementById('gameScreen').classList.contains('active')) resizeCanvas();
+});
 </script>
 </body>
 </html>
