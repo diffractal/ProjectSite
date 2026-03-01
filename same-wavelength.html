@@ -311,7 +311,7 @@
   </div>
 
   <button class="big-btn" onclick="showMapScreen()">Launch Mission</button>
-  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.24</div>
+  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.27</div>
   <button onclick="if(confirm('Reset all progress?')){resetProgress();showMapScreen();}" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#2a2a4a;background:transparent;border:none;cursor:pointer;letter-spacing:0.15em;margin-top:-8px;">Reset Progress</button>
 </div>
 
@@ -378,7 +378,7 @@
       <h1>Same Wavelength</h1>
       <span class="world-badge" id="worldBadge"></span>
     </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.24</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.27</span>
   </div>
 
   <span id="targetFreqDisplay" style="display:none;"></span>
@@ -591,7 +591,44 @@ const WORLDS = [
     hasCosine:true, hasInterference:true,
     briefing:{
       title:'Hyperion — Interference',
-      body:`One shot only. No second chances.\n\nSome waves require <span class="hl">constructive interference</span> — match the target exactly.\n\nOthers require <span class="warn">destructive interference</span> — match the target but shift phase by π to cancel it out.\n\nThe objective will be shown above the oscilloscope each wave.`
+      body:`One shot only. No second chances.\n\nSome waves require <span class="hl">constructive interference</span> — match the target exactly so your signals add together and amplify.\n\nOthers require <span class="warn">destructive interference</span> — match the target but shift phase by π so your signals cancel each other out.\n\nThe objective will be shown below your equation each wave.\n\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 180" style="width:100%;max-width:480px;display:block;margin:12px auto 0;background:#020c07;border:1px solid #1a3a2a;border-radius:4px;font-family:Share Tech Mono,monospace;">
+  <!-- Labels -->
+  <text x="120" y="22" fill="#00ff9f" font-size="14" letter-spacing="2" text-anchor="middle" opacity="0.9">CONSTRUCTIVE</text>
+  <text x="360" y="22" fill="#ff3355" font-size="14" letter-spacing="2" text-anchor="middle" opacity="0.9">DESTRUCTIVE</text>
+  <!-- Divider -->
+  <line x1="240" y1="8" x2="240" y2="172" stroke="#1a3a2a" stroke-width="1"/>
+  <!-- Grid lines left -->
+  <line x1="12" y1="90" x2="228" y2="90" stroke="#0a200f" stroke-width="1"/>
+  <!-- Grid lines right -->
+  <line x1="252" y1="90" x2="468" y2="90" stroke="#0a200f" stroke-width="1"/>
+
+  <!-- CONSTRUCTIVE: target (green) -->
+  <path d="M12,90 C34,50 56,50 78,90 C100,130 122,130 144,90 C166,50 188,50 210,90 C220,110 228,118 228,118"
+        fill="none" stroke="#00ff9f" stroke-width="2" opacity="0.9"/>
+  <!-- CONSTRUCTIVE: player (amber, same phase) -->
+  <path d="M12,90 C34,50 56,50 78,90 C100,130 122,130 144,90 C166,50 188,50 210,90 C220,110 228,118 228,118"
+        fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+  <!-- CONSTRUCTIVE: result (white, double amplitude) -->
+  <path d="M12,90 C34,10 56,10 78,90 C100,170 122,170 144,90 C166,10 188,10 210,90"
+        fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+  <!-- Constructive labels -->
+  <text x="14" y="36" fill="#00ff9f" font-size="8" opacity="0.8">target</text>
+  <text x="14" y="47" fill="#ffaa00" font-size="8" opacity="0.8">your signal</text>
+  <text x="14" y="58" fill="#ffffff" font-size="8" opacity="0.5">result ×2</text>
+
+  <!-- DESTRUCTIVE: target (green) -->
+  <path d="M252,90 C274,50 296,50 318,90 C340,130 362,130 384,90 C406,50 428,50 450,90 C460,110 468,118 468,118"
+        fill="none" stroke="#00ff9f" stroke-width="2" opacity="0.9"/>
+  <!-- DESTRUCTIVE: player (amber, inverted — π shift) -->
+  <path d="M252,90 C274,130 296,130 318,90 C340,50 362,50 384,90 C406,130 428,130 450,90 C460,70 468,62 468,62"
+        fill="none" stroke="#ffaa00" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+  <!-- DESTRUCTIVE: result (flat line) -->
+  <line x1="252" y1="90" x2="468" y2="90" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+  <!-- Destructive labels -->
+  <text x="254" y="36" fill="#00ff9f" font-size="8" opacity="0.8">target</text>
+  <text x="254" y="47" fill="#ffaa00" font-size="8" opacity="0.8">your signal (+π)</text>
+  <text x="254" y="58" fill="#ffffff" font-size="8" opacity="0.5">result = 0</text>
+</svg>`
     },
     generate(){
       const A=[1,2,3,4,5], H=[-3,-2,-1,0,1,2,3], D=[-2,-1,0,1,2];
@@ -705,14 +742,20 @@ function showBriefing(worldIdx, debugPreview=false){
   titleEl.style.color = world.color;
   titleEl.style.textShadow = `0 0 20px ${world.color}, 0 0 40px ${world.color}66`;
 
-  bodyEl.innerHTML = b.body
-    .replace(/\n/g,'<br>')
-    .replace(/<span class="hl eq">(.*?)<\/span>/g,
-      '<span style="color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:1.1em;display:inline-block;margin:4px 0;text-shadow:var(--glow);">$1</span>')
-    .replace(/<span class="hl">(.*?)<\/span>/g,
-      '<span style="color:var(--green);">$1</span>')
-    .replace(/<span class="warn">(.*?)<\/span>/g,
-      '<span style="color:var(--red);">$1</span>');
+  // Split on SVG blocks so the replace chains don't mangle them
+  const svgSplit = b.body.split(/(<svg[\s\S]*?<\/svg>)/);
+  const processedParts = svgSplit.map((part, i) => {
+    if(part.startsWith('<svg')) return part; // pass SVG through raw
+    return part
+      .replace(/\n/g,'<br>')
+      .replace(/<span class="hl eq">(.*?)<\/span>/g,
+        '<span style="color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:1.1em;display:inline-block;margin:4px 0;text-shadow:var(--glow);">$1</span>')
+      .replace(/<span class="hl">(.*?)<\/span>/g,
+        '<span style="color:var(--green);">$1</span>')
+      .replace(/<span class="warn">(.*?)<\/span>/g,
+        '<span style="color:var(--red);">$1</span>');
+  });
+  bodyEl.innerHTML = processedParts.join('');
 
   backBtn.style.display = debugPreview ? 'inline-flex' : 'none';
 
@@ -1056,7 +1099,7 @@ function enterWorldDirect(worldIdx){
   // Reset sliders
   ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
 
-  updateLabels(); generateTarget(); buildPips();
+  generateTarget(); updateLabels(); buildPips();
   renderPlayerHP(); renderAlienHP(); updateWaveBadge();
   updateInterferenceDisplay();
 
@@ -1507,7 +1550,7 @@ function nextWave(){
   if(aimTimer){ clearTimeout(aimTimer); aimTimer=null; }
   hideFirstShotBar();
   ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
-  updateLabels(); generateTarget(); buildPips(); drawScope();
+  generateTarget(); updateLabels(); buildPips(); drawScope();
   updateInterferenceDisplay();
   document.getElementById('attemptBtn').disabled=false;
   document.getElementById('feedback').innerHTML='<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>';
