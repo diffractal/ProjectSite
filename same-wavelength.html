@@ -311,7 +311,8 @@
   </div>
 
   <button class="big-btn" onclick="showMapScreen()">Launch Mission</button>
-  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.17</div>
+  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.24</div>
+  <button onclick="if(confirm('Reset all progress?')){resetProgress();showMapScreen();}" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#2a2a4a;background:transparent;border:none;cursor:pointer;letter-spacing:0.15em;margin-top:-8px;">Reset Progress</button>
 </div>
 
 <!-- ══════ WORLD MAP SCREEN ══════ -->
@@ -377,7 +378,7 @@
       <h1>Same Wavelength</h1>
       <span class="world-badge" id="worldBadge"></span>
     </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.17</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.24</span>
   </div>
 
   <span id="targetFreqDisplay" style="display:none;"></span>
@@ -437,15 +438,15 @@
       <div class="scope-overlay"></div>
       <div class="legend">
         <div class="legend-item"><div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div><span style="color:#00ff9f88;">Target signal</span></div>
-        <div class="legend-item"><div class="legend-line" style="background:#ffaa00;box-shadow:0 0 4px #ffaa00;"></div><span style="color:#ffaa0088;">Your signal</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#ffaa00;box-shadow:0 0 4px #ffaa00;"></div><span style="color:#ffaa0088;">Your shot</span></div>
         <div class="legend-item"><div class="legend-line" style="background:#ff335588;border-top:2px dashed #ff335588;height:0;"></div><span>Shot 1 (miss)</span></div>
       </div>
       <div class="target-hint" id="targetHint"></div>
-      <div id="interferenceDisplay" style="display:none;font-family:'Orbitron',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-align:center;margin-top:8px;padding:8px 16px;border-radius:3px;border:1px solid #ffffff11;background:#0a0a1a;"></div>
       <div class="equation-bar" style="border-color:#ffaa0044;box-shadow:0 0 20px #ffaa0011,inset 0 0 30px #0d0a00;">
         <div class="equation-bar-label" style="color:#ffaa0077;">Your Signal</div>
         <div class="equation-bar-text" id="equationDisplay" style="color:var(--amber);text-shadow:var(--amber-glow);"></div>
       </div>
+      <div id="interferenceDisplay" style="display:none;"></div>
       <div class="equation-bar shot1-bar" id="shot1Bar" style="display:none;border-color:#ff335544;box-shadow:0 0 20px #ff335511,inset 0 0 30px #1a0008;">
         <div class="equation-bar-label" style="color:#ff335588;">Shot 1 (miss)</div>
         <div class="equation-bar-text" id="shot1Display" style="color:#ff3355;text-shadow:0 0 10px #ff335588,0 0 20px #ff335544;font-size:clamp(1rem,2.2vw,1.5rem);"></div>
@@ -522,7 +523,10 @@
     background:var(--panel); border:1px solid var(--border);
     border-radius:6px; padding:24px 32px;
   "></div>
-  <button class="overlay-btn green-btn" id="briefingBeginBtn">Begin Mission</button>
+  <div style="display:flex;gap:16px;">
+    <button class="overlay-btn green-btn" id="briefingBeginBtn">Begin Mission</button>
+    <button class="overlay-btn" id="briefingBackBtn" style="display:none;border-color:#2a3a2a;color:var(--muted);" onclick="document.getElementById('briefingOverlay').classList.remove('active');showMapScreen();">← Back to Map</button>
+  </div>
 </div>
 
 <!-- ══════ WORLD CLEAR OVERLAY ══════ -->
@@ -547,7 +551,7 @@ const WORLDS = [
     hasCosine:false, hasInterference:false,
     briefing:{
       title:'Titan — Signal Basics',
-      body:`The enemy broadcasts a simple sinusoidal signal. Match its <span class="hl">Amplitude</span>, <span class="hl">Frequency</span>, and <span class="hl">Vertical Shift</span> to lock on.\n\nYour equation takes the form:\n<span class="hl eq">f(x) = A·sin(Bx) + D</span>\n\nA miss on your first shot costs 1 HP but grants a second attempt.`
+      body:`Match the <span class="hl">Amplitude</span>, <span class="hl">Frequency</span>, and <span class="hl">Vertical Shift</span> of the graph shown to lock on with your equation.\n\n<span class="hl eq">f(x) = A·sin(Bx) + D</span>\n\nA miss on your first attempt costs 1 HP but gives a second shot. Hitting either shot takes 1 HP from the enemy.`
     },
     generate(){
       const A=[1,2,3,4,5], B=pick(FREQ_VALUES), D=[-3,-2,-1,0,1,2,3];
@@ -572,8 +576,8 @@ const WORLDS = [
     unlocks:{amp:true, freq:true, phase:true, shift:true},
     hasCosine:true, hasInterference:false,
     briefing:{
-      title:'Mimas — Cosine Signals',
-      body:`The enemy has begun using <span class="hl">cosine waves</span>. Each signal is equally likely to be sine or cosine.\n\nCosine is just sine shifted by π/2:\n<span class="hl eq">cos(x) = sin(x + π/2)</span>\n\nThe equation display will show <span class="hl">cos()</span> or <span class="hl">sin()</span> accordingly. Adjust your Phase Shift slider to match.`
+      title:'Mimas — Sine & Cosine',
+      body:`Each wave will show you a graph and tell you whether to use <span class="hl">sin</span> or <span class="hl">cos</span> — you can't switch. Your job is to find the right <span class="hl">Phase Shift</span> to make your equation match the graph.\n\nRemember: cosine starts at its peak, sine starts at zero:\n<span class="hl eq">cos(x) = sin(x + π/2)</span>\n\nAdjust the Phase Shift slider until the shape lines up.`
     },
     generate(){
       const A=[1,2,3,4,5], H=[-3,-2,-1,0,1,2,3], D=[-3,-2,-1,0,1,2,3];
@@ -624,12 +628,38 @@ const shiftSlider = document.getElementById('shiftSlider');
 const MAX_PLAYER_HP = 3;
 
 // ═══════════════════════════════════════════════
+// PERSISTENT PROGRESS (localStorage)
+// ═══════════════════════════════════════════════
+function loadProgress(){
+  try {
+    const raw = localStorage.getItem('swProgress');
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return { unlocked:[0], cleared:[] };
+}
+function saveProgress(){
+  try {
+    localStorage.setItem('swProgress', JSON.stringify({ unlocked:[...worldsUnlocked], cleared:[...worldsCleared] }));
+  } catch(e){}
+}
+function resetProgress(){
+  try { localStorage.removeItem('swProgress'); } catch(e){}
+  worldsUnlocked = new Set([0]);
+  worldsCleared  = new Set();
+  briefingsSeen  = new Set();
+  currentWorld   = 0;
+}
+
+const _saved = loadProgress();
+
+// ═══════════════════════════════════════════════
 // RUN STATE (persists across worlds)
 // ═══════════════════════════════════════════════
 let playerHP      = MAX_PLAYER_HP;
 let currentWorld  = 0;
-let worldsCleared = [];
-let briefingsSeen = new Set(); // track which world briefings have been shown
+let worldsUnlocked = new Set(_saved.unlocked || [0]);
+let worldsCleared  = new Set(_saved.cleared  || []);
+let briefingsSeen  = new Set([...(worldsCleared)]); // already-cleared worlds skip briefing
 
 // ═══════════════════════════════════════════════
 // BATTLE STATE (resets each world)
@@ -652,7 +682,7 @@ function showScreen(id){
 }
 
 function returnToTitle(){
-  playerHP=MAX_PLAYER_HP; currentWorld=0; worldsCleared=[]; briefingsSeen=new Set();
+  playerHP = MAX_PLAYER_HP;
   showScreen('titleScreen');
 }
 
@@ -662,19 +692,19 @@ function showMapScreen(){
   showScreen('mapScreen');
 }
 
-function showBriefing(worldIdx){
+function showBriefing(worldIdx, debugPreview=false){
   const world = WORLDS[worldIdx];
   const b = world.briefing;
   const overlay = document.getElementById('briefingOverlay');
   const titleEl = document.getElementById('briefingTitle');
   const bodyEl  = document.getElementById('briefingBody');
   const btnEl   = document.getElementById('briefingBeginBtn');
+  const backBtn = document.getElementById('briefingBackBtn');
 
   titleEl.textContent = b.title;
   titleEl.style.color = world.color;
   titleEl.style.textShadow = `0 0 20px ${world.color}, 0 0 40px ${world.color}66`;
 
-  // Replace \n with <br> and process inline tags
   bodyEl.innerHTML = b.body
     .replace(/\n/g,'<br>')
     .replace(/<span class="hl eq">(.*?)<\/span>/g,
@@ -683,6 +713,8 @@ function showBriefing(worldIdx){
       '<span style="color:var(--green);">$1</span>')
     .replace(/<span class="warn">(.*?)<\/span>/g,
       '<span style="color:var(--red);">$1</span>');
+
+  backBtn.style.display = debugPreview ? 'inline-flex' : 'none';
 
   btnEl.onclick = () => {
     overlay.classList.remove('active');
@@ -822,16 +854,16 @@ function renderMap(){
 
   WORLDS.forEach((world, i) => {
     const pos      = NODE_POS[i];
-    const cleared  = worldsCleared.includes(i);
-    // Only current world is clickable; all others locked
-    const isCur    = (i === currentWorld) && !cleared;
-    const locked   = !isCur && !cleared;
+    const cleared  = worldsCleared.has(i);
+    const unlocked = worldsUnlocked.has(i);
+    const locked   = !unlocked;
+    const isCur    = (i === currentWorld) && unlocked;
 
     const r = isCur ? 28 : 24;
     const ns = 'http://www.w3.org/2000/svg';
     const grp = document.createElementNS(ns,'g');
 
-    if(isCur){
+    if(unlocked){
       grp.style.cursor = 'pointer';
       grp.onclick = () => enterWorld(i);
     } else {
@@ -853,14 +885,14 @@ function renderMap(){
     // Main circle background
     const circ = document.createElementNS(ns,'circle');
     circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-    if(cleared){
-      circ.setAttribute('fill','#0a180a');
-      circ.setAttribute('stroke','#2a6a2a');
-      circ.setAttribute('stroke-width','2');
-    } else if(locked){
+    if(locked){
       circ.setAttribute('fill','#08080f');
       circ.setAttribute('stroke','#1a1a3a');
       circ.setAttribute('stroke-width','1.5');
+    } else if(cleared){
+      circ.setAttribute('fill','#090914');
+      circ.setAttribute('stroke','#2a8a2a');
+      circ.setAttribute('stroke-width','2');
     } else {
       circ.setAttribute('fill','#090914');
       circ.setAttribute('stroke',world.color);
@@ -868,23 +900,22 @@ function renderMap(){
     }
     grp.appendChild(circ);
 
-    // Moon illustration (always, dimmed when locked/cleared)
+    // Moon illustration
     const moonGrp = moonContent(ns, i, pos.x, pos.y, r);
-    if(cleared) moonGrp.setAttribute('opacity','0.35');
-    else if(locked) moonGrp.setAttribute('opacity','0.18');
+    if(locked) moonGrp.setAttribute('opacity','0.18');
     else moonGrp.setAttribute('opacity','1');
     grp.appendChild(moonGrp);
 
-    // Overlay for cleared: green tint + checkmark
+    // Cleared badge — small ✓ in corner, doesn't block the moon
     if(cleared){
-      const tint=document.createElementNS(ns,'circle');
-      tint.setAttribute('cx',pos.x); tint.setAttribute('cy',pos.y); tint.setAttribute('r',r-2);
-      tint.setAttribute('fill','#00ff9f'); tint.setAttribute('opacity','0.08');
-      grp.appendChild(tint);
+      const ckBg=document.createElementNS(ns,'circle');
+      ckBg.setAttribute('cx',pos.x+r-8); ckBg.setAttribute('cy',pos.y-r+8); ckBg.setAttribute('r',9);
+      ckBg.setAttribute('fill','#003300'); ckBg.setAttribute('opacity','0.9');
+      grp.appendChild(ckBg);
       const ck=document.createElementNS(ns,'text');
-      ck.setAttribute('x',pos.x); ck.setAttribute('y',pos.y+6);
-      ck.setAttribute('text-anchor','middle'); ck.setAttribute('font-size','18');
-      ck.setAttribute('fill','#00ff9f'); ck.setAttribute('opacity','0.9');
+      ck.setAttribute('x',pos.x+r-8); ck.setAttribute('y',pos.y-r+13);
+      ck.setAttribute('text-anchor','middle'); ck.setAttribute('font-size','11');
+      ck.setAttribute('fill','#00ff9f'); ck.setAttribute('opacity','0.95');
       ck.textContent='✓';
       grp.appendChild(ck);
     }
@@ -918,7 +949,7 @@ function renderMap(){
     }
 
     // World name label — bigger and brighter
-    const textCol = cleared ? '#4a9a4a' : locked ? '#2a2a5a' : world.color;
+    const textCol = locked ? '#2a2a5a' : cleared ? '#4aaa4a' : world.color;
     const lbl = document.createElementNS(ns,'text');
     lbl.setAttribute('x',pos.x); lbl.setAttribute('y',pos.y+r+18);
     lbl.setAttribute('text-anchor','middle');
@@ -1046,23 +1077,20 @@ function enterWorldDirect(worldIdx){
 function generateTarget(){
   const world = WORLDS[currentWorld];
   const t = world.generate();
-  targetA  = t.A;
-  targetB  = t.B;
-  targetIsCos = t.isCos || false;
+  targetA      = t.A;
+  targetB      = t.B;
+  targetIsCos  = t.isCos || false;
   interferenceMode = t.interference || null;
 
-  // Phase is stored in multiples of π (half-integer steps allowed).
-  // Cosine: cos(Bx + h·π) = sin(Bx + h·π + π/2)
-  // So for cosine we add 0.5 to h to get the effective phase in π-multiples.
-  // targetCN is the h value the player must dial in (in π-multiples).
-  // targetC is the actual radians for drawing.
-  targetCN = t.isCos ? t.h + 0.5 : t.h;  // what the slider must show to match
-  targetC  = targetCN * Math.PI;           // radians for sin() drawing
+  // targetCN: the h value (in π-multiples) the player must dial in
+  // targetC:  radians used for drawing — same formula regardless of sin/cos
+  //           because drawWave now uses the correct trig function
+  targetCN = t.h;          // integer (half-integer not needed anymore)
+  targetC  = t.h * Math.PI;
   targetD  = t.D;
 }
 
 function getInterferenceTargetC(){
-  // destructive: player must match targetC + π (i.e. targetCN + 1 on slider)
   if(interferenceMode === 'destructive') return targetC + Math.PI;
   return targetC;
 }
@@ -1087,16 +1115,13 @@ function isPerfectMatch(){
   const pD = w.unlocks.shift ? Number(shiftSlider.value)             : 0;
   if(pA !== targetA || pB !== targetB || pD !== targetD) return false;
 
-  // The required phase for the player to match (adjusted for interference mode)
-  const requiredC = getInterferenceTargetC();
+  // Required h value in π-multiples (adjusted for interference)
+  const requiredH = interferenceMode === 'destructive' ? targetCN + 1 : targetCN;
 
-  // Player's phase: pH * π radians
-  const pC = pH * Math.PI;
-
-  // Check if pC ≡ requiredC (mod 2π) — waves are identical when phases differ by 2πk
-  const diff = pC - requiredC;
-  const mod = ((diff % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-  return mod < 0.0001 || Math.abs(mod - 2*Math.PI) < 0.0001;
+  // Check pH ≡ requiredH (mod 2) — period of both sin and cos is 2π = 2 × π-units
+  const diff = pH - requiredH;
+  const mod  = ((diff % 2) + 2) % 2;
+  return mod < 0.0001 || Math.abs(mod - 2) < 0.0001;
 }
 
 // ═══════════════════════════════════════════════
@@ -1126,19 +1151,11 @@ function updateLabels(){
   const aStr   = A===1 ? '' : `${A}·`;
   const bEqStr = bStr==='1' ? '' : bStr;
   const dStr   = D===0 ? '' : D>0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
+  const cStr   = h===0 ? '' : ` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
 
-  // Detect if current phase is ≡ π/2 (mod 2π) → display as cos
-  const pC = h * Math.PI;
-  const cosDiff = ((pC - Math.PI/2) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
-  const playerLooksCos = w.hasCosine && (cosDiff < 0.001 || Math.abs(cosDiff - 2*Math.PI) < 0.001);
-
-  let eqStr;
-  if(playerLooksCos){
-    eqStr = `f(x) = ${aStr}cos(${bEqStr}x)${dStr}`;
-  } else {
-    const cStr = h===0 ? '' : ` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
-    eqStr = `f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
-  }
+  // Function type is locked to target — student can't switch sin/cos
+  const fn = targetIsCos ? 'cos' : 'sin';
+  const eqStr = `f(x) = ${aStr}${fn}(${bEqStr}x${cStr})${dStr}`;
 
   document.getElementById('equationDisplay').innerHTML = wrapFrac(eqStr);
 }
@@ -1172,7 +1189,7 @@ function formatPiFrac(abs){
   return abs+'π';
 }
 
-[ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',()=>{ updateLabels(); if(targetA) drawScope(); }));
+[ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',updateLabels));
 
 // ═══════════════════════════════════════════════
 // CANVAS DRAWING
@@ -1191,21 +1208,18 @@ function drawScope(){
 
   drawGrid(W,H);
 
-  // Target wave — green
-  drawWave(targetA,targetB,targetC,targetD,'#00ff9f',2.5,false,W,H);
-  drawPeakValleyMarkers(targetA,targetB,targetC,targetD,'#00ff9f',W,H);
+  // Target wave — green, drawn with correct trig function
+  drawWave(targetA,targetB,targetC,targetD,'#00ff9f',2.5,false,W,H,targetIsCos);
+  drawPeakValleyMarkers(targetA,targetB,targetC,targetD,'#00ff9f',W,H,targetIsCos);
 
-  // First shot miss — dim red dashed
+  // First shot miss — dim red dashed (same function type as target)
   if(firstShotMissed&&firstShotParams)
-    drawWave(firstShotParams.A,firstShotParams.B,firstShotParams.C,firstShotParams.D,'#ff335577',1.5,true,W,H);
+    drawWave(firstShotParams.A,firstShotParams.B,firstShotParams.C,firstShotParams.D,'#ff335577',1.5,true,W,H,targetIsCos);
 
-  // Player's current wave — amber, always live
-  // (brighter/solid after firing, dimmer/dashed while aiming)
-  if(waveActive || showCurrentAim){
-    const lw  = showCurrentAim ? 2.5 : 1.5;
-    const col = showCurrentAim ? '#ffaa00' : '#ffaa0066';
-    drawWave(playerA,playerB,playerC,playerD,col,lw,!showCurrentAim,W,H);
-    if(showCurrentAim) drawPeakValleyMarkers(playerA,playerB,playerC,playerD,'#ffaa00',W,H);
+  // Player's current wave — amber, only shown briefly after firing (same function type)
+  if(showCurrentAim){
+    drawWave(playerA,playerB,playerC,playerD,'#ffaa00',2.5,false,W,H,targetIsCos);
+    drawPeakValleyMarkers(playerA,playerB,playerC,playerD,'#ffaa00',W,H,targetIsCos);
   }
 }
 
@@ -1264,32 +1278,37 @@ function drawGrid(W,H){
   ctx.fillText('0',cx-5,cy+16);
 }
 
-function drawWave(A,B,C,D,color,lw,dashed,W,H){
+function drawWave(A,B,C,D,color,lw,dashed,W,H,isCos=false){
   const cx=canvas._cx,cy=canvas._cy,yScale=canvas._yScale,xScale=canvas._xScale;
   ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.shadowColor=color; ctx.shadowBlur=8;
   if(dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
   ctx.beginPath(); let started=false;
   for(let px=0;px<W;px++){
-    const x=(px-cx)/xScale, y=A*Math.sin(B*x+C)+D, py=cy-y*yScale;
+    const x=(px-cx)/xScale;
+    const y = isCos ? A*Math.cos(B*x+C)+D : A*Math.sin(B*x+C)+D;
+    const py=cy-y*yScale;
     if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py);
   }
   ctx.stroke(); ctx.shadowBlur=0; ctx.setLineDash([]);
 }
 
-function findPeaksValleys(A,B,C,D){
+function findPeaksValleys(A,B,C,D,isCos=false){
   const cx=canvas._cx,xScale=canvas._xScale;
   const xMin=-cx/xScale, xMax=(canvas.width-cx)/xScale;
   const pts=[];
+  // sin peaks at π/2, cos peaks at 0
+  const peakOffset = isCos ? 0 : Math.PI/2;
+  const valleyOffset = isCos ? Math.PI : -Math.PI/2;
   for(let k=-8;k<=8;k++){
-    const xP=(Math.PI/2-C+2*Math.PI*k)/B; if(xP>=xMin&&xP<=xMax) pts.push({x:xP,y:A+D,type:'peak'});
-    const xV=(-Math.PI/2-C+2*Math.PI*k)/B; if(xV>=xMin&&xV<=xMax) pts.push({x:xV,y:-A+D,type:'valley'});
+    const xP=(-C+peakOffset+2*Math.PI*k)/B;   if(xP>=xMin&&xP<=xMax) pts.push({x:xP,y:A+D,type:'peak'});
+    const xV=(-C+valleyOffset+2*Math.PI*k)/B;  if(xV>=xMin&&xV<=xMax) pts.push({x:xV,y:-A+D,type:'valley'});
   }
   return pts.sort((a,b)=>a.x-b.x);
 }
 
-function drawPeakValleyMarkers(A,B,C,D,color,W,H){
+function drawPeakValleyMarkers(A,B,C,D,color,W,H,isCos=false){
   const cx=canvas._cx,cy=canvas._cy,xScale=canvas._xScale,yScale=canvas._yScale;
-  const all=findPeaksValleys(A,B,C,D);
+  const all=findPeaksValleys(A,B,C,D,isCos);
   const sel=[
     ...all.filter(p=>p.type==='peak').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x)).slice(0,2),
     ...all.filter(p=>p.type==='valley').sort((a,b)=>Math.abs(a.x)-Math.abs(b.x)).slice(0,1)
@@ -1520,13 +1539,42 @@ function updateInterferenceDisplay(){
   if(!el) return;
   if(!interferenceMode){
     el.style.display='none';
+    el.innerHTML='';
     return;
   }
   el.style.display='block';
   if(interferenceMode==='constructive'){
-    el.innerHTML=`<span style="color:var(--green);text-shadow:var(--glow);">▲ CONSTRUCTIVE</span> <span style="color:var(--muted);font-size:0.75em;">— match the target signal exactly</span>`;
+    el.innerHTML=`
+      <div style="
+        font-family:'Orbitron',sans-serif;
+        font-size:clamp(1rem,2.5vw,1.5rem);
+        font-weight:700;
+        letter-spacing:0.2em;
+        color:var(--green);
+        text-shadow:var(--glow);
+        text-align:center;
+        padding:14px 20px;
+        margin-top:10px;
+        border:1px solid #00ff9f44;
+        border-radius:4px;
+        background:#00100700;
+      ">▲ Constructively interfere with the signal!</div>`;
   } else {
-    el.innerHTML=`<span style="color:var(--red);text-shadow:var(--red-glow);">▼ DESTRUCTIVE</span> <span style="color:var(--muted);font-size:0.75em;">— match the target, shifted by π to cancel it</span>`;
+    el.innerHTML=`
+      <div style="
+        font-family:'Orbitron',sans-serif;
+        font-size:clamp(1rem,2.5vw,1.5rem);
+        font-weight:700;
+        letter-spacing:0.2em;
+        color:var(--red);
+        text-shadow:var(--red-glow);
+        text-align:center;
+        padding:14px 20px;
+        margin-top:10px;
+        border:1px solid #ff335544;
+        border-radius:4px;
+        background:#00100700;
+      ">▼ Destructively interfere with the signal!</div>`;
   }
 }
 
@@ -1544,17 +1592,9 @@ function showFirstShotBar(){
   const bEqStr=bStr==='1'?'':bStr;
   const dStr=D===0?'':D>0?` + ${D}`:` - ${Math.abs(D)}`;
 
-  const pC = h * Math.PI;
-  const cosDiff = ((pC - Math.PI/2) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
-  const looksCoS = w.hasCosine && (cosDiff < 0.001 || Math.abs(cosDiff-2*Math.PI)<0.001);
-
-  let eqStr;
-  if(looksCoS){
-    eqStr=`f(x) = ${aStr}cos(${bEqStr}x)${dStr}`;
-  } else {
-    const cStr = h===0?'':` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
-    eqStr=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
-  }
+  const fn = targetIsCos ? 'cos' : 'sin';
+  const cStr = h===0?'':` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
+  const eqStr=`f(x) = ${aStr}${fn}(${bEqStr}x${cStr})${dStr}`;
   disp.innerHTML=wrapFrac(eqStr);
   bar.style.display='flex';
 }
@@ -1579,15 +1619,20 @@ function updateWaveBadge(){
 // WIN / LOSE
 // ═══════════════════════════════════════════════
 function onWorldWon(){
-  worldsCleared.push(currentWorld);
+  worldsCleared.add(currentWorld);
   const world  = WORLDS[currentWorld];
   const isLast = currentWorld === WORLDS.length-1;
+
+  // Unlock next world permanently
+  if(!isLast){
+    worldsUnlocked.add(currentWorld+1);
+  }
+  saveProgress();
 
   if(isLast){
     showEndScreen(true);
   } else {
-    currentWorld++;
-    const next = WORLDS[currentWorld];
+    const next = WORLDS[currentWorld+1];
     const unlockMsgs = [
       'Phase Shift controls unlocked.',
       'Cosine waves now possible — watch the peaks.',
@@ -1598,8 +1643,8 @@ function onWorldWon(){
     document.getElementById('worldClearTitle').style.color = '';
     document.getElementById('worldClearTitle').style.textShadow = '';
     document.getElementById('worldClearSub').innerHTML =
-      `Advancing to <span style="color:${next.color};font-family:Orbitron,sans-serif;">${next.name}</span>.<br>
-       <span style="font-size:0.9rem;">${unlockMsgs[currentWorld-1]||''}</span>`;
+      `<span style="color:${next.color};font-family:Orbitron,sans-serif;">${next.name}</span> is now unlocked.<br>
+       <span style="font-size:0.9rem;">${unlockMsgs[currentWorld]||''}</span>`;
     document.getElementById('worldClearOverlay').classList.add('active');
   }
 }
@@ -1619,8 +1664,8 @@ function onGameOver(){
 }
 
 function showEndScreen(victory){
-  const beaten    = worldsCleared.length;
-  const names     = worldsCleared.map(i=>WORLDS[i].name).join(', ') || 'None';
+  const beaten    = worldsCleared.size;
+  const names     = [...worldsCleared].map(i=>WORLDS[i].name).join(', ') || 'None';
   const hpLeft    = playerHP;
 
   document.getElementById('endTitle').textContent = victory ? 'Fleet Defeated' : 'Ship Destroyed';
@@ -1667,6 +1712,9 @@ function renderDebugBar(){
   const list = document.getElementById('debugWorldList');
   list.innerHTML = '';
   WORLDS.forEach((world, i) => {
+    const col = document.createElement('div');
+    col.style.cssText = 'display:flex;flex-direction:column;gap:6px;align-items:center;';
+
     const btn = document.createElement('button');
     btn.className = 'debug-world-btn';
     btn.style.borderColor = world.color;
@@ -1675,11 +1723,26 @@ function renderDebugBar(){
     btn.onclick = () => {
       currentWorld = i;
       playerHP = MAX_PLAYER_HP;
-      briefingsSeen.add(i); // skip briefing in debug
+      briefingsSeen.add(i);
       toggleDebugMode();
       enterWorldDirect(i);
     };
-    list.appendChild(btn);
+
+    const briefBtn = document.createElement('button');
+    briefBtn.className = 'debug-world-btn';
+    briefBtn.style.borderColor = world.color + '88';
+    briefBtn.style.color = world.color + 'aa';
+    briefBtn.style.fontSize = '0.55rem';
+    briefBtn.style.padding = '5px 10px';
+    briefBtn.textContent = '📋 Briefing';
+    briefBtn.onclick = () => {
+      toggleDebugMode();
+      showBriefing(i, true);
+    };
+
+    col.appendChild(btn);
+    col.appendChild(briefBtn);
+    list.appendChild(col);
   });
 }
 
