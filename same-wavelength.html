@@ -307,11 +307,11 @@
     Each wave, the enemy broadcasts an encrypted signal. Tune your parameters to <span class="hl">match the target waveform</span> exactly, then fire.<br><br>
     A <span class="hl">direct hit</span> destroys one enemy section. A <span class="warn">miss on your first shot</span> costs you 1 HP — but earns a second shot for a glancing hit.<br><br>
     You begin at <span class="hl">Titan</span> with limited controls. Defeat each boss to advance and unlock new parameters.<br><br>
-    <span class="warn">Roguelike rules: die and you start over. HP carries between worlds.</span>
+    <span class="warn">Lose all HP and your ship is restored — but you restart the level. Cleared levels stay unlocked.</span>
   </div>
 
   <button class="big-btn" onclick="showMapScreen()">Launch Mission</button>
-  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.27</div>
+  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.28</div>
   <button onclick="if(confirm('Reset all progress?')){resetProgress();showMapScreen();}" style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#2a2a4a;background:transparent;border:none;cursor:pointer;letter-spacing:0.15em;margin-top:-8px;">Reset Progress</button>
 </div>
 
@@ -378,11 +378,10 @@
       <h1>Same Wavelength</h1>
       <span class="world-badge" id="worldBadge"></span>
     </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.27</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.28</span>
   </div>
 
   <span id="targetFreqDisplay" style="display:none;"></span>
-  <span id="roundDisplay"      style="display:none;">Wave 1</span>
 
   <!-- Battle Bar -->
   <div class="battle-bar">
@@ -542,7 +541,6 @@
 // ═══════════════════════════════════════════════
 const FREQ_VALUES = [1/4, 1/3, 1/2, 1, 2, 3, 4];
 const FREQ_LABELS = ['¼','⅓','½','1','2','3','4'];
-const FREQ_FRACS  = [[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1]];
 
 const WORLDS = [
   {
@@ -701,7 +699,7 @@ let briefingsSeen  = new Set([...(worldsCleared)]); // already-cleared worlds sk
 // ═══════════════════════════════════════════════
 // BATTLE STATE (resets each world)
 // ═══════════════════════════════════════════════
-let alienHP=0, alienMaxHP=0, alienPartialHits=0;
+let alienHP=0, alienMaxHP=0;
 let currentWave=1, attemptsUsed=0, maxAttempts=2;
 let waveActive=true, firstShotMissed=false, firstShotParams=null, showCurrentAim=false;
 let aimTimer=null;
@@ -1069,7 +1067,6 @@ function enterWorldDirect(worldIdx){
   const world      = WORLDS[worldIdx];
   alienHP          = world.bossHP;
   alienMaxHP       = world.bossHP;
-  alienPartialHits = 0;
   currentWave      = 1;
   attemptsUsed     = 0;
   maxAttempts      = world.maxAttempts;
@@ -1133,10 +1130,6 @@ function generateTarget(){
   targetD  = t.D;
 }
 
-function getInterferenceTargetC(){
-  if(interferenceMode === 'destructive') return targetC + Math.PI;
-  return targetC;
-}
 
 // ═══════════════════════════════════════════════
 // PLAYER VALUES & MATCH
@@ -1653,9 +1646,7 @@ function setBattle(icon,msg){
 }
 
 function updateWaveBadge(){
-  const label=`Wave ${currentWave}`;
-  document.getElementById('roundBadge').textContent=label;
-  document.getElementById('roundDisplay').textContent=label;
+  document.getElementById('roundBadge').textContent=`Wave ${currentWave}`;
 }
 
 // ═══════════════════════════════════════════════
