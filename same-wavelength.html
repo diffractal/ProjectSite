@@ -311,7 +311,7 @@
   </div>
 
   <button class="big-btn" onclick="showMapScreen()">Launch Mission</button>
-  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.15</div>
+  <div style="font-size:0.65rem;color:#2a3a2a;letter-spacing:0.15em;margin-top:-12px;">v0.17</div>
 </div>
 
 <!-- ══════ WORLD MAP SCREEN ══════ -->
@@ -377,7 +377,7 @@
       <h1>Same Wavelength</h1>
       <span class="world-badge" id="worldBadge"></span>
     </div>
-    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.15</span>
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);opacity:0.8;letter-spacing:0.15em;">v0.17</span>
   </div>
 
   <span id="targetFreqDisplay" style="display:none;"></span>
@@ -436,14 +436,15 @@
       <canvas id="scope" height="300"></canvas>
       <div class="scope-overlay"></div>
       <div class="legend">
-        <div class="legend-item"><div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div><span>Target signal</span></div>
-        <div class="legend-item"><div class="legend-line" style="background:#ff335588;border-top:2px dashed #ff335588;height:0;"></div><span>First shot (miss)</span></div>
-        <div class="legend-item"><div class="legend-line" style="background:#ffaa00;border-top:2px dashed #ffaa00;height:0;"></div><span>Current aim</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#00ff9f;box-shadow:0 0 4px #00ff9f;"></div><span style="color:#00ff9f88;">Target signal</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#ffaa00;box-shadow:0 0 4px #ffaa00;"></div><span style="color:#ffaa0088;">Your signal</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:#ff335588;border-top:2px dashed #ff335588;height:0;"></div><span>Shot 1 (miss)</span></div>
       </div>
       <div class="target-hint" id="targetHint"></div>
-      <div class="equation-bar">
-        <div class="equation-bar-label">f(x)</div>
-        <div class="equation-bar-text" id="equationDisplay">f(x) = sin(x)</div>
+      <div id="interferenceDisplay" style="display:none;font-family:'Orbitron',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-align:center;margin-top:8px;padding:8px 16px;border-radius:3px;border:1px solid #ffffff11;background:#0a0a1a;"></div>
+      <div class="equation-bar" style="border-color:#ffaa0044;box-shadow:0 0 20px #ffaa0011,inset 0 0 30px #0d0a00;">
+        <div class="equation-bar-label" style="color:#ffaa0077;">Your Signal</div>
+        <div class="equation-bar-text" id="equationDisplay" style="color:var(--amber);text-shadow:var(--amber-glow);"></div>
       </div>
       <div class="equation-bar shot1-bar" id="shot1Bar" style="display:none;border-color:#ff335544;box-shadow:0 0 20px #ff335511,inset 0 0 30px #1a0008;">
         <div class="equation-bar-label" style="color:#ff335588;">Shot 1 (miss)</div>
@@ -467,9 +468,9 @@
           <div class="range-ends"><span>¼×</span><span>4×</span></div>
         </div>
         <div class="param-block" id="phaseBlock">
-          <div class="param-header"><span class="param-name">Phase Shift</span><span class="param-formula">sin(B(x+h))</span></div>
+          <div class="param-header"><span class="param-name">Phase Shift</span><span class="param-formula">sin(Bx + hπ)</span></div>
           <div class="param-value" id="phaseVal">+0</div>
-          <input type="range" id="phaseSlider" min="-4" max="4" step="1" value="0">
+          <input type="range" id="phaseSlider" min="-4" max="4" step="0.5" value="0">
           <div class="range-ends"><span>−4π</span><span>+4π</span></div>
         </div>
         <div class="param-block" id="shiftBlock">
@@ -512,6 +513,18 @@
   <button class="big-btn" onclick="returnToTitle()">Return to Base</button>
 </div>
 
+<!-- ══════ BRIEFING OVERLAY ══════ -->
+<div class="overlay" id="briefingOverlay">
+  <div class="overlay-title win" id="briefingTitle" style="font-size:clamp(1.2rem,3vw,2rem);"></div>
+  <div id="briefingBody" style="
+    font-size:clamp(0.9rem,2vw,1.1rem); color:var(--text); letter-spacing:0.05em;
+    max-width:560px; line-height:2; text-align:left;
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:6px; padding:24px 32px;
+  "></div>
+  <button class="overlay-btn green-btn" id="briefingBeginBtn">Begin Mission</button>
+</div>
+
 <!-- ══════ WORLD CLEAR OVERLAY ══════ -->
 <div class="overlay" id="worldClearOverlay">
   <div class="overlay-title win" id="worldClearTitle">World Cleared!</div>
@@ -530,34 +543,57 @@ const FREQ_FRACS  = [[1,4],[1,3],[1,2],[1,1],[2,1],[3,1],[4,1]];
 const WORLDS = [
   {
     id:0, name:'Titan', color:'#ffaa00', bossHP:3, maxAttempts:2,
-    unlocks:{amp:true, freq:false, phase:false, shift:true},
+    unlocks:{amp:true, freq:true, phase:false, shift:true},
+    hasCosine:false, hasInterference:false,
+    briefing:{
+      title:'Titan — Signal Basics',
+      body:`The enemy broadcasts a simple sinusoidal signal. Match its <span class="hl">Amplitude</span>, <span class="hl">Frequency</span>, and <span class="hl">Vertical Shift</span> to lock on.\n\nYour equation takes the form:\n<span class="hl eq">f(x) = A·sin(Bx) + D</span>\n\nA miss on your first shot costs 1 HP but grants a second attempt.`
+    },
     generate(){
-      const A=[1,2,3,4,5], D=[-3,-2,-1,0,1,2,3];
-      return { A:pick(A), B:1, h:0, D:pick(D) };
+      const A=[1,2,3,4,5], B=pick(FREQ_VALUES), D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B, h:0, D:pick(D), isCos:false };
     }
   },
   {
     id:1, name:'Enceladus', color:'#00aaff', bossHP:4, maxAttempts:2,
-    unlocks:{amp:true, freq:true, phase:false, shift:true},
+    unlocks:{amp:true, freq:true, phase:true, shift:true},
+    hasCosine:false, hasInterference:false,
+    briefing:{
+      title:'Enceladus — Phase Shift',
+      body:`New control unlocked: <span class="hl">Phase Shift (h)</span>. The enemy signal may now be horizontally shifted along the x-axis.\n\nYour equation:\n<span class="hl eq">f(x) = A·sin(Bx + h) + D</span>\n\nWatch the peak positions carefully — they reveal the phase.`
+    },
     generate(){
-      const A=[1,2,3,4,5], D=[-3,-2,-1,0,1,2,3];
-      return { A:pick(A), B:pick(FREQ_VALUES), h:0, D:pick(D) };
+      const A=[1,2,3,4,5], H=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
+      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D), isCos:false };
     }
   },
   {
     id:2, name:'Mimas', color:'#aa55ff', bossHP:4, maxAttempts:2,
     unlocks:{amp:true, freq:true, phase:true, shift:true},
+    hasCosine:true, hasInterference:false,
+    briefing:{
+      title:'Mimas — Cosine Signals',
+      body:`The enemy has begun using <span class="hl">cosine waves</span>. Each signal is equally likely to be sine or cosine.\n\nCosine is just sine shifted by π/2:\n<span class="hl eq">cos(x) = sin(x + π/2)</span>\n\nThe equation display will show <span class="hl">cos()</span> or <span class="hl">sin()</span> accordingly. Adjust your Phase Shift slider to match.`
+    },
     generate(){
-      const A=[1,2,3,4,5], H=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
-      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D) };
+      const A=[1,2,3,4,5], H=[-3,-2,-1,0,1,2,3], D=[-3,-2,-1,0,1,2,3];
+      const isCos = Math.random()<0.5;
+      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D), isCos };
     }
   },
   {
     id:3, name:'Hyperion', color:'#ff3355', bossHP:5, maxAttempts:1,
     unlocks:{amp:true, freq:true, phase:true, shift:true},
+    hasCosine:true, hasInterference:true,
+    briefing:{
+      title:'Hyperion — Interference',
+      body:`One shot only. No second chances.\n\nSome waves require <span class="hl">constructive interference</span> — match the target exactly.\n\nOthers require <span class="warn">destructive interference</span> — match the target but shift phase by π to cancel it out.\n\nThe objective will be shown above the oscilloscope each wave.`
+    },
     generate(){
-      const A=[1,2,3,4,5], H=[-4,-3,-2,-1,0,1,2,3,4], D=[-3,-2,-1,0,1,2,3];
-      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D) };
+      const A=[1,2,3,4,5], H=[-3,-2,-1,0,1,2,3], D=[-2,-1,0,1,2];
+      const isCos = Math.random()<0.5;
+      const interference = Math.random()<0.5 ? 'constructive' : 'destructive';
+      return { A:pick(A), B:pick(FREQ_VALUES), h:pick(H), D:pick(D), isCos, interference };
     }
   }
 ];
@@ -593,6 +629,7 @@ const MAX_PLAYER_HP = 3;
 let playerHP      = MAX_PLAYER_HP;
 let currentWorld  = 0;
 let worldsCleared = [];
+let briefingsSeen = new Set(); // track which world briefings have been shown
 
 // ═══════════════════════════════════════════════
 // BATTLE STATE (resets each world)
@@ -602,6 +639,8 @@ let currentWave=1, attemptsUsed=0, maxAttempts=2;
 let waveActive=true, firstShotMissed=false, firstShotParams=null, showCurrentAim=false;
 let aimTimer=null;
 let targetA, targetB, targetC, targetD, targetCN;
+let targetIsCos=false;          // World 2+: was target generated as cosine?
+let interferenceMode=null;      // World 3: 'constructive' | 'destructive' | null
 let playerA, playerB, playerC, playerD;
 
 // ═══════════════════════════════════════════════
@@ -613,7 +652,7 @@ function showScreen(id){
 }
 
 function returnToTitle(){
-  playerHP=MAX_PLAYER_HP; currentWorld=0; worldsCleared=[];
+  playerHP=MAX_PLAYER_HP; currentWorld=0; worldsCleared=[]; briefingsSeen=new Set();
   showScreen('titleScreen');
 }
 
@@ -621,6 +660,36 @@ function showMapScreen(){
   renderMap();
   renderMapHP();
   showScreen('mapScreen');
+}
+
+function showBriefing(worldIdx){
+  const world = WORLDS[worldIdx];
+  const b = world.briefing;
+  const overlay = document.getElementById('briefingOverlay');
+  const titleEl = document.getElementById('briefingTitle');
+  const bodyEl  = document.getElementById('briefingBody');
+  const btnEl   = document.getElementById('briefingBeginBtn');
+
+  titleEl.textContent = b.title;
+  titleEl.style.color = world.color;
+  titleEl.style.textShadow = `0 0 20px ${world.color}, 0 0 40px ${world.color}66`;
+
+  // Replace \n with <br> and process inline tags
+  bodyEl.innerHTML = b.body
+    .replace(/\n/g,'<br>')
+    .replace(/<span class="hl eq">(.*?)<\/span>/g,
+      '<span style="color:var(--green);font-family:\'Share Tech Mono\',monospace;font-size:1.1em;display:inline-block;margin:4px 0;text-shadow:var(--glow);">$1</span>')
+    .replace(/<span class="hl">(.*?)<\/span>/g,
+      '<span style="color:var(--green);">$1</span>')
+    .replace(/<span class="warn">(.*?)<\/span>/g,
+      '<span style="color:var(--red);">$1</span>');
+
+  btnEl.onclick = () => {
+    overlay.classList.remove('active');
+    enterWorldDirect(worldIdx);
+  };
+
+  overlay.classList.add('active');
 }
 
 function returnToMap(){
@@ -860,23 +929,26 @@ function renderMap(){
     lbl.textContent = world.name;
     grp.appendChild(lbl);
 
-    // Equation form hint for current world (replaces A B D param list)
+    // Equation form hint for current world (shows general form based on unlocked params)
     if(isCur){
-      // Build general form string based on unlocked params
       const u = world.unlocks;
       const A = u.amp   ? 'A' : '1';
       const B = u.freq  ? 'B' : '';
       const h = u.phase ? '+h' : '';
       const D = u.shift ? '+D' : '';
       const inner = B ? `${B}x${h}` : `x${h}`;
-      const eqStr = `f(x) = ${A}sin(${inner})${D}`;
+      // For worlds with cosine possibility, show sin/cos
+      const fnPart = world.hasCosine ? 'sin/cos' : 'sin';
+      const eqStr = `f(x) = ${A}·${fnPart}(${inner})${D}`;
+      // Extra note for interference
+      const extraNote = world.hasInterference ? ' ± π' : '';
 
       const ph = document.createElementNS(ns,'text');
       ph.setAttribute('x',pos.x); ph.setAttribute('y',pos.y+r+34);
       ph.setAttribute('text-anchor','middle');
       ph.setAttribute('font-family','Share Tech Mono,monospace'); ph.setAttribute('font-size','11');
       ph.setAttribute('fill',world.color); ph.setAttribute('opacity','0.85');
-      ph.textContent = eqStr;
+      ph.textContent = eqStr + extraNote;
       grp.appendChild(ph);
 
       // 1-shot badge for Hyperion
@@ -909,6 +981,16 @@ function renderMapHP(){
 // ENTER WORLD
 // ═══════════════════════════════════════════════
 function enterWorld(worldIdx){
+  // Show briefing overlay first time entering each world
+  if(!briefingsSeen.has(worldIdx)){
+    briefingsSeen.add(worldIdx);
+    showBriefing(worldIdx);
+    return; // briefing's "Begin" button will call enterWorldDirect
+  }
+  enterWorldDirect(worldIdx);
+}
+
+function enterWorldDirect(worldIdx){
   currentWorld     = worldIdx;
   const world      = WORLDS[worldIdx];
   alienHP          = world.bossHP;
@@ -921,6 +1003,8 @@ function enterWorld(worldIdx){
   firstShotMissed  = false;
   firstShotParams  = null;
   showCurrentAim   = false;
+  targetIsCos      = false;
+  interferenceMode = null;
 
   // Show/hide sliders
   document.getElementById('ampBlock').style.display   = world.unlocks.amp   ? '' : 'none';
@@ -943,6 +1027,7 @@ function enterWorld(worldIdx){
 
   updateLabels(); generateTarget(); buildPips();
   renderPlayerHP(); renderAlienHP(); updateWaveBadge();
+  updateInterferenceDisplay();
 
   document.getElementById('attemptBtn').disabled=false;
   hideQuitConfirm();
@@ -963,9 +1048,23 @@ function generateTarget(){
   const t = world.generate();
   targetA  = t.A;
   targetB  = t.B;
-  targetCN = t.h;
-  targetC  = t.h * t.B * Math.PI;
+  targetIsCos = t.isCos || false;
+  interferenceMode = t.interference || null;
+
+  // Phase is stored in multiples of π (half-integer steps allowed).
+  // Cosine: cos(Bx + h·π) = sin(Bx + h·π + π/2)
+  // So for cosine we add 0.5 to h to get the effective phase in π-multiples.
+  // targetCN is the h value the player must dial in (in π-multiples).
+  // targetC is the actual radians for drawing.
+  targetCN = t.isCos ? t.h + 0.5 : t.h;  // what the slider must show to match
+  targetC  = targetCN * Math.PI;           // radians for sin() drawing
   targetD  = t.D;
+}
+
+function getInterferenceTargetC(){
+  // destructive: player must match targetC + π (i.e. targetCN + 1 on slider)
+  if(interferenceMode === 'destructive') return targetC + Math.PI;
+  return targetC;
 }
 
 // ═══════════════════════════════════════════════
@@ -976,7 +1075,7 @@ function getPlayerValues(){
   playerA = w.unlocks.amp   ? Number(ampSlider.value)               : 1;
   playerB = w.unlocks.freq  ? FREQ_VALUES[Number(freqSlider.value)] : 1;
   const h = w.unlocks.phase ? Number(phaseSlider.value)             : 0;
-  playerC = h * playerB * Math.PI;
+  playerC = h * Math.PI;  // h in π-multiples (may be half-integer for cosine)
   playerD = w.unlocks.shift ? Number(shiftSlider.value)             : 0;
 }
 
@@ -986,9 +1085,18 @@ function isPerfectMatch(){
   const pB = w.unlocks.freq  ? FREQ_VALUES[Number(freqSlider.value)] : 1;
   const pH = w.unlocks.phase ? Number(phaseSlider.value)             : 0;
   const pD = w.unlocks.shift ? Number(shiftSlider.value)             : 0;
-  if(pA!==targetA || pB!==targetB || pD!==targetD) return false;
-  const hDiff = (pH-targetCN)*pB;
-  return Math.abs(hDiff%2)<0.0001 || Math.abs(Math.abs(hDiff%2)-2)<0.0001;
+  if(pA !== targetA || pB !== targetB || pD !== targetD) return false;
+
+  // The required phase for the player to match (adjusted for interference mode)
+  const requiredC = getInterferenceTargetC();
+
+  // Player's phase: pH * π radians
+  const pC = pH * Math.PI;
+
+  // Check if pC ≡ requiredC (mod 2π) — waves are identical when phases differ by 2πk
+  const diff = pC - requiredC;
+  const mod = ((diff % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+  return mod < 0.0001 || Math.abs(mod - 2*Math.PI) < 0.0001;
 }
 
 // ═══════════════════════════════════════════════
@@ -1002,40 +1110,69 @@ function wrapFrac(str){
 function updateLabels(){
   getPlayerValues();
   const w    = WORLDS[currentWorld];
-  const h    = w.unlocks.phase ? (Number(phaseSlider.value)|0) : 0;
-  const D    = w.unlocks.shift ? Number(shiftSlider.value)     : 0;
-  const bIdx = w.unlocks.freq  ? Number(freqSlider.value)      : 3;
-  const A    = w.unlocks.amp   ? Number(ampSlider.value)       : 1;
+  const h    = w.unlocks.phase ? Number(phaseSlider.value) : 0; // may be half-integer
+  const D    = w.unlocks.shift ? Number(shiftSlider.value) : 0;
+  const bIdx = w.unlocks.freq  ? Number(freqSlider.value)  : 3;
+  const A    = w.unlocks.amp   ? Number(ampSlider.value)   : 1;
   const bStr = FREQ_LABELS[bIdx];
 
   document.getElementById('ampVal').textContent  = A;
-  // Use innerHTML for freq so fraction glyphs get the .frac treatment
   document.getElementById('freqVal').innerHTML = wrapFrac(bStr);
 
-  const hDisp = h===0?'0':h===1?'π':h===-1?'-π':`${h}π`;
-  document.getElementById('phaseVal').textContent = (h>=0?'+':'')+hDisp.replace(/^-/,'-');
+  // Phase display: format h as a π-fraction label
+  document.getElementById('phaseVal').innerHTML = wrapFrac(formatPhaseLabel(h));
   document.getElementById('shiftVal').textContent = (D>=0?'+':'')+D;
 
   const aStr   = A===1 ? '' : `${A}·`;
   const bEqStr = bStr==='1' ? '' : bStr;
   const dStr   = D===0 ? '' : D>0 ? ` + ${D}` : ` - ${Math.abs(D)}`;
 
-  let cStr='';
-  if(h!==0){
-    const frac=FREQ_FRACS[bIdx];
-    let num=h*frac[0], den=frac[1];
-    const g=gcd(Math.abs(num),den); num/=g; den/=g;
-    const sign=num<0?' - ':' + ';
-    const absN=Math.abs(num);
-    const cVal=den===1?(absN===1?'π':`${absN}π`):(absN===1?`π/${den}`:`${absN}π/${den}`);
-    cStr=sign+cVal;
+  // Detect if current phase is ≡ π/2 (mod 2π) → display as cos
+  const pC = h * Math.PI;
+  const cosDiff = ((pC - Math.PI/2) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  const playerLooksCos = w.hasCosine && (cosDiff < 0.001 || Math.abs(cosDiff - 2*Math.PI) < 0.001);
+
+  let eqStr;
+  if(playerLooksCos){
+    eqStr = `f(x) = ${aStr}cos(${bEqStr}x)${dStr}`;
+  } else {
+    const cStr = h===0 ? '' : ` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
+    eqStr = `f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
   }
-  // Use innerHTML so fraction glyphs in bEqStr get enlarged
-  document.getElementById('equationDisplay').innerHTML =
-    wrapFrac(`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`);
+
+  document.getElementById('equationDisplay').innerHTML = wrapFrac(eqStr);
 }
 
-[ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',updateLabels));
+// Format a number (integer or half-integer) as a π-multiple label e.g. "+½π", "-3π", "+π"
+function formatPhaseLabel(h){
+  if(h===0) return '+0';
+  const sign = h>0 ? '+' : '-';
+  const abs  = Math.abs(h);
+  if(abs===0.5) return sign+'½π';
+  if(abs===1)   return sign+'π';
+  if(abs===1.5) return sign+'3π/2';
+  if(abs===2)   return sign+'2π';
+  if(abs===2.5) return sign+'5π/2';
+  if(abs===3)   return sign+'3π';
+  if(abs===3.5) return sign+'7π/2';
+  if(abs===4)   return sign+'4π';
+  return sign+abs+'π';
+}
+
+// Format |h| as a π fraction for the equation string (no sign)
+function formatPiFrac(abs){
+  if(abs===0.5) return '½π';
+  if(abs===1)   return 'π';
+  if(abs===1.5) return '3π/2';
+  if(abs===2)   return '2π';
+  if(abs===2.5) return '5π/2';
+  if(abs===3)   return '3π';
+  if(abs===3.5) return '7π/2';
+  if(abs===4)   return '4π';
+  return abs+'π';
+}
+
+[ampSlider,freqSlider,phaseSlider,shiftSlider].forEach(s=>s.addEventListener('input',()=>{ updateLabels(); if(targetA) drawScope(); }));
 
 // ═══════════════════════════════════════════════
 // CANVAS DRAWING
@@ -1051,14 +1188,24 @@ function drawScope(){
   const W=canvas.width, H=canvas.height;
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#020c07'; ctx.fillRect(0,0,W,H);
+
   drawGrid(W,H);
+
+  // Target wave — green
   drawWave(targetA,targetB,targetC,targetD,'#00ff9f',2.5,false,W,H);
   drawPeakValleyMarkers(targetA,targetB,targetC,targetD,'#00ff9f',W,H);
+
+  // First shot miss — dim red dashed
   if(firstShotMissed&&firstShotParams)
     drawWave(firstShotParams.A,firstShotParams.B,firstShotParams.C,firstShotParams.D,'#ff335577',1.5,true,W,H);
-  if(showCurrentAim){
-    drawWave(playerA,playerB,playerC,playerD,'#ffaa00',2,true,W,H);
-    drawPeakValleyMarkers(playerA,playerB,playerC,playerD,'#ffaa00',W,H);
+
+  // Player's current wave — amber, always live
+  // (brighter/solid after firing, dimmer/dashed while aiming)
+  if(waveActive || showCurrentAim){
+    const lw  = showCurrentAim ? 2.5 : 1.5;
+    const col = showCurrentAim ? '#ffaa00' : '#ffaa0066';
+    drawWave(playerA,playerB,playerC,playerD,col,lw,!showCurrentAim,W,H);
+    if(showCurrentAim) drawPeakValleyMarkers(playerA,playerB,playerC,playerD,'#ffaa00',W,H);
   }
 }
 
@@ -1337,10 +1484,12 @@ function nextWave(){
   currentWave++;
   attemptsUsed=0; waveActive=true;
   firstShotMissed=false; firstShotParams=null; showCurrentAim=false;
+  targetIsCos=false; interferenceMode=null;
   if(aimTimer){ clearTimeout(aimTimer); aimTimer=null; }
   hideFirstShotBar();
   ampSlider.value=1; freqSlider.value=3; phaseSlider.value=0; shiftSlider.value=0;
   updateLabels(); generateTarget(); buildPips(); drawScope();
+  updateInterferenceDisplay();
   document.getElementById('attemptBtn').disabled=false;
   document.getElementById('feedback').innerHTML='<div class="feedback-score" style="color:#2a4a3a;font-size:0.7rem;">—</div>';
   document.getElementById('targetHint').textContent='';
@@ -1366,29 +1515,47 @@ function setFeedback(cls,title,msg){
     `<div class="feedback-score ${cls}">${title}</div><div class="feedback-msg">${msg}</div>`;
 }
 
+function updateInterferenceDisplay(){
+  const el = document.getElementById('interferenceDisplay');
+  if(!el) return;
+  if(!interferenceMode){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='block';
+  if(interferenceMode==='constructive'){
+    el.innerHTML=`<span style="color:var(--green);text-shadow:var(--glow);">▲ CONSTRUCTIVE</span> <span style="color:var(--muted);font-size:0.75em;">— match the target signal exactly</span>`;
+  } else {
+    el.innerHTML=`<span style="color:var(--red);text-shadow:var(--red-glow);">▼ DESTRUCTIVE</span> <span style="color:var(--muted);font-size:0.75em;">— match the target, shifted by π to cancel it</span>`;
+  }
+}
+
 function showFirstShotBar(){
   const bar=document.getElementById('shot1Bar');
   const disp=document.getElementById('shot1Display');
-  // Build equation string from current player values at time of first shot
   const w=WORLDS[currentWorld];
-  const A=playerA, B=playerB, h=w.unlocks.phase?Number(phaseSlider.value):0;
-  const D=playerD;
+  const A=playerA;
   const bIdx=w.unlocks.freq?Number(freqSlider.value):3;
   const bStr=FREQ_LABELS[bIdx];
+  const h=w.unlocks.phase?Number(phaseSlider.value):0;
+  const D=playerD;
+
   const aStr=A===1?'':`${A}·`;
   const bEqStr=bStr==='1'?'':bStr;
-  let cStr='';
-  if(h!==0){
-    const frac=FREQ_FRACS[bIdx];
-    let num=h*frac[0],den=frac[1];
-    const g=gcd(Math.abs(num),den); num/=g; den/=g;
-    const sign=num<0?' - ':' + ';
-    const absN=Math.abs(num);
-    const cVal=den===1?(absN===1?'π':`${absN}π`):(absN===1?`π/${den}`:`${absN}π/${den}`);
-    cStr=sign+cVal;
-  }
   const dStr=D===0?'':D>0?` + ${D}`:` - ${Math.abs(D)}`;
-  disp.textContent=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
+
+  const pC = h * Math.PI;
+  const cosDiff = ((pC - Math.PI/2) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  const looksCoS = w.hasCosine && (cosDiff < 0.001 || Math.abs(cosDiff-2*Math.PI)<0.001);
+
+  let eqStr;
+  if(looksCoS){
+    eqStr=`f(x) = ${aStr}cos(${bEqStr}x)${dStr}`;
+  } else {
+    const cStr = h===0?'':` ${h>0?'+':'-'} ${formatPiFrac(Math.abs(h))}`;
+    eqStr=`f(x) = ${aStr}sin(${bEqStr}x${cStr})${dStr}`;
+  }
+  disp.innerHTML=wrapFrac(eqStr);
   bar.style.display='flex';
 }
 
@@ -1421,11 +1588,18 @@ function onWorldWon(){
   } else {
     currentWorld++;
     const next = WORLDS[currentWorld];
-    const unlockMsgs = ['','Frequency controls unlocked.','Phase Shift unlocked.','Final boss — one shot only. No mercy.'];
+    const unlockMsgs = [
+      'Phase Shift controls unlocked.',
+      'Cosine waves now possible — watch the peaks.',
+      'Final boss — one shot only. Constructive and destructive interference required.'
+    ];
     document.getElementById('worldClearTitle').textContent = world.name+' Cleared!';
+    document.getElementById('worldClearTitle').className = 'overlay-title win';
+    document.getElementById('worldClearTitle').style.color = '';
+    document.getElementById('worldClearTitle').style.textShadow = '';
     document.getElementById('worldClearSub').innerHTML =
       `Advancing to <span style="color:${next.color};font-family:Orbitron,sans-serif;">${next.name}</span>.<br>
-       <span style="font-size:0.8rem;">${unlockMsgs[currentWorld]}</span>`;
+       <span style="font-size:0.9rem;">${unlockMsgs[currentWorld-1]||''}</span>`;
     document.getElementById('worldClearOverlay').classList.add('active');
   }
 }
@@ -1499,11 +1673,11 @@ function renderDebugBar(){
     btn.style.color = world.color;
     btn.innerHTML = `<span style="font-size:0.6rem;opacity:0.6;display:block;letter-spacing:0.15em;">${i===currentWorld?'► ':''}</span>${world.name}`;
     btn.onclick = () => {
-      // Unlock target world without resetting cleared worlds
       currentWorld = i;
       playerHP = MAX_PLAYER_HP;
+      briefingsSeen.add(i); // skip briefing in debug
       toggleDebugMode();
-      enterWorld(i);
+      enterWorldDirect(i);
     };
     list.appendChild(btn);
   });
