@@ -19,7 +19,6 @@
     --text-dim: #a0906a;
     --green: #2d6e2d;
     --green-bright: #4caf50;
-    --shadow: rgba(0,0,0,0.8);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,7 +28,7 @@
     color: var(--text);
     font-family: 'Crimson Text', serif;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     position: relative;
   }
 
@@ -37,7 +36,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: 
+    background:
       radial-gradient(ellipse at 20% 50%, rgba(139,0,0,0.08) 0%, transparent 60%),
       radial-gradient(ellipse at 80% 20%, rgba(80,40,0,0.12) 0%, transparent 50%),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
@@ -50,628 +49,402 @@
     position: relative;
     z-index: 1;
     min-height: 100vh;
-    animation: fadeIn 0.4s ease;
+    animation: fadeIn 0.35s ease;
   }
   .screen.active { display: flex; }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== MAIN MENU ===== */
-  #screen-menu {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-  }
-
-  .title-glyph {
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: clamp(56px, 10vw, 96px);
-    color: var(--blood-bright);
-    text-shadow: 0 0 40px rgba(200,0,0,0.4), 2px 4px 0 #000;
-    line-height: 1;
-    animation: pulse-glow 3s ease-in-out infinite;
-    letter-spacing: 2px;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% { text-shadow: 0 0 30px rgba(200,0,0,0.3), 2px 4px 0 #000; }
-    50% { text-shadow: 0 0 60px rgba(200,0,0,0.6), 2px 4px 0 #000; }
-  }
-
-  .title-sub {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(11px, 2vw, 14px);
-    letter-spacing: 6px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    text-transform: uppercase;
-  }
+  /* ─── SHARED ─── */
+  .centered  { flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+  .scrollable { flex-direction: column; align-items: center; padding: 30px 20px; overflow-y: auto; }
 
   .divider {
-    width: 300px;
-    height: 1px;
+    width: 300px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--blood), transparent);
-    margin: 24px auto;
+    margin: 20px auto;
   }
 
-  .gold-display {
+  .screen-title {
     font-family: 'Cinzel', serif;
-    font-size: 18px;
+    font-size: clamp(20px, 4vw, 30px);
     color: var(--gold);
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-  }
-
-  .gold-display .coin { font-size: 20px; }
-
-  .btn {
-    font-family: 'Cinzel', serif;
-    font-size: 15px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    padding: 14px 36px;
-    border-radius: 2px;
-    transition: all 0.2s;
-    display: block;
-    width: 260px;
-    margin: 10px auto;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--blood-dark), var(--blood));
-    color: var(--text);
-    border: 1px solid var(--blood-bright);
-    box-shadow: 0 4px 20px rgba(139,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .btn-primary:hover {
-    background: linear-gradient(135deg, var(--blood), var(--blood-bright));
-    box-shadow: 0 4px 30px rgba(200,0,0,0.6);
-    transform: translateY(-1px);
-  }
-
-  .btn-gold {
-    background: linear-gradient(135deg, #6b5020, var(--gold));
-    color: #1a1008;
-    border: 1px solid var(--gold-bright);
-    font-weight: 700;
-    box-shadow: 0 4px 20px rgba(200,160,50,0.3);
-  }
-  .btn-gold:hover {
-    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-    box-shadow: 0 4px 30px rgba(200,160,50,0.5);
-    transform: translateY(-1px);
-  }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-dim);
-    border: 1px solid #3a3020;
-  }
-  .btn-ghost:hover {
-    color: var(--text);
-    border-color: var(--text-dim);
-  }
-
-  .btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none !important;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
   }
 
   .flavor-text {
     font-style: italic;
     color: var(--text-dim);
     font-size: 15px;
-    max-width: 340px;
-    margin: 16px auto 0;
+    max-width: 360px;
+    margin: 12px auto 0;
     line-height: 1.6;
   }
 
-  /* ===== MISSION SELECT ===== */
-  #screen-mission {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-  }
-
-  .screen-title {
+  /* ─── BUTTONS ─── */
+  .btn {
     font-family: 'Cinzel', serif;
-    font-size: clamp(22px, 4vw, 32px);
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    padding: 13px 32px;
+    border-radius: 2px;
+    transition: all 0.18s;
+    display: block;
+    width: 260px;
+    margin: 8px auto;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blood-dark), var(--blood));
+    color: var(--text);
+    border: 1px solid var(--blood-bright);
+    box-shadow: 0 4px 20px rgba(139,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--blood), var(--blood-bright)); box-shadow: 0 4px 30px rgba(200,0,0,0.6); transform: translateY(-1px); }
+  .btn-gold {
+    background: linear-gradient(135deg, #6b5020, var(--gold));
+    color: #1a1008; border: 1px solid var(--gold-bright); font-weight: 700;
+    box-shadow: 0 4px 20px rgba(200,160,50,0.3);
+  }
+  .btn-gold:hover { background: linear-gradient(135deg, var(--gold), var(--gold-bright)); box-shadow: 0 4px 30px rgba(200,160,50,0.5); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid #3a3020; }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ══════════════════════════════════
+     WORLD SELECT
+  ══════════════════════════════════ */
+  #screen-world-select { flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+
+  .title-glyph {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(52px, 10vw, 90px);
+    color: var(--blood-bright);
+    text-shadow: 0 0 40px rgba(200,0,0,0.4), 2px 4px 0 #000;
+    line-height: 1;
+    animation: pulse-glow 3s ease-in-out infinite;
+    letter-spacing: 2px;
+  }
+  @keyframes pulse-glow {
+    0%,100% { text-shadow: 0 0 30px rgba(200,0,0,0.3), 2px 4px 0 #000; }
+    50%      { text-shadow: 0 0 60px rgba(200,0,0,0.6), 2px 4px 0 #000; }
+  }
+  .title-sub {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(10px, 2vw, 13px);
+    letter-spacing: 6px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .version-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 4px;
     color: var(--gold);
-    letter-spacing: 3px;
-    margin-bottom: 8px;
+    margin-top: 8px;
+    opacity: 0.9;
   }
 
-  .topic-grid {
+  .world-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: 14px;
     margin: 24px 0;
     width: 100%;
-    max-width: 700px;
+    max-width: 660px;
   }
-
-  .topic-card {
+  .world-card {
     background: linear-gradient(135deg, var(--stone), #1e1810);
     border: 1px solid #3a3020;
     border-radius: 4px;
-    padding: 24px 16px;
+    padding: 22px 14px;
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
   }
-  .topic-card:hover {
-    border-color: var(--gold);
-    box-shadow: 0 0 20px rgba(200,160,50,0.2);
-    transform: translateY(-2px);
-  }
-  .topic-card.locked {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  .topic-card.locked:hover { transform: none; border-color: #3a3020; box-shadow: none; }
+  .world-card:hover { border-color: var(--gold); box-shadow: 0 0 20px rgba(200,160,50,0.2); transform: translateY(-2px); }
+  .world-card.locked { opacity: 0.36; cursor: not-allowed; }
+  .world-card.locked:hover { transform: none; border-color: #3a3020; box-shadow: none; }
+  .world-icon { font-size: 34px; margin-bottom: 8px; }
+  .world-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); letter-spacing: 1px; }
+  .world-desc { font-size: 12px; color: var(--text-dim); margin-top: 5px; }
 
-  .topic-icon { font-size: 36px; margin-bottom: 10px; }
-  .topic-name {
+  /* ══════════════════════════════════
+     WORLD HUB
+  ══════════════════════════════════ */
+  #screen-hub { flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+
+  .hub-gold {
     font-family: 'Cinzel', serif;
-    font-size: 14px;
+    font-size: 20px;
     color: var(--gold);
-    letter-spacing: 1px;
+    margin: 10px 0 4px;
   }
-  .topic-desc {
-    font-size: 13px;
+  .hub-upgrades {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
     color: var(--text-dim);
-    margin-top: 6px;
+    line-height: 2;
+    min-height: 24px;
+    margin-bottom: 12px;
   }
 
-  /* ===== SHOP ===== */
-  #screen-shop {
-    flex-direction: column;
-    align-items: center;
-    padding: 30px 20px;
-    overflow-y: auto;
-  }
-
-  .shop-header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
+  /* ══════════════════════════════════
+     SHOP
+  ══════════════════════════════════ */
+  #screen-shop { flex-direction: column; align-items: center; padding: 30px 20px; overflow-y: auto; }
 
   .shop-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 13px;
     width: 100%;
-    max-width: 800px;
-    margin-bottom: 24px;
+    max-width: 760px;
+    margin-bottom: 22px;
   }
-
   .shop-item {
     background: linear-gradient(135deg, var(--stone), #1a1408);
     border: 1px solid #3a3020;
     border-radius: 4px;
-    padding: 18px;
+    padding: 17px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    transition: all 0.2s;
+    gap: 5px;
+    transition: all 0.18s;
   }
   .shop-item.affordable { border-color: #5a4a20; }
-  .shop-item.affordable:hover {
-    border-color: var(--gold);
-    box-shadow: 0 0 16px rgba(200,160,50,0.15);
-  }
-  .shop-item.maxed { opacity: 0.5; }
-
-  .item-name {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    color: var(--gold);
-    letter-spacing: 1px;
-  }
-  .item-desc { font-size: 13px; color: var(--text-dim); }
-  .item-cost {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    color: var(--gold-bright);
-    margin-top: 4px;
-  }
-  .item-owned { font-size: 12px; color: var(--text-dim); }
-
+  .shop-item.affordable:hover { border-color: var(--gold); box-shadow: 0 0 16px rgba(200,160,50,0.15); }
+  .shop-item.maxed { opacity: 0.44; }
+  .item-name  { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); letter-spacing: 1px; }
+  .item-desc  { font-size: 13px; color: var(--text-dim); }
+  .item-cost  { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); margin-top: 3px; }
+  .item-owned { font-size: 11px; color: var(--text-dim); }
   .btn-buy {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 8px 16px;
-    border-radius: 2px;
-    cursor: pointer;
-    border: none;
-    margin-top: 8px;
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1px;
+    padding: 8px 14px; border-radius: 2px; cursor: pointer; border: none; margin-top: 7px;
     background: linear-gradient(135deg, #6b5020, var(--gold));
-    color: #1a1008;
-    font-weight: 700;
-    transition: all 0.2s;
+    color: #1a1008; font-weight: 700; transition: all 0.18s;
   }
-  .btn-buy:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-  }
-  .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-buy:hover:not(:disabled) { background: linear-gradient(135deg, var(--gold), var(--gold-bright)); }
+  .btn-buy:disabled { opacity: 0.36; cursor: not-allowed; }
 
-  /* ===== BATTLE ===== */
-  #screen-battle {
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    gap: 16px;
-  }
+  /* ══════════════════════════════════
+     BATTLE
+  ══════════════════════════════════ */
+  #screen-battle { flex-direction: column; align-items: center; padding: 16px; gap: 14px; }
 
   .battle-header {
-    width: 100%;
-    max-width: 700px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
+    width: 100%; max-width: 680px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
   }
-
-  .combatant {
-    flex: 1;
-  }
-
-  .combatant-name {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-  }
-
-  .hp-bar-wrap {
-    background: #0d0905;
-    border: 1px solid #3a3020;
-    border-radius: 2px;
-    height: 18px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .hp-bar {
-    height: 100%;
-    transition: width 0.4s ease;
-    border-radius: 1px;
-  }
+  .combatant { flex: 1; }
+  .combatant-name { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 5px; text-transform: uppercase; }
+  .hp-bar-wrap { background: #0d0905; border: 1px solid #3a3020; border-radius: 2px; height: 17px; overflow: hidden; }
+  .hp-bar { height: 100%; transition: width 0.4s ease; border-radius: 1px; }
   .hp-bar.player { background: linear-gradient(90deg, #1a5c1a, var(--green-bright)); }
-  .hp-bar.enemy { background: linear-gradient(90deg, var(--blood-dark), var(--blood-bright)); }
+  .hp-bar.enemy  { background: linear-gradient(90deg, var(--blood-dark), var(--blood-bright)); }
+  .hp-text { font-family: 'Cinzel', serif; font-size: 11px; color: var(--text-dim); margin-top: 3px; text-align: center; }
 
-  .hp-text {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 4px;
-    text-align: center;
-  }
+  .battle-mid { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+  .boss-indicator { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: var(--text-dim); }
+  .gold-counter   { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-  .battle-mid {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 0 10px;
-    flex-shrink: 0;
-  }
-
-  .boss-indicator {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-align: center;
-  }
-
-  .gold-counter {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    color: var(--gold);
-    text-align: center;
-  }
-
-  .enemy-art {
-    width: 100%;
-    max-width: 700px;
-    text-align: center;
-    position: relative;
-  }
-
+  .enemy-art { width: 100%; max-width: 680px; text-align: center; }
   .enemy-svg {
-    font-size: 80px;
-    line-height: 1;
-    filter: drop-shadow(0 0 20px rgba(139,0,0,0.4));
+    font-size: 74px; line-height: 1;
+    filter: drop-shadow(0 0 18px rgba(139,0,0,0.4));
     display: block;
     animation: enemy-idle 3s ease-in-out infinite;
     user-select: none;
   }
-
   @keyframes enemy-idle {
-    0%, 100% { transform: translateY(0) rotate(-1deg); }
-    50% { transform: translateY(-6px) rotate(1deg); }
+    0%,100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-5px) rotate(1deg); }
   }
-
-  .enemy-name {
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: 28px;
-    color: var(--blood-bright);
-    margin-top: 4px;
-    text-shadow: 0 0 20px rgba(200,0,0,0.4);
-  }
+  .enemy-name { font-family: 'UnifrakturMaguntia', cursive; font-size: 26px; color: var(--blood-bright); margin-top: 2px; text-shadow: 0 0 18px rgba(200,0,0,0.4); }
 
   .question-zone {
-    width: 100%;
-    max-width: 700px;
+    width: 100%; max-width: 680px;
     background: linear-gradient(135deg, var(--stone), #1a1408);
-    border: 1px solid #3a3020;
-    border-radius: 4px;
-    padding: 24px;
-    text-align: center;
+    border: 1px solid #3a3020; border-radius: 4px;
+    padding: 22px; text-align: center;
   }
-
-  .question-text {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(22px, 5vw, 36px);
-    color: var(--text);
-    margin-bottom: 20px;
-    letter-spacing: 2px;
-  }
-
-  .answers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
+  .question-text { font-family: 'Cinzel', serif; font-size: clamp(20px, 5vw, 34px); color: var(--text); margin-bottom: 18px; letter-spacing: 2px; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
   .answer-btn {
-    font-family: 'Cinzel', serif;
-    font-size: 16px;
-    padding: 14px;
-    border-radius: 2px;
+    font-family: 'Cinzel', serif; font-size: 16px;
+    padding: 13px; border-radius: 2px;
     border: 1px solid #3a3020;
     background: linear-gradient(135deg, #1e1810, var(--stone));
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 1px;
+    color: var(--text); cursor: pointer; transition: all 0.14s; letter-spacing: 1px;
   }
-  .answer-btn:hover:not(:disabled) {
-    border-color: var(--gold);
-    background: linear-gradient(135deg, #2a2010, #3a3020);
-    box-shadow: 0 0 12px rgba(200,160,50,0.15);
-  }
-  .answer-btn.correct {
-    border-color: var(--green-bright);
-    background: linear-gradient(135deg, #0d2a0d, var(--green));
-    color: #aaffaa;
-  }
-  .answer-btn.wrong {
-    border-color: var(--blood-bright);
-    background: linear-gradient(135deg, #2a0505, var(--blood-dark));
-    color: #ffaaaa;
-  }
+  .answer-btn:hover:not(:disabled) { border-color: var(--gold); background: linear-gradient(135deg, #2a2010, #3a3020); box-shadow: 0 0 10px rgba(200,160,50,0.15); }
+  .answer-btn.correct { border-color: var(--green-bright); background: linear-gradient(135deg, #0d2a0d, var(--green)); color: #aaffaa; }
+  .answer-btn.wrong   { border-color: var(--blood-bright); background: linear-gradient(135deg, #2a0505, var(--blood-dark)); color: #ffaaaa; }
   .answer-btn:disabled { cursor: not-allowed; }
 
-  /* Heal prompt between bosses */
   .heal-prompt {
-    width: 100%;
-    max-width: 700px;
+    width: 100%; max-width: 680px;
     background: linear-gradient(135deg, var(--stone), #1a1408);
-    border: 1px solid #3a3020;
-    border-radius: 4px;
-    padding: 24px;
-    text-align: center;
-    display: none;
+    border: 1px solid #3a3020; border-radius: 4px;
+    padding: 22px; text-align: center; display: none;
   }
   .heal-prompt.active { display: block; }
-
-  .heal-title {
-    font-family: 'Cinzel', serif;
-    font-size: 18px;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-
-  .heal-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin: 16px 0;
-  }
-
+  .heal-title { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold); margin-bottom: 8px; }
+  .heal-options { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin: 14px 0; }
   .heal-btn {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    padding: 10px 18px;
-    border-radius: 2px;
+    font-family: 'Cinzel', serif; font-size: 12px;
+    padding: 9px 16px; border-radius: 2px;
     border: 1px solid #5a4a20;
     background: linear-gradient(135deg, #2a2010, #3a3020);
-    color: var(--gold);
-    cursor: pointer;
-    transition: all 0.2s;
+    color: var(--gold); cursor: pointer; transition: all 0.18s;
   }
-  .heal-btn:hover:not(:disabled) {
-    border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(200,160,50,0.2);
-  }
-  .heal-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .heal-btn:hover:not(:disabled) { border-color: var(--gold); box-shadow: 0 0 10px rgba(200,160,50,0.2); }
+  .heal-btn:disabled { opacity: 0.36; cursor: not-allowed; }
 
-  /* Floating damage text */
+  /* floating text */
   .damage-float {
     position: fixed;
-    font-family: 'Cinzel', serif;
-    font-size: 28px;
-    font-weight: 900;
-    pointer-events: none;
-    z-index: 100;
+    font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900;
+    pointer-events: none; z-index: 200;
     animation: float-up 1.2s ease forwards;
   }
-  .damage-float.hit { color: var(--blood-bright); text-shadow: 0 0 10px rgba(200,0,0,0.6); }
+  .damage-float.hit  { color: var(--blood-bright); text-shadow: 0 0 10px rgba(200,0,0,0.6); }
   .damage-float.miss { color: #888; }
-  .damage-float.gold { color: var(--gold-bright); font-size: 20px; }
-
+  .damage-float.gold { color: var(--gold-bright); font-size: 18px; }
   @keyframes float-up {
-    0% { opacity: 1; transform: translateY(0) scale(1.2); }
-    100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+    0%   { opacity: 1; transform: translateY(0) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-65px) scale(0.8); }
   }
 
-  /* Die result */
   .die-display {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 80px;
-    z-index: 50;
-    pointer-events: none;
-    animation: die-pop 0.8s ease forwards;
+    position: fixed; top: 50%; left: 50%; font-size: 76px;
+    z-index: 150; pointer-events: none;
+    animation: die-pop 0.85s ease forwards;
   }
-
   @keyframes die-pop {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-20deg); }
-    40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
-    70% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) rotate(0deg); }
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.3) rotate(-20deg); }
+    40%  { opacity: 1; transform: translate(-50%,-50%) scale(1.2) rotate(5deg); }
+    70%  { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
   }
 
-  /* Game over / Victory */
-  #screen-gameover, #screen-victory {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-  }
+  /* ══════════════════════════════════
+     END OF RUN SUMMARY
+  ══════════════════════════════════ */
+  #screen-summary { flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
 
-  .outcome-title {
+  .summary-title {
     font-family: 'UnifrakturMaguntia', cursive;
-    font-size: clamp(48px, 10vw, 80px);
-    line-height: 1;
-    margin-bottom: 8px;
+    font-size: clamp(44px, 9vw, 76px);
+    line-height: 1; margin-bottom: 6px;
   }
-  #screen-gameover .outcome-title { color: var(--blood-bright); text-shadow: 0 0 40px rgba(200,0,0,0.5); }
-  #screen-victory .outcome-title { color: var(--gold); text-shadow: 0 0 40px rgba(200,160,50,0.5); }
+  .summary-title.defeat  { color: var(--blood-bright); text-shadow: 0 0 40px rgba(200,0,0,0.5); }
+  .summary-title.victory { color: var(--gold);         text-shadow: 0 0 40px rgba(200,160,50,0.5); }
 
-  .outcome-stats {
-    font-family: 'Cinzel', serif;
-    font-size: 16px;
-    color: var(--text-dim);
-    margin: 16px 0 24px;
-    line-height: 2;
-  }
-  .outcome-stats span { color: var(--gold); }
-
-  .boss-pips {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
+  .summary-gold-earned {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 30px; color: var(--gold-bright);
+    text-shadow: 0 0 20px rgba(200,160,50,0.4);
     margin: 8px 0;
   }
+
+  .summary-stats {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; color: var(--text-dim);
+    margin: 14px 0 8px; line-height: 2.2;
+  }
+  .summary-stats .hi { color: var(--gold); }
+
+  .boss-pips { display: flex; gap: 24px; justify-content: center; margin: 14px 0 20px; }
   .boss-pip {
-    width: 14px; height: 14px;
-    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .pip-dot {
+    width: 14px; height: 14px; border-radius: 50%;
     border: 1px solid #5a4020;
   }
-  .boss-pip.done { background: var(--gold); border-color: var(--gold-bright); }
-  .boss-pip.dead { background: var(--blood); border-color: var(--blood-bright); }
+  .pip-dot.done { background: var(--gold);  border-color: var(--gold-bright); }
+  .pip-dot.died { background: var(--blood); border-color: var(--blood-bright); }
+  .pip-dot.not-reached { background: #1a1408; }
+  .pip-name { font-family: 'Cinzel', serif; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; }
 </style>
 </head>
 <body>
 
-<!-- ===== MAIN MENU ===== -->
-<div id="screen-menu" class="screen active">
+<!-- ══ WORLD SELECT ══ -->
+<div id="screen-world-select" class="screen active">
   <div class="title-glyph">The Blood Gargler</div>
   <div class="title-sub">A Mathematics of Ruin</div>
+  <div class="version-tag">v0.3</div>
   <div class="divider"></div>
-  <div class="gold-display">
-    <span class="coin">⚜</span>
-    <span id="menu-gold">0</span> Gold in the vault
-  </div>
-  <div id="menu-upgrades-display" style="font-family:'Cinzel',serif;font-size:12px;color:var(--text-dim);margin-bottom:20px;line-height:1.8;"></div>
-  <button class="btn btn-primary" onclick="goTo('screen-mission')">⚔ Begin the Slaughter</button>
-  <button class="btn btn-gold" onclick="goTo('screen-shop')" id="btn-shop">🏪 Visit the Shop</button>
-  <p class="flavor-text">Four bosses stand between you and glory. Answer well. Bleed less.</p>
-  <p style="font-family:'Cinzel',serif;font-size:11px;color:#4a3a20;letter-spacing:2px;margin-top:24px;">v0.2</p>
-</div>
-
-<!-- ===== MISSION SELECT ===== -->
-<div id="screen-mission" class="screen">
-  <div class="screen-title">Choose Your Trial</div>
-  <p style="color:var(--text-dim);font-size:14px;margin-bottom:4px;font-family:'Cinzel',serif;letter-spacing:1px;">SELECT A TOPIC</p>
-  <div class="divider"></div>
-  <div class="topic-grid">
-    <div class="topic-card" onclick="startMission('multiplication')">
-      <div class="topic-icon">✖</div>
-      <div class="topic-name">Multiplication</div>
-      <div class="topic-desc">Tables 1–15<br>Four bosses await</div>
+  <p style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--text-dim);margin-bottom:16px;">SELECT YOUR WORLD</p>
+  <div class="world-grid">
+    <div class="world-card" onclick="enterWorld('multiplication')">
+      <div class="world-icon">✖</div>
+      <div class="world-name">Multiplication</div>
+      <div class="world-desc">Tables 1–15<br>Four bosses await</div>
     </div>
-    <div class="topic-card locked">
-      <div class="topic-icon">➗</div>
-      <div class="topic-name">Division</div>
-      <div class="topic-desc">Coming soon</div>
+    <div class="world-card locked">
+      <div class="world-icon">➗</div>
+      <div class="world-name">Division</div>
+      <div class="world-desc">Locked</div>
     </div>
-    <div class="topic-card locked">
-      <div class="topic-icon">📐</div>
-      <div class="topic-name">Fractions</div>
-      <div class="topic-desc">Coming soon</div>
+    <div class="world-card locked">
+      <div class="world-icon">📐</div>
+      <div class="world-name">Fractions</div>
+      <div class="world-desc">Locked</div>
     </div>
   </div>
-  <button class="btn btn-ghost" onclick="goTo('screen-menu')" style="width:200px;">← Back</button>
+  <p class="flavor-text">Four bosses. No mercy. Answer well or bleed.</p>
 </div>
 
-<!-- ===== SHOP ===== -->
-<div id="screen-shop" class="screen">
-  <div class="shop-header">
+<!-- ══ WORLD HUB ══ -->
+<div id="screen-hub" class="screen centered">
+  <div class="screen-title" id="hub-world-name">Multiplication</div>
+  <div class="title-sub" style="margin-bottom:4px;letter-spacing:4px;">WORLD HUB</div>
+  <div class="divider"></div>
+  <div class="hub-gold" id="hub-gold">⚜ 0 Gold in the Vault</div>
+  <div class="hub-upgrades" id="hub-upgrades"></div>
+  <button class="btn btn-primary" onclick="startRun()">⚔ Begin the Slaughter</button>
+  <button class="btn btn-gold"    onclick="goTo('screen-shop')">🏪 Visit the Shop</button>
+  <button class="btn btn-ghost"   onclick="goTo('screen-world-select')">← Change World</button>
+</div>
+
+<!-- ══ SHOP ══ -->
+<div id="screen-shop" class="screen scrollable">
+  <div style="text-align:center;margin-bottom:20px;">
     <div class="screen-title">The Merchant's Den</div>
-    <div class="gold-display" style="margin-top:8px;">
-      <span class="coin">⚜</span>
-      <span id="shop-gold-display">0</span> Gold
+    <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-top:8px;">
+      ⚜ <span id="shop-gold-display">0</span> Gold
     </div>
   </div>
   <div class="shop-grid" id="shop-grid"></div>
-  <button class="btn btn-ghost" onclick="goTo('screen-menu')" style="width:200px;">← Back to Menu</button>
+  <button class="btn btn-ghost" onclick="goTo('screen-hub')" style="width:220px;">← Back to Hub</button>
 </div>
 
-<!-- ===== BATTLE ===== -->
+<!-- ══ BATTLE ══ -->
 <div id="screen-battle" class="screen">
   <div class="battle-header">
     <div class="combatant">
       <div class="combatant-name">⚔ Hero</div>
-      <div class="hp-bar-wrap">
-        <div class="hp-bar player" id="player-bar" style="width:100%"></div>
-      </div>
+      <div class="hp-bar-wrap"><div class="hp-bar player" id="player-bar" style="width:100%"></div></div>
       <div class="hp-text" id="player-hp-text">20 / 20</div>
     </div>
     <div class="battle-mid">
-      <div>
-        <div class="boss-indicator" id="boss-indicator">BOSS 1 / 4</div>
-        <div class="gold-counter" id="battle-gold">⚜ 0</div>
-      </div>
+      <div class="boss-indicator" id="boss-indicator">BOSS 1 / 4</div>
+      <div class="gold-counter"   id="battle-gold">⚜ 0</div>
     </div>
     <div class="combatant" style="text-align:right;">
       <div class="combatant-name" style="text-align:right;">Enemy ⚔</div>
-      <div class="hp-bar-wrap">
-        <div class="hp-bar enemy" id="enemy-bar" style="width:100%"></div>
-      </div>
+      <div class="hp-bar-wrap"><div class="hp-bar enemy" id="enemy-bar" style="width:100%"></div></div>
       <div class="hp-text" id="enemy-hp-text">10 / 10</div>
     </div>
   </div>
@@ -688,526 +461,373 @@
 
   <div class="heal-prompt" id="heal-prompt">
     <div class="heal-title">⚕ The Mending Stone</div>
-    <p style="color:var(--text-dim);font-size:14px;margin-bottom:4px;">You rest before the next chamber. Purchase healing?</p>
-    <div id="heal-status" style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);margin:8px 0;"></div>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:4px;">Rest before the next chamber. Purchase healing?</p>
+    <div id="heal-status" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold);margin:8px 0;"></div>
     <div class="heal-options" id="heal-options"></div>
-    <button class="btn btn-primary" onclick="proceedToNextBoss()" style="margin-top:8px;">Continue ⚔</button>
+    <button class="btn btn-primary" onclick="proceedToNextBoss()" style="margin-top:6px;">Continue ⚔</button>
   </div>
 </div>
 
-<!-- ===== GAME OVER ===== -->
-<div id="screen-gameover" class="screen">
-  <div class="outcome-title">You Died</div>
-  <div class="outcome-stats" id="gameover-stats"></div>
-  <button class="btn btn-primary" onclick="goToShopAfterRun()">⚜ Visit Shop &amp; Try Again</button>
-</div>
-
-<!-- ===== VICTORY ===== -->
-<div id="screen-victory" class="screen">
-  <div class="outcome-title">Victory!</div>
-  <div class="outcome-stats" id="victory-stats"></div>
-  <button class="btn btn-gold" onclick="goToShopAfterRun()">⚜ Claim Reward &amp; Shop</button>
+<!-- ══ END OF RUN SUMMARY ══ -->
+<div id="screen-summary" class="screen centered">
+  <div class="summary-title" id="summary-title">You Died</div>
+  <div class="boss-pips"    id="summary-pips"></div>
+  <div class="summary-gold-earned" id="summary-gold-earned"></div>
+  <div class="summary-stats"       id="summary-stats"></div>
+  <button class="btn btn-primary" onclick="goTo('screen-hub')" style="margin-top:8px;">Return to Hub</button>
 </div>
 
 <script>
-// ============================================================
-//  GAME STATE
-// ============================================================
-const SAVE_KEY = 'bloodgargler_v1';
+// ─────────────────────────────────────────────
+//  SAVE / LOAD  (world-scoped, no global state)
+// ─────────────────────────────────────────────
+const SAVE_KEY = 'bloodgargler_v03';
 
-function defaultSave() {
-  return {
-    gold: 0,
-    upgrades: {
-      hp: 0,        // +1 max HP (once, cost 10)
-      armor: 0,     // +1 armor (once, cost 50)
-      damage: 0,    // +1 damage floor (once, cost 50)
-      // future: goldMult, extraHeals, etc.
-    }
-  };
+function defaultWorldSave() {
+  return { gold: 0, upgrades: { hp: 0, armor: 0, damage: 0 } };
 }
 
-let save = loadSave();
-let run = null; // active run state
+let save = (() => {
+  try { const r = localStorage.getItem(SAVE_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return {};
+})();
 
-function loadSave() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) return Object.assign(defaultSave(), JSON.parse(raw));
-  } catch(e) {}
-  return defaultSave();
+function getWS(id) {               // world save
+  if (!save[id]) save[id] = defaultWorldSave();
+  return save[id];
 }
+function persist() { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 
-function persist() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-}
+let currentWorld = null;
+let run = null;
 
-// ============================================================
-//  BOSSES
-// ============================================================
+// ─────────────────────────────────────────────
+//  STATIC DATA
+// ─────────────────────────────────────────────
+const WORLDS = {
+  multiplication: { name: 'Multiplication' }
+};
+
 const BOSSES = [
-  { name: 'Skullrot',      emoji: '💀', maxHp: 10, damage: 1,          diffWeights: [5,1,0] },
+  { name: 'Skullrot',      emoji: '💀', maxHp: 10, damage: [1],       diffWeights: [5,1,0] },
   { name: 'The Fleshworm', emoji: '🐛', maxHp: 12, damage: [1,1,1,2], diffWeights: [2,2,0] },
-  { name: 'Vomitus Rex',   emoji: '🐉', maxHp: 14, damage: [2,2,3],    diffWeights: [1,3,1] },
-  { name: 'The Gargler',   emoji: '👹', maxHp: 16, damage: [2,3,3,3],  diffWeights: [0,1,4] },
+  { name: 'Vomitus Rex',   emoji: '🐉', maxHp: 14, damage: [2,2,3],   diffWeights: [1,3,1] },
+  { name: 'The Gargler',   emoji: '👹', maxHp: 16, damage: [2,3,3,3], diffWeights: [0,1,4] },
+];
+const bossDmg = b => b.damage[Math.floor(Math.random()*b.damage.length)];
+
+const HEAL_COSTS = [5, 10, 20, 40, 80];
+const DIE_EMOJI  = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+const SHOP_ITEMS = [
+  { id:'hp',     name:'+1 Max HP',                   desc:'Permanently +1 maximum HP.',            cost:10,  maxLv:1, buy:ws=>ws.upgrades.hp++,     lbl:ws=>ws.upgrades.hp     ?'Purchased':null },
+  { id:'armor',  name:'Iron Skin — Armor +1',         desc:'Reduces incoming damage by 1 (min 1).', cost:50,  maxLv:1, buy:ws=>ws.upgrades.armor++,  lbl:ws=>ws.upgrades.armor  ?'Purchased':null },
+  { id:'damage', name:'Savage Strikes — Attack +1',   desc:'All die results deal +1 damage.',       cost:50,  maxLv:1, buy:ws=>ws.upgrades.damage++, lbl:ws=>ws.upgrades.damage ?'Purchased':null },
 ];
 
-function bossDamage(boss) {
-  const d = boss.damage;
-  if (typeof d === 'number') return d;
-  return d[Math.floor(Math.random() * d.length)];
-}
-
-// ============================================================
-//  QUESTION BANK — Multiplication
-// ============================================================
-function buildMultiplicationBank() {
-  const bank = { easy: [], medium: [], hard: [] };
-  for (let a = 1; a <= 15; a++) {
-    for (let b = a; b <= 15; b++) {
-      const q = { q: `${a} × ${b}`, answer: a * b, a, b };
-      const maxFactor = Math.max(a, b);
-      if (maxFactor <= 6) bank.easy.push(q);
-      else if (maxFactor <= 10) bank.medium.push(q);
-      else bank.hard.push(q);
-      // Add reversed if different
-      if (a !== b) {
-        const q2 = { q: `${b} × ${a}`, answer: a * b, a: b, b: a };
-        if (maxFactor <= 6) bank.easy.push(q2);
-        else if (maxFactor <= 10) bank.medium.push(q2);
-        else bank.hard.push(q2);
-      }
-    }
+// ─────────────────────────────────────────────
+//  QUESTION BANK — MULTIPLICATION
+// ─────────────────────────────────────────────
+function buildMultBank() {
+  const bank = { easy:[], medium:[], hard:[] };
+  for (let a=1;a<=15;a++) for (let b=1;b<=15;b++) {
+    const q = { q:`${a} × ${b}`, answer:a*b, a, b };
+    const m = Math.max(a,b);
+    if (m<=6) bank.easy.push(q); else if (m<=10) bank.medium.push(q); else bank.hard.push(q);
   }
   return bank;
 }
-
-const BANK = { multiplication: buildMultiplicationBank() };
+const BANK = { multiplication: buildMultBank() };
 
 function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
 
-function getQuestions(topic, weights, count) {
-  // weights = [easyW, mediumW, hardW]
-  const bank = BANK[topic];
-  const total = weights.reduce((a, b) => a + b, 0);
-  const tiers = ['easy', 'medium', 'hard'];
-  const pool = [];
-  tiers.forEach((tier, i) => {
-    const share = Math.round(count * weights[i] / total);
-    const shuffled = shuffle(bank[tier]);
-    pool.push(...shuffled.slice(0, share));
+function getQuestions(worldId, weights, count) {
+  const bank=BANK[worldId]; const tiers=['easy','medium','hard'];
+  const total=weights.reduce((a,b)=>a+b,0); const pool=[];
+  tiers.forEach((t,i)=>{
+    const share=Math.round(count*weights[i]/total);
+    pool.push(...shuffle(bank[t]).slice(0,share));
   });
-  // fill if short
-  const all = shuffle([...bank.easy, ...bank.medium, ...bank.hard]);
-  let idx = 0;
-  while (pool.length < count) { pool.push(all[idx++ % all.length]); }
-  return shuffle(pool).slice(0, count);
+  const all=shuffle([...bank.easy,...bank.medium,...bank.hard]);
+  let idx=0; while(pool.length<count) pool.push(all[idx++%all.length]);
+  return shuffle(pool).slice(0,count);
 }
 
 function generateDistractors(correct, a, b) {
-  const distractors = new Set();
-  // nearby multiples
-  const offsets = [-2, -1, 1, 2, 3, -3];
-  for (const o of offsets) {
-    if (correct + o > 0) distractors.add(correct + o);
-  }
-  // wrong factor combos
-  const factorErrors = [
-    a * (b + 1), a * (b - 1),
-    (a + 1) * b, (a - 1) * b,
-    a + b,
-    a * b + a,
-    a * b - b,
-  ];
-  for (const v of factorErrors) {
-    if (v > 0 && v !== correct) distractors.add(v);
-  }
-  const arr = shuffle([...distractors].filter(v => v !== correct));
-  return arr.slice(0, 3);
+  const s=new Set();
+  [-2,-1,1,2,3,-3].forEach(o=>{if(correct+o>0)s.add(correct+o);});
+  [a*(b+1),a*(b-1),(a+1)*b,(a-1)*b,a+b,a*b+a,a*b-b]
+    .forEach(v=>{if(v>0&&v!==correct)s.add(v);});
+  return shuffle([...s].filter(v=>v!==correct)).slice(0,3);
 }
 
-// ============================================================
-//  ATTACK DIE
-// ============================================================
-function rollDie(damageUpgrade) {
-  // Base: 1-3 → 1dmg, 4-5 → 2dmg, 6 → 3dmg
-  const roll = Math.ceil(Math.random() * 6);
-  let dmg;
-  if (roll <= 3) dmg = 1;
-  else if (roll <= 5) dmg = 2;
-  else dmg = 3;
-  return dmg + damageUpgrade;
+function rollDie(bonus) {
+  const r=Math.ceil(Math.random()*6);
+  return (r<=3?1:r<=5?2:3)+bonus;
 }
 
-const DIE_EMOJI = ['⚀','⚁','⚂','⚃','⚄','⚅'];
-
-// ============================================================
-//  SHOP DATA
-// ============================================================
-const SHOP_ITEMS = [
-  {
-    id: 'hp',
-    name: '+1 Max HP',
-    desc: 'Permanently increases your maximum HP by 1.',
-    baseCost: 10,
-    maxLevel: 1,
-    effect: s => s.upgrades.hp++,
-    levelText: s => s.upgrades.hp > 0 ? 'Purchased' : null,
-  },
-  {
-    id: 'armor',
-    name: 'Iron Skin (Armor +1)',
-    desc: 'Reduces all incoming damage by 1 (min 1).',
-    baseCost: 50,
-    maxLevel: 1,
-    effect: s => s.upgrades.armor++,
-    levelText: s => s.upgrades.armor > 0 ? 'Purchased' : null,
-  },
-  {
-    id: 'damage',
-    name: 'Savage Strikes (Attack +1)',
-    desc: 'All die results deal +1 damage.',
-    baseCost: 50,
-    maxLevel: 1,
-    effect: s => s.upgrades.damage++,
-    levelText: s => s.upgrades.damage > 0 ? 'Purchased' : null,
-  },
-];
-
-// ============================================================
+// ─────────────────────────────────────────────
 //  NAVIGATION
-// ============================================================
-function goTo(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
-  if (screenId === 'screen-menu') renderMenu();
-  if (screenId === 'screen-shop') renderShop();
+// ─────────────────────────────────────────────
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='screen-hub')  renderHub();
+  if(id==='screen-shop') renderShop();
 }
 
-function renderMenu() {
-  document.getElementById('menu-gold').textContent = save.gold;
-  const up = save.upgrades;
-  const lines = [];
-  if (up.hp) lines.push('✦ +1 Max HP');
-  if (up.armor) lines.push('✦ Armor +1');
-  if (up.damage) lines.push('✦ Attack +1');
-  document.getElementById('menu-upgrades-display').innerHTML = lines.join('<br>');
+// ─────────────────────────────────────────────
+//  WORLD SELECT → HUB
+// ─────────────────────────────────────────────
+function enterWorld(worldId) {
+  currentWorld = worldId;
+  goTo('screen-hub');
 }
 
-// ============================================================
-//  SHOP RENDER
-// ============================================================
-function renderShop(fromRun) {
-  document.getElementById('shop-gold-display').textContent = save.gold;
-  const grid = document.getElementById('shop-grid');
-  grid.innerHTML = '';
-  SHOP_ITEMS.forEach(item => {
-    const level = save.upgrades[item.id] || 0;
-    const maxed = level >= item.maxLevel;
-    const cost = item.baseCost;
-    const canAfford = save.gold >= cost && !maxed;
-    const div = document.createElement('div');
-    div.className = 'shop-item' + (canAfford ? ' affordable' : '') + (maxed ? ' maxed' : '');
-    const levelLabel = item.levelText(save) || '';
-    div.innerHTML = `
+// ─────────────────────────────────────────────
+//  HUB
+// ─────────────────────────────────────────────
+function renderHub() {
+  const ws=getWS(currentWorld);
+  document.getElementById('hub-world-name').textContent = WORLDS[currentWorld].name;
+  document.getElementById('hub-gold').textContent = `⚜ ${ws.gold} Gold in the Vault`;
+  const up=ws.upgrades; const lines=[];
+  if(up.hp)     lines.push('✦ +1 Max HP');
+  if(up.armor)  lines.push('✦ Armor +1');
+  if(up.damage) lines.push('✦ Attack +1');
+  document.getElementById('hub-upgrades').innerHTML = lines.length ? lines.join('&nbsp;&nbsp;') : '&nbsp;';
+}
+
+// ─────────────────────────────────────────────
+//  SHOP
+// ─────────────────────────────────────────────
+function renderShop() {
+  const ws=getWS(currentWorld);
+  document.getElementById('shop-gold-display').textContent = ws.gold;
+  const grid=document.getElementById('shop-grid'); grid.innerHTML='';
+  SHOP_ITEMS.forEach(item=>{
+    const lv=ws.upgrades[item.id]||0; const maxed=lv>=item.maxLv;
+    const canAfford=ws.gold>=item.cost&&!maxed;
+    const div=document.createElement('div');
+    div.className='shop-item'+(canAfford?' affordable':'')+(maxed?' maxed':'');
+    const lbl=item.lbl(ws);
+    div.innerHTML=`
       <div class="item-name">${item.name}</div>
       <div class="item-desc">${item.desc}</div>
-      <div class="item-cost">⚜ ${cost} Gold</div>
-      ${levelLabel ? `<div class="item-owned">${levelLabel}</div>` : ''}
-      <button class="btn-buy" ${canAfford ? '' : 'disabled'} onclick="buyItem('${item.id}')">
-        ${maxed ? 'Maxed' : 'Purchase'}
-      </button>
-    `;
+      <div class="item-cost">⚜ ${item.cost} Gold</div>
+      ${lbl?`<div class="item-owned">${lbl}</div>`:''}
+      <button class="btn-buy" ${canAfford?'':'disabled'} onclick="buyItem('${item.id}')">
+        ${maxed?'Maxed':'Purchase'}
+      </button>`;
     grid.appendChild(div);
   });
 }
 
 function buyItem(id) {
-  const item = SHOP_ITEMS.find(i => i.id === id);
-  if (!item) return;
-  const cost = item.baseCost;
-  if (save.gold < cost) return;
-  save.gold -= cost;
-  item.effect(save);
-  persist();
-  renderShop();
+  const ws=getWS(currentWorld); const item=SHOP_ITEMS.find(i=>i.id===id);
+  if(!item||ws.gold<item.cost) return;
+  ws.gold-=item.cost; item.buy(ws); persist(); renderShop();
 }
 
-// ============================================================
-//  MISSION START
-// ============================================================
-function startMission(topic) {
-  const maxHp = 20 + (save.upgrades.hp || 0);
-  run = {
-    topic,
-    gold: 0,
-    playerMaxHp: maxHp,
-    playerHp: maxHp,
-    armor: save.upgrades.armor || 0,
-    damageBonus: save.upgrades.damage || 0,
-    bossIndex: 0,
-    bossHp: 0,
-    questions: [],
-    qIndex: 0,
-    healsPurchased: 0,
-    bossesDefeated: 0,
-    phase: 'battle', // 'battle' | 'heal'
+// ─────────────────────────────────────────────
+//  RUN START
+// ─────────────────────────────────────────────
+function startRun() {
+  const ws=getWS(currentWorld);
+  const maxHp=20+(ws.upgrades.hp||0);
+  run={
+    world: currentWorld,
+    goldEarned: 0,
+    playerMaxHp: maxHp, playerHp: maxHp,
+    armor: ws.upgrades.armor||0,
+    damageBonus: ws.upgrades.damage||0,
+    bossIndex: 0, bossHp:0, bossMaxHp:0,
+    questions:[], qIndex:0,
+    bossesDefeated:0, questionsAnswered:0, questionsCorrect:0,
+    phase:'battle',
   };
-  loadBoss();
-  goTo('screen-battle');
-  renderBattle();
+  loadBoss(); goTo('screen-battle'); renderBattle();
 }
 
 function loadBoss() {
-  const boss = BOSSES[run.bossIndex];
-  run.bossHp = boss.maxHp;
-  run.bossMaxHp = boss.maxHp;
-  // Generate ~10 questions for this boss
-  run.questions = getQuestions(run.topic, boss.diffWeights, 10);
-  run.qIndex = 0;
-  run.phase = 'battle';
+  const boss=BOSSES[run.bossIndex];
+  run.bossHp=boss.maxHp; run.bossMaxHp=boss.maxHp;
+  run.questions=getQuestions(run.world,boss.diffWeights,10);
+  run.qIndex=0; run.phase='battle';
+}
+function loadBossForHeal() {
+  const boss=BOSSES[run.bossIndex];
+  run.bossHp=boss.maxHp; run.bossMaxHp=boss.maxHp;
+  run.questions=getQuestions(run.world,boss.diffWeights,10);
+  run.qIndex=0; run.phase='heal';
 }
 
-// ============================================================
+// ─────────────────────────────────────────────
 //  BATTLE RENDER
-// ============================================================
+// ─────────────────────────────────────────────
 function renderBattle() {
-  const boss = BOSSES[run.bossIndex];
-  // HP bars
-  const pPct = Math.max(0, run.playerHp / run.playerMaxHp * 100);
-  const ePct = Math.max(0, run.bossHp / run.bossMaxHp * 100);
-  document.getElementById('player-bar').style.width = pPct + '%';
-  document.getElementById('enemy-bar').style.width = ePct + '%';
-  document.getElementById('player-hp-text').textContent = `${Math.max(0,run.playerHp)} / ${run.playerMaxHp}`;
-  document.getElementById('enemy-hp-text').textContent = `${Math.max(0,run.bossHp)} / ${run.bossMaxHp}`;
-  document.getElementById('boss-indicator').textContent = `BOSS ${run.bossIndex + 1} / 4`;
-  document.getElementById('battle-gold').textContent = `⚜ ${run.gold}`;
-  document.getElementById('enemy-emoji').textContent = boss.emoji;
-  document.getElementById('enemy-name').textContent = boss.name;
-  document.getElementById('question-zone').style.display = run.phase === 'battle' ? 'block' : 'none';
-  document.getElementById('heal-prompt').classList.toggle('active', run.phase === 'heal');
-  if (run.phase === 'battle') renderQuestion();
-  if (run.phase === 'heal') renderHealPrompt();
+  const boss=BOSSES[run.bossIndex];
+  const pPct=Math.max(0,run.playerHp/run.playerMaxHp*100);
+  const ePct=Math.max(0,run.bossHp/run.bossMaxHp*100);
+  document.getElementById('player-bar').style.width=pPct+'%';
+  document.getElementById('enemy-bar').style.width=ePct+'%';
+  document.getElementById('player-hp-text').textContent=`${Math.max(0,run.playerHp)} / ${run.playerMaxHp}`;
+  document.getElementById('enemy-hp-text').textContent=`${Math.max(0,run.bossHp)} / ${run.bossMaxHp}`;
+  document.getElementById('boss-indicator').textContent=`BOSS ${run.bossIndex+1} / 4`;
+  document.getElementById('battle-gold').textContent=`⚜ ${run.goldEarned}`;
+  document.getElementById('enemy-emoji').textContent=boss.emoji;
+  document.getElementById('enemy-name').textContent=boss.name;
+  document.getElementById('question-zone').style.display=run.phase==='battle'?'block':'none';
+  document.getElementById('heal-prompt').classList.toggle('active',run.phase==='heal');
+  if(run.phase==='battle') renderQuestion();
+  if(run.phase==='heal')   renderHealPrompt();
 }
 
 function renderQuestion() {
-  if (run.qIndex >= run.questions.length) {
-    // ran out of questions — treat as ongoing boss with fresh batch
-    run.questions = getQuestions(run.topic, BOSSES[run.bossIndex].diffWeights, 10);
-    run.qIndex = 0;
+  if(run.qIndex>=run.questions.length){
+    run.questions=getQuestions(run.world,BOSSES[run.bossIndex].diffWeights,10);
+    run.qIndex=0;
   }
-  const q = run.questions[run.qIndex];
-  document.getElementById('question-text').textContent = q.q + ' = ?';
-  const distractors = generateDistractors(q.answer, q.a, q.b);
-  const choices = shuffle([q.answer, ...distractors]);
-  const answersEl = document.getElementById('answers');
-  answersEl.innerHTML = '';
-  choices.forEach(val => {
-    const btn = document.createElement('button');
-    btn.className = 'answer-btn';
-    btn.textContent = val;
-    btn.onclick = () => handleAnswer(val === q.answer, btn, choices, q.answer);
-    answersEl.appendChild(btn);
+  const q=run.questions[run.qIndex];
+  document.getElementById('question-text').textContent=q.q+' = ?';
+  const distractors=generateDistractors(q.answer,q.a,q.b);
+  const choices=shuffle([q.answer,...distractors]);
+  const el=document.getElementById('answers'); el.innerHTML='';
+  choices.forEach(val=>{
+    const btn=document.createElement('button');
+    btn.className='answer-btn'; btn.textContent=val;
+    btn.onclick=()=>handleAnswer(val===q.answer,btn,q.answer);
+    el.appendChild(btn);
   });
 }
 
-function handleAnswer(correct, clickedBtn, allChoices, correctAnswer) {
-  // Disable all
-  document.querySelectorAll('.answer-btn').forEach(b => {
-    b.disabled = true;
-    if (parseInt(b.textContent) === correctAnswer) b.classList.add('correct');
+// ─────────────────────────────────────────────
+//  ANSWER HANDLER
+// ─────────────────────────────────────────────
+function handleAnswer(correct, clickedBtn, correctAnswer) {
+  document.querySelectorAll('.answer-btn').forEach(b=>{
+    b.disabled=true;
+    if(+b.textContent===correctAnswer) b.classList.add('correct');
   });
-  if (!correct) clickedBtn.classList.add('wrong');
+  if(!correct) clickedBtn.classList.add('wrong');
+  run.qIndex++; run.questionsAnswered++;
 
-  run.qIndex++;
-
-  if (correct) {
-    const dmg = rollDie(run.damageBonus);
-    const goldEarned = 1 + Math.floor(Math.random() * 2); // 1-2 gold per hit
-    run.gold += goldEarned;
-    run.bossHp -= dmg;
-    showDieAndDamage(dmg, goldEarned);
-    setTimeout(() => {
-      if (run.bossHp <= 0) {
-        bossDefeated();
-      } else {
-        renderBattle();
-      }
-    }, 900);
+  if(correct) {
+    run.questionsCorrect++;
+    const dmg=rollDie(run.damageBonus);
+    const g=1+Math.floor(Math.random()*2);
+    run.goldEarned+=g; run.bossHp-=dmg;
+    showDieAndDamage(dmg,g);
+    setTimeout(()=>{ run.bossHp<=0 ? bossDefeated() : renderBattle(); },900);
   } else {
-    let dmgTaken = bossDamage(BOSSES[run.bossIndex]);
-    dmgTaken = Math.max(1, dmgTaken - run.armor);
-    run.playerHp -= dmgTaken;
-    floatText(`-${dmgTaken}`, 'miss', document.getElementById('player-bar'));
-    setTimeout(() => {
-      if (run.playerHp <= 0) {
-        playerDead();
-      } else {
-        renderBattle();
-      }
-    }, 900);
+    const dmgTaken=Math.max(1,bossDmg(BOSSES[run.bossIndex])-run.armor);
+    run.playerHp-=dmgTaken;
+    floatText(`-${dmgTaken}`,'miss',document.getElementById('player-bar'));
+    setTimeout(()=>{ run.playerHp<=0 ? endRun(false) : renderBattle(); },900);
   }
 }
 
-function showDieAndDamage(dmg, gold) {
-  // Die emoji
-  const dieEl = document.createElement('div');
-  dieEl.className = 'die-display';
-  dieEl.textContent = DIE_EMOJI[Math.floor(Math.random() * 6)];
-  document.body.appendChild(dieEl);
-  setTimeout(() => dieEl.remove(), 900);
-
-  // Damage float on enemy
-  floatText(`-${dmg}`, 'hit', document.getElementById('enemy-bar'));
-  floatText(`+${gold}⚜`, 'gold', document.getElementById('battle-gold'));
+function showDieAndDamage(dmg,gold) {
+  const d=document.createElement('div'); d.className='die-display';
+  d.textContent=DIE_EMOJI[Math.floor(Math.random()*6)];
+  document.body.appendChild(d); setTimeout(()=>d.remove(),900);
+  floatText(`-${dmg}`,'hit',document.getElementById('enemy-bar'));
+  floatText(`+${gold}⚜`,'gold',document.getElementById('battle-gold'));
 }
 
-function floatText(text, type, anchor) {
-  const el = document.createElement('div');
-  el.className = `damage-float ${type}`;
-  el.textContent = text;
-  const rect = anchor ? anchor.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2 };
-  el.style.left = (rect.left + rect.width/2 + (Math.random()*40-20)) + 'px';
-  el.style.top = (rect.top + (Math.random()*20)) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1200);
+function floatText(text,type,anchor) {
+  const el=document.createElement('div');
+  el.className=`damage-float ${type}`; el.textContent=text;
+  const r=anchor?anchor.getBoundingClientRect():{left:window.innerWidth/2,top:window.innerHeight/2,width:0};
+  el.style.left=(r.left+r.width/2+(Math.random()*40-20))+'px';
+  el.style.top=(r.top+Math.random()*20)+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
 }
 
-// ============================================================
+// ─────────────────────────────────────────────
 //  BOSS DEFEATED
-// ============================================================
+// ─────────────────────────────────────────────
 function bossDefeated() {
   run.bossesDefeated++;
-  const bonusGold = 10 + run.bossIndex * 5; // 10, 15, 20, 25
-  run.gold += bonusGold;
-  floatText(`+${bonusGold}⚜ BOSS SLAIN!`, 'gold', document.getElementById('enemy-bar'));
-
-  if (run.bossIndex >= 3) {
-    // Victory!
-    setTimeout(() => showVictory(), 1000);
-  } else {
-    run.bossIndex++;
-    run.healsPurchased = 0;
-    run.phase = 'heal';
-    setTimeout(() => {
-      loadBossForHeal();
-      renderBattle();
-    }, 1000);
-  }
+  const bonus=10+run.bossIndex*5; run.goldEarned+=bonus;
+  floatText(`+${bonus}⚜ BOSS SLAIN!`,'gold',document.getElementById('enemy-bar'));
+  if(run.bossIndex>=3) { setTimeout(()=>endRun(true),1000); return; }
+  run.bossIndex++;
+  setTimeout(()=>{ loadBossForHeal(); renderBattle(); },1000);
 }
 
-function loadBossForHeal() {
-  // Prepare next boss data but don't start yet
-  const boss = BOSSES[run.bossIndex];
-  run.bossHp = boss.maxHp;
-  run.bossMaxHp = boss.maxHp;
-  run.questions = getQuestions(run.topic, boss.diffWeights, 10);
-  run.qIndex = 0;
-  run.phase = 'heal';
-}
-
-// ============================================================
-//  HEAL PROMPT
-// ============================================================
-const HEAL_COSTS = [5, 10, 20, 40, 80];
-
+// ─────────────────────────────────────────────
+//  HEAL BETWEEN BOSSES
+// ─────────────────────────────────────────────
 function renderHealPrompt() {
-  document.getElementById('heal-status').textContent =
-    `HP: ${run.playerHp} / ${run.playerMaxHp}  |  Gold: ⚜ ${run.gold}`;
-  const opts = document.getElementById('heal-options');
-  opts.innerHTML = '';
-  if (run.playerHp >= run.playerMaxHp) {
-    opts.innerHTML = '<p style="color:var(--green-bright);font-family:Cinzel,serif;font-size:13px;">You are at full health.</p>';
+  document.getElementById('heal-status').textContent=
+    `HP: ${run.playerHp} / ${run.playerMaxHp}  |  Gold: ⚜ ${run.goldEarned}`;
+  const opts=document.getElementById('heal-options'); opts.innerHTML='';
+  if(run.playerHp>=run.playerMaxHp){
+    opts.innerHTML='<p style="color:var(--green-bright);font-family:Cinzel,serif;font-size:12px;">You are at full health.</p>';
     return;
   }
-  let cumCost = 0;
-  for (let i = 0; i < 5; i++) {
-    cumCost += HEAL_COSTS[i];
-    const hp = i + 1;
-    const cost = HEAL_COSTS[i];
-    const canAfford = run.gold >= cost;
-    const wouldOverheal = run.playerHp + hp > run.playerMaxHp;
-    const btn = document.createElement('button');
-    btn.className = 'heal-btn';
-    btn.textContent = `+${hp} HP — ⚜ ${cost}`;
-    btn.disabled = !canAfford || wouldOverheal;
-    btn.onclick = () => buyHeal(hp, cost);
-    opts.appendChild(btn);
-  }
-}
-
-function buyHeal(hp, cost) {
-  if (run.gold < cost) return;
-  run.gold -= cost;
-  run.playerHp = Math.min(run.playerMaxHp, run.playerHp + hp);
-  renderHealPrompt();
-  // update hp bar
-  const pPct = run.playerHp / run.playerMaxHp * 100;
-  document.getElementById('player-bar').style.width = pPct + '%';
-  document.getElementById('player-hp-text').textContent = `${run.playerHp} / ${run.playerMaxHp}`;
-  document.getElementById('battle-gold').textContent = `⚜ ${run.gold}`;
-}
-
-function proceedToNextBoss() {
-  run.phase = 'battle';
-  renderBattle();
-}
-
-// ============================================================
-//  PLAYER DEAD
-// ============================================================
-function playerDead() {
-  // Award gold from run
-  save.gold += run.gold;
-  persist();
-  const stats = document.getElementById('gameover-stats');
-  stats.innerHTML = `
-    Bosses slain: <span>${run.bossesDefeated}</span><br>
-    Gold earned this run: <span>⚜ ${run.gold}</span><br>
-    Total gold: <span>⚜ ${save.gold}</span>
-  `;
-  // boss pips
-  const pips = renderBossPips();
-  stats.innerHTML += pips;
-  goTo('screen-gameover');
-}
-
-function showVictory() {
-  save.gold += run.gold;
-  persist();
-  const stats = document.getElementById('victory-stats');
-  stats.innerHTML = `
-    All four bosses defeated!<br>
-    Gold earned this run: <span>⚜ ${run.gold}</span><br>
-    Total gold: <span>⚜ ${save.gold}</span>
-  `;
-  goTo('screen-victory');
-}
-
-function renderBossPips() {
-  let html = '<div class="boss-pips">';
-  BOSSES.forEach((b, i) => {
-    const cls = i < run.bossesDefeated ? 'done' : (i === run.bossIndex ? 'dead' : '');
-    html += `<div class="boss-pip ${cls}" title="${b.name}"></div>`;
+  HEAL_COSTS.forEach((cost,i)=>{
+    const hp=i+1; const btn=document.createElement('button');
+    btn.className='heal-btn'; btn.textContent=`+${hp} HP — ⚜ ${cost}`;
+    btn.disabled=run.goldEarned<cost||(run.playerHp+hp>run.playerMaxHp);
+    btn.onclick=()=>buyHeal(hp,cost); opts.appendChild(btn);
   });
-  return html + '</div>';
 }
 
-function goToShopAfterRun() {
-  goTo('screen-shop');
+function buyHeal(hp,cost) {
+  if(run.goldEarned<cost) return;
+  run.goldEarned-=cost; run.playerHp=Math.min(run.playerMaxHp,run.playerHp+hp);
+  renderHealPrompt();
+  document.getElementById('player-bar').style.width=(run.playerHp/run.playerMaxHp*100)+'%';
+  document.getElementById('player-hp-text').textContent=`${run.playerHp} / ${run.playerMaxHp}`;
+  document.getElementById('battle-gold').textContent=`⚜ ${run.goldEarned}`;
 }
 
-// ============================================================
-//  INIT
-// ============================================================
-renderMenu();
+function proceedToNextBoss() { run.phase='battle'; renderBattle(); }
+
+// ─────────────────────────────────────────────
+//  END RUN → SUMMARY SCREEN
+// ─────────────────────────────────────────────
+function endRun(victory) {
+  const ws=getWS(currentWorld);
+  ws.gold+=run.goldEarned; persist();
+
+  // Title
+  const titleEl=document.getElementById('summary-title');
+  titleEl.textContent=victory?'Victory!':'You Died';
+  titleEl.className='summary-title '+(victory?'victory':'defeat');
+
+  // Gold earned banner
+  document.getElementById('summary-gold-earned').textContent=`+⚜ ${run.goldEarned} Gold Earned`;
+
+  // Boss pips with names
+  const pipsEl=document.getElementById('summary-pips'); pipsEl.innerHTML='';
+  BOSSES.forEach((b,i)=>{
+    const wrap=document.createElement('div'); wrap.className='boss-pip';
+    const dot=document.createElement('div'); dot.className='pip-dot';
+    if(i<run.bossesDefeated) dot.classList.add('done');
+    else if(i===run.bossIndex&&!victory) dot.classList.add('died');
+    else dot.classList.add('not-reached');
+    const lbl=document.createElement('div'); lbl.className='pip-name';
+    lbl.textContent=b.name.split(' ')[0].toUpperCase();
+    wrap.appendChild(dot); wrap.appendChild(lbl); pipsEl.appendChild(wrap);
+  });
+
+  // Stats
+  const acc=run.questionsAnswered>0?Math.round(run.questionsCorrect/run.questionsAnswered*100):0;
+  document.getElementById('summary-stats').innerHTML=`
+    Bosses defeated: <span class="hi">${run.bossesDefeated} / 4</span><br>
+    Accuracy: <span class="hi">${run.questionsCorrect} / ${run.questionsAnswered} (${acc}%)</span><br>
+    Vault total: <span class="hi">⚜ ${ws.gold}</span>
+  `;
+
+  goTo('screen-summary');
+}
 </script>
 </body>
 </html>
