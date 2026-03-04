@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataStreet — Stock Market Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0c0f0a;
+  --paper: #f5f0e8;
+  --cream: #ede8d8;
+  --green: #1a6b3c;
+  --green-light: #d4edda;
+  --green-bright: #22c55e;
+  --red: #c0392b;
+  --red-light: #fde8e8;
+  --gold: #c8860a;
+  --gold-light: #fef3c7;
+  --blue: #1a4a8a;
+  --border: #c8bfa8;
+  --shadow: rgba(12,15,10,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── SCREEN SYSTEM ─── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ─── BACKGROUND TEXTURE ─── */
+.bg-texture {
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(245,240,232,0.015) 40px, rgba(245,240,232,0.015) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(245,240,232,0.015) 40px, rgba(245,240,232,0.015) 41px),
+    radial-gradient(ellipse at 15% 50%, rgba(26,107,60,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 50%, rgba(200,134,10,0.06) 0%, transparent 60%),
+    var(--ink);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── NEWSPAPER CARD ─── */
+.newspaper {
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 2px 0 #a09070, 0 4px 0 #8a7a60, 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* ─── INTRO SCREEN ─── */
+#introScreen {
+  z-index: 10;
+}
+
+.intro-card {
+  width: min(720px, 96vw);
+  padding: 0;
+}
+
+.intro-masthead {
+  background: var(--ink);
+  padding: 28px 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.intro-masthead::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.015) 3px, rgba(255,255,255,0.015) 4px);
+}
+.masthead-top {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 4px;
+  color: rgba(245,240,232,0.4);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.masthead-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  color: var(--paper);
+  letter-spacing: 4px;
+  line-height: 0.9;
+  position: relative;
+}
+.masthead-title .accent { color: #4ade80; }
+.masthead-sub {
+  font-size: 0.75rem;
+  color: rgba(245,240,232,0.5);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+}
+.masthead-rule {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4ade80, #facc15, transparent);
+  margin-top: 20px;
+}
+
+.intro-body {
+  padding: 36px 40px;
+}
+
+.intro-byline {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+.byline-item {
+  text-align: center;
+}
+.byline-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  color: var(--green);
+  line-height: 1;
+}
+.byline-val.gold { color: var(--gold); }
+.byline-label {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+}
+
+.intro-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.intro-col h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--ink);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.intro-col p {
+  font-size: 0.82rem;
+  color: #444;
+  line-height: 1.7;
+}
+.intro-col ul {
+  list-style: none;
+  font-size: 0.82rem;
+  color: #444;
+  line-height: 1.9;
+}
+.intro-col ul li::before { content: '▸  '; color: var(--green); }
+
+.name-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.name-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+.name-input {
+  flex: 1;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.name-input:focus { border-color: var(--green); }
+
+.start-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 4px;
+  padding: 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.start-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(74,222,128,0.15) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+.start-btn:hover { background: #1a2a1a; }
+.start-btn:hover::after { transform: translateX(100%); }
+.start-btn:active { transform: scale(0.99); }
+
+
+/* ─── QUIZ SCREEN ─── */
+#quizScreen {
+  z-index: 10;
+}
+
+.quiz-card {
+  width: min(680px, 96vw);
+}
+
+.quiz-header {
+  background: var(--ink);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.quiz-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--paper);
+  letter-spacing: 3px;
+}
+.quiz-logo span { color: #4ade80; }
+.hud-pills { display: flex; gap: 10px; }
+.hud-pill {
+  background: rgba(245,240,232,0.08);
+  border: 1px solid rgba(245,240,232,0.12);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.7rem;
+  color: rgba(245,240,232,0.7);
+  font-family: 'DM Mono', monospace;
+}
+.hud-pill strong { color: #4ade80; font-size: 0.85rem; }
+.hud-pill.gold strong { color: #facc15; }
+
+.quiz-progress-bar {
+  height: 4px;
+  background: rgba(245,240,232,0.08);
+}
+.quiz-progress-fill {
+  height: 4px;
+  background: linear-gradient(90deg, #4ade80, #facc15);
+  transition: width 0.6s ease;
+}
+
+.quiz-body {
+  padding: 32px 36px;
+}
+
+.quiz-round-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.quiz-category-badge {
+  display: inline-block;
+  background: var(--green-light);
+  color: var(--green);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.quiz-q-text {
+  font-size: 1.15rem;
+  color: var(--ink);
+  line-height: 1.65;
+  margin-bottom: 24px;
+  min-height: 72px;
+  font-weight: 500;
+}
+.quiz-q-text .num { 
+  font-family: 'DM Mono', monospace;
+  background: var(--cream);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+  color: var(--green);
+}
+
+.quiz-answer-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.quiz-ans-input {
+  flex: 1;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.quiz-ans-input:focus { border-color: var(--green); }
+.quiz-ans-input.correct { border-color: var(--green-bright); background: #f0fdf4; }
+.quiz-ans-input.wrong { border-color: var(--red); background: #fef2f2; }
+
+.quiz-submit-btn {
+  background: var(--green);
+  border: none;
+  border-radius: 4px;
+  padding: 12px 28px;
+  color: white;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.quiz-submit-btn:hover { background: #145e32; }
+.quiz-submit-btn:active { transform: scale(0.97); }
+
+.quiz-hint {
+  font-size: 0.75rem;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 16px;
+  min-height: 18px;
+}
+
+.quiz-feedback-box {
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  min-height: 56px;
+  margin-bottom: 18px;
+  transition: all 0.2s;
+}
+.quiz-feedback-box.idle { background: var(--cream); color: #888; border: 1px solid var(--border); }
+.quiz-feedback-box.correct { background: var(--green-light); color: #145e32; border: 1px solid #86efac; }
+.quiz-feedback-box.wrong { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
+
+.quiz-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #555;
+}
+.streak-fire { font-size: 1.2rem; }
+.streak-count { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); }
+
+.go-market-btn {
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.go-market-btn:hover { background: #a06a08; }
+.go-market-btn .arrow { font-size: 0.9rem; }
+
+
+/* ─── MARKET SCREEN ─── */
+#marketScreen {
+  z-index: 10;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 24px 16px;
+}
+
+.market-wrapper {
+  width: min(1100px, 98vw);
+}
+
+.market-header {
+  background: var(--ink);
+  border-radius: 4px 4px 0 0;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 2px 0 #a09070, 0 4px 0 #8a7a60;
+}
+
+.market-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  color: var(--paper);
+  letter-spacing: 3px;
+}
+.market-logo span { color: #4ade80; }
+
+.market-hud { display: flex; gap: 10px; flex-wrap: wrap; }
+.m-pill {
+  background: rgba(245,240,232,0.08);
+  border: 1px solid rgba(245,240,232,0.12);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.7rem;
+  color: rgba(245,240,232,0.6);
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+.m-pill strong { display: block; font-size: 0.95rem; color: var(--paper); }
+.m-pill.accent strong { color: #4ade80; }
+.m-pill.gold strong { color: #facc15; }
+.m-pill.red strong { color: #f87171; }
+
+.goal-bar-wrap {
+  background: var(--paper);
+  padding: 10px 28px;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.goal-label {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+.goal-track {
+  flex: 1;
+  height: 8px;
+  background: var(--cream);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #4ade80);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.goal-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+.market-news {
+  background: var(--gold-light);
+  border-bottom: 2px solid #fcd34d;
+  padding: 8px 28px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #78350f;
+}
+.news-badge {
+  background: var(--gold);
+  color: white;
+  font-family: 'Bebas Neue', sans-serif;
+  padding: 2px 8px;
+  border-radius: 2px;
+  letter-spacing: 2px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.market-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 0;
+  background: var(--paper);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 0 #a09070, 0 4px 0 #8a7a60, 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.market-main {
+  border-right: 2px solid var(--border);
+}
+
+.m-section-head {
+  padding: 10px 20px;
+  border-bottom: 2px solid var(--border);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  font-size: 0.9rem;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+table.stocks {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+table.stocks th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #888;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+table.stocks td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(200,191,168,0.4);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+table.stocks tr:hover td { background: rgba(200,191,168,0.2); }
+table.stocks tr:last-child td { border-bottom: none; }
+
+.s-ticker { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--blue); font-size: 0.78rem; }
+.s-name { color: #333; }
+.s-price { font-family: 'DM Mono', monospace; font-weight: 500; }
+.s-chg.up { color: var(--green); font-family: 'DM Mono', monospace; }
+.s-chg.down { color: var(--red); font-family: 'DM Mono', monospace; }
+.s-chg.flat { color: #888; font-family: 'DM Mono', monospace; }
+.s-owned { font-family: 'DM Mono', monospace; color: var(--gold); font-weight: 500; }
+.s-val { font-family: 'DM Mono', monospace; color: #555; }
+
+.mini-btn {
+  border: none;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.12s;
+  font-family: 'DM Sans', sans-serif;
+}
+.b-buy { background: #dcfce7; color: var(--green); border: 1px solid #86efac; }
+.b-buy:hover { background: var(--green); color: white; }
+.b-sell { background: #fee2e2; color: var(--red); border: 1px solid #fca5a5; }
+.b-sell:hover { background: var(--red); color: white; }
+.b-sell:disabled { opacity: 0.3; cursor: not-allowed; }
+.b-sell:disabled:hover { background: #fee2e2; color: var(--red); }
+
+/* Sidebar */
+.market-sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  padding: 16px 18px;
+  border-bottom: 2px solid var(--border);
+}
+.sidebar-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+/* Portfolio in sidebar */
+.port-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(200,191,168,0.4);
+  font-size: 0.78rem;
+}
+.port-item:last-child { border-bottom: none; }
+.pi-ticker { font-family: 'DM Mono', monospace; color: var(--blue); font-weight: 500; }
+.pi-qty { color: #888; font-size: 0.68rem; }
+.pi-val { font-family: 'DM Mono', monospace; font-weight: 500; text-align: right; }
+.pi-pnl { font-size: 0.68rem; text-align: right; font-family: 'DM Mono', monospace; }
+.pi-pnl.pos { color: var(--green); }
+.pi-pnl.neg { color: var(--red); }
+.port-empty { color: #aaa; font-size: 0.78rem; line-height: 1.6; }
+
+/* Trade log */
+.trade-log {
+  font-size: 0.72rem;
+  font-family: 'DM Mono', monospace;
+  color: #666;
+  line-height: 2;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.trade-log .tl-buy { color: var(--green); }
+.trade-log .tl-sell { color: var(--gold); }
+
+.advance-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 14px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: auto;
+  border-radius: 0 0 4px 0;
+}
+.advance-btn:hover { background: #1a2a1a; }
+
+.go-quiz-btn {
+  width: 100%;
+  background: var(--gold);
+  color: white;
+  border: none;
+  padding: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.go-quiz-btn:hover { background: #a06a08; }
+
+
+/* ─── WIN SCREEN ─── */
+#winScreen { z-index: 20; }
+.win-card {
+  width: min(560px, 96vw);
+  text-align: center;
+  padding: 0;
+}
+.win-banner {
+  background: var(--ink);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.win-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(74,222,128,0.15), transparent 70%);
+}
+.win-emoji { font-size: 3.5rem; display: block; margin-bottom: 8px; position: relative; }
+.win-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  color: var(--paper);
+  letter-spacing: 4px;
+  position: relative;
+}
+.win-title .green { color: #4ade80; }
+.win-body { padding: 32px 40px; }
+.win-body p { color: #555; font-size: 0.9rem; line-height: 1.7; margin-bottom: 24px; }
+.win-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+.ws-item { background: var(--cream); border-radius: 4px; padding: 14px 8px; }
+.ws-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--green); }
+.ws-label { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: #888; font-family: 'DM Mono', monospace; }
+.play-again-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 4px;
+  padding: 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.play-again-btn:hover { background: #1a2a1a; }
+
+/* ─── TRADE MODAL ─── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,15,10,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.trade-modal {
+  background: var(--paper);
+  border-radius: 4px;
+  width: min(360px, 92vw);
+  box-shadow: 0 2px 0 #a09070, 0 4px 0 #8a7a60, 0 30px 60px rgba(0,0,0,0.4);
+  overflow: hidden;
+  animation: popIn 0.18s ease;
+}
+@keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.tm-header {
+  background: var(--ink);
+  padding: 18px 24px;
+  color: var(--paper);
+}
+.tm-header h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; }
+.tm-header p { font-size: 0.72rem; color: rgba(245,240,232,0.5); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.tm-body { padding: 22px 24px; }
+.tm-price-big { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--green); margin-bottom: 16px; }
+.tm-qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.qty-adj { background: var(--cream); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 3px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; transition: background 0.1s; }
+.qty-adj:hover { background: var(--border); }
+.qty-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; flex: 1; text-align: center; color: var(--ink); }
+.tm-total { font-size: 0.82rem; color: #666; margin-bottom: 20px; font-family: 'DM Mono', monospace; }
+.tm-total strong { color: var(--ink); font-size: 1.1rem; }
+.tm-actions { display: flex; gap: 10px; }
+.tm-confirm {
+  flex: 1;
+  border: none;
+  border-radius: 3px;
+  padding: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tm-confirm:hover { opacity: 0.85; }
+.tm-confirm.buy { background: var(--green); color: white; }
+.tm-confirm.sell { background: var(--red); color: white; }
+.tm-cancel { background: none; border: 1px solid var(--border); border-radius: 3px; padding: 12px 16px; font-family: 'DM Mono', monospace; font-size: 0.78rem; cursor: pointer; color: #666; }
+.tm-cancel:hover { background: var(--cream); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.intro-card, .quiz-card { animation: fadeUp 0.5s ease both; }
+
+.price-flash-up { animation: flashGreen 0.6s ease; }
+.price-flash-down { animation: flashRed 0.6s ease; }
+@keyframes flashGreen { 0%,100% { background: transparent; } 30% { background: rgba(34,197,94,0.18); } }
+@keyframes flashRed { 0%,100% { background: transparent; } 30% { background: rgba(192,57,43,0.12); } }
+</style>
+</head>
+<body>
+<div class="bg-texture"></div>
+
+<!-- ══════════════ INTRO SCREEN ══════════════ -->
+<div class="screen active" id="introScreen">
+  <div class="newspaper intro-card">
+    <div class="intro-masthead">
+      <div class="masthead-top">Est. 2024 — Data Science Edition</div>
+      <div class="masthead-title">DATA<span class="accent">STREET</span></div>
+      <div class="masthead-sub">The Stock Market Learning Challenge</div>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="intro-body">
+      <div class="intro-byline">
+        <div class="byline-item">
+          <div class="byline-val">$10,000</div>
+          <div class="byline-label">Starting Cash</div>
+        </div>
+        <div class="byline-item">
+          <div class="byline-val gold">$25,000</div>
+          <div class="byline-label">Goal to Win</div>
+        </div>
+        <div class="byline-item">
+          <div class="byline-val">20</div>
+          <div class="byline-label">Companies</div>
+        </div>
+        <div class="byline-item">
+          <div class="byline-val">∞</div>
+          <div class="byline-label">Rounds</div>
+        </div>
+      </div>
+      <div class="intro-columns">
+        <div class="intro-col">
+          <h3>How To Play</h3>
+          <ul>
+            <li>Answer math questions to earn cash</li>
+            <li>Use cash to buy shares on the market</li>
+            <li>Advance rounds to shift stock prices</li>
+            <li>Sell high, buy low, reach $25,000</li>
+            <li>Watch for sector news events!</li>
+          </ul>
+        </div>
+        <div class="intro-col">
+          <h3>Math Topics</h3>
+          <p>
+            Percentages, ratios, profit & loss, 
+            price changes, portfolio allocation,
+            and more. Each correct answer earns 
+            <strong>$80–$200</strong> plus a streak 
+            bonus for consecutive correct answers.
+          </p>
+        </div>
+      </div>
+      <div class="name-row">
+        <span class="name-label">Your name:</span>
+        <input class="name-input" id="playerNameInput" type="text" placeholder="Enter your name..." maxlength="24">
+      </div>
+      <button class="start-btn" onclick="startGame()">ENTER THE MARKET →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ SCREEN ══════════════ -->
+<div class="screen" id="quizScreen">
+  <div class="newspaper quiz-card">
+    <div class="quiz-header">
+      <div class="quiz-logo">Data<span>Street</span></div>
+      <div class="hud-pills">
+        <div class="hud-pill">CASH <strong id="q-cash">$10,000</strong></div>
+        <div class="hud-pill gold">GOAL <strong id="q-goal">$25,000</strong></div>
+        <div class="hud-pill">ROUND <strong id="q-round">1</strong></div>
+      </div>
+    </div>
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-round-label" id="quizRoundLabel">ROUND 1 — QUIZ PHASE</div>
+      <div class="quiz-category-badge" id="quizCategoryBadge">Percentages</div>
+      <div class="quiz-q-text" id="quizQText">Loading question...</div>
+      <div class="quiz-answer-area">
+        <input class="quiz-ans-input" id="quizAnsInput" type="number" placeholder="Type your answer..." step="any" autocomplete="off">
+        <button class="quiz-submit-btn" onclick="submitAnswer()">CHECK</button>
+      </div>
+      <div class="quiz-hint" id="quizHintText">Hint will appear here</div>
+      <div class="quiz-feedback-box idle" id="quizFeedbackBox">Solve the question above to earn cash for the market.</div>
+      <div class="quiz-footer">
+        <div class="streak-display">
+          <span class="streak-fire">🔥</span>
+          <span>Streak:</span>
+          <span class="streak-count" id="streakCount">0</span>
+          <span style="font-size:0.72rem;color:#aaa;" id="streakBonus"></span>
+        </div>
+        <button class="go-market-btn" onclick="goToMarket()">
+          GO TO MARKET <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MARKET SCREEN ══════════════ -->
+<div class="screen" id="marketScreen">
+  <div class="market-wrapper">
+    <div class="market-header">
+      <div class="market-logo">Data<span>Street</span> — <span style="color:#facc15;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;" id="playerNameDisplay">Trader</span></div>
+      <div class="market-hud">
+        <div class="m-pill accent">CASH<strong id="m-cash">$10,000</strong></div>
+        <div class="m-pill">HOLDINGS<strong id="m-holdings">$0</strong></div>
+        <div class="m-pill gold">NET WORTH<strong id="m-net">$10,000</strong></div>
+        <div class="m-pill">ROUND<strong id="m-round">1</strong></div>
+      </div>
+    </div>
+    <div class="goal-bar-wrap">
+      <span class="goal-label">Progress to Goal ($25,000)</span>
+      <div class="goal-track"><div class="goal-fill" id="goalFill" style="width:40%"></div></div>
+      <span class="goal-pct" id="goalPct">40%</span>
+    </div>
+    <div class="market-news" id="marketNewsBar">
+      <span class="news-badge">NEWS</span>
+      <span id="marketNewsText"></span>
+    </div>
+    <div class="market-layout">
+      <div class="market-main">
+        <div class="m-section-head">
+          <span>📊 LIVE MARKET</span>
+          <span style="font-size:0.7rem;font-family:'DM Mono',monospace;color:#aaa;" id="mktRoundLabel">Round 1 prices</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="stocks">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Company</th>
+                <th>Price</th>
+                <th>Change</th>
+                <th>% Chg</th>
+                <th>Owned</th>
+                <th>Value</th>
+                <th>Buy</th>
+                <th>Sell</th>
+              </tr>
+            </thead>
+            <tbody id="stocksBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="market-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">💼 My Portfolio</div>
+          <div id="portfolioSidebar"><div class="port-empty">No holdings yet. Buy shares from the market!</div></div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-title">📋 Activity</div>
+          <div class="trade-log" id="tradeLog"><span style="color:#aaa">No activity yet.</span></div>
+        </div>
+        <button class="go-quiz-btn" onclick="goToQuiz()">🧮 BACK TO QUIZ — EARN MORE CASH</button>
+        <button class="advance-btn" onclick="advanceRound()">⏭ ADVANCE TO NEXT ROUND</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ WIN SCREEN ══════════════ -->
+<div class="screen" id="winScreen">
+  <div class="newspaper win-card">
+    <div class="win-banner">
+      <span class="win-emoji">🏆</span>
+      <div class="win-title">YOU <span class="green">WIN!</span></div>
+    </div>
+    <div class="win-body">
+      <p id="winMsg">Congratulations! You reached the goal.</p>
+      <div class="win-stats">
+        <div class="ws-item">
+          <div class="ws-val" id="winNetWorth">$0</div>
+          <div class="ws-label">Net Worth</div>
+        </div>
+        <div class="ws-item">
+          <div class="ws-val" id="winRounds">0</div>
+          <div class="ws-label">Rounds</div>
+        </div>
+        <div class="ws-item">
+          <div class="ws-val" id="winQuizCash">$0</div>
+          <div class="ws-label">Quiz Earned</div>
+        </div>
+      </div>
+      <button class="play-again-btn" onclick="resetGame()">PLAY AGAIN →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TRADE MODAL ══════════════ -->
+<div class="modal-backdrop" id="tradeModalBackdrop">
+  <div class="trade-modal">
+    <div class="tm-header">
+      <h3 id="tmTitle">BUY SHARES</h3>
+      <p id="tmSubtitle">APEX · Apex Robotics</p>
+    </div>
+    <div class="tm-body">
+      <div class="tm-price-big" id="tmPriceBig">$0.00</div>
+      <div class="tm-qty-row">
+        <button class="qty-adj" onclick="adjustQty(-1)">−</button>
+        <div class="qty-num" id="tmQtyNum">1</div>
+        <button class="qty-adj" onclick="adjustQty(1)">+</button>
+      </div>
+      <div class="tm-total">Total: <strong id="tmTotal">$0.00</strong></div>
+      <div class="tm-actions">
+        <button class="tm-confirm" id="tmConfirmBtn" onclick="confirmTrade()">CONFIRM</button>
+        <button class="tm-cancel" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════ DATA ══════════════
+const COMPANIES = [
+  { ticker:'APEX', name:'Apex Robotics', sector:'tech' },
+  { ticker:'NVEX', name:'Novalex Energy', sector:'energy' },
+  { ticker:'BRNK', name:'BioRank Pharma', sector:'health' },
+  { ticker:'ZAPP', name:'Zapper Networks', sector:'tech' },
+  { ticker:'GREX', name:'GreatEx Mining', sector:'materials' },
+  { ticker:'LUMA', name:'Luma Media Corp', sector:'media' },
+  { ticker:'DRFT', name:'Driftwood Foods', sector:'consumer' },
+  { ticker:'HYDR', name:'HydroCore Power', sector:'energy' },
+  { ticker:'PIXL', name:'Pixel Dynamics', sector:'tech' },
+  { ticker:'ARAN', name:'Aranthos Bank', sector:'finance' },
+  { ticker:'SKYR', name:'Skyreach Air', sector:'transport' },
+  { ticker:'VOXL', name:'Voxel Labs AI', sector:'tech' },
+  { ticker:'CBRN', name:'Carbon Future', sector:'energy' },
+  { ticker:'FLDX', name:'FluidEx Biotech', sector:'health' },
+  { ticker:'MTRX', name:'Matrixx Retail', sector:'consumer' },
+  { ticker:'SOLR', name:'Solaris Grid', sector:'energy' },
+  { ticker:'BRCK', name:'Brickstone REIT', sector:'realestate' },
+  { ticker:'QNTM', name:'Quantum Shield', sector:'defense' },
+  { ticker:'NXUS', name:'Nexus Logistics', sector:'transport' },
+  { ticker:'AMBI', name:'Ambilight Chem', sector:'materials' },
+];
+
+const NEWS_EVENTS = [
+  { text:'🚀 Tech sector surges after AI breakthrough!', sectors:['tech'], mult:1.28 },
+  { text:'⚡ Energy crisis drives power stocks higher.', sectors:['energy'], mult:1.22 },
+  { text:'💊 Pharma recall hits biotech sector hard.', sectors:['health'], mult:0.72 },
+  { text:'🛒 Retail slump: consumer confidence falls.', sectors:['consumer'], mult:0.78 },
+  { text:'⛏️ Mining boom as commodities spike.', sectors:['materials'], mult:1.38 },
+  { text:'✈️ Airline delays — transport stocks dip.', sectors:['transport'], mult:0.82 },
+  { text:'🏦 Interest rate cut — financials rally!', sectors:['finance'], mult:1.24 },
+  { text:'🛡️ Huge defense contract awarded!', sectors:['defense'], mult:1.32 },
+  { text:'🏠 Real estate cools amid mortgage hikes.', sectors:['realestate'], mult:0.76 },
+  { text:'📺 Streaming boom lifts media stocks.', sectors:['media'], mult:1.20 },
+  { text:'📉 Market-wide selloff — panic selling!', sectors:['tech','energy','health','consumer','materials','transport','finance','defense','realestate','media'], mult:0.88 },
+  { text:'📈 Bull run: broad market rally today!', sectors:['tech','energy','health','consumer','materials','transport','finance','defense','realestate','media'], mult:1.12 },
+];
+
+const QUIZ_QUESTIONS = [
+  {
+    cat:'Multiplication',
+    gen:()=>{
+      const price=Math.round(Math.random()*200+20), qty=Math.floor(Math.random()*40+5);
+      return { q:`You want to buy <span class="num">${qty} shares</span> of a stock priced at <span class="num">$${price}/share</span>. What is the total cost?`, a:price*qty, tol:0, reward:80, hint:`Total = shares × price per share` };
+    }
+  },
+  {
+    cat:'Profit & Loss',
+    gen:()=>{
+      const buy=Math.round(Math.random()*100+20), qty=Math.floor(Math.random()*20+5);
+      const sell=Math.round(buy*(0.75+Math.random()*0.6));
+      const pnl=(sell-buy)*qty;
+      return { q:`You bought <span class="num">${qty} shares</span> at <span class="num">$${buy}</span> each, then sold them at <span class="num">$${sell}</span> each. What is your total profit or loss? (negative = loss)`, a:pnl, tol:0, reward:110, hint:`P/L = (sell price − buy price) × number of shares` };
+    }
+  },
+  {
+    cat:'% Change',
+    gen:()=>{
+      const old=Math.round(Math.random()*150+30), pct=Math.round((Math.random()-0.4)*50);
+      const nw=Math.round(old*(1+pct/100));
+      return { q:`A stock was <span class="num">$${old}</span> last round and is now <span class="num">$${nw}</span>. What is the percentage change? (round to nearest whole number)`, a:Math.round((nw-old)/old*100), tol:1, reward:120, hint:`% change = (new − old) ÷ old × 100` };
+    }
+  },
+  {
+    cat:'% of Budget',
+    gen:()=>{
+      const total=Math.round((Math.random()*8000+2000)/100)*100, pct=Math.floor(Math.random()*35+5);
+      return { q:`You have <span class="num">$${total.toLocaleString()}</span> in cash. You want to invest <span class="num">${pct}%</span> into one stock. How many dollars is that?`, a:Math.round(total*pct/100), tol:1, reward:95, hint:`Amount = total cash × (percentage ÷ 100)` };
+    }
+  },
+  {
+    cat:'Max Shares',
+    gen:()=>{
+      const price=Math.round(Math.random()*180+20), budget=Math.round((Math.random()*4000+500)/10)*10;
+      return { q:`A stock costs <span class="num">$${price}/share</span>. You have <span class="num">$${budget}</span>. What is the maximum number of <em>whole</em> shares you can buy?`, a:Math.floor(budget/price), tol:0, reward:90, hint:`Max shares = floor(budget ÷ price per share)` };
+    }
+  },
+  {
+    cat:'Portfolio %',
+    gen:()=>{
+      const a=Math.round(Math.random()*4000+500), b=Math.round(Math.random()*4000+500);
+      return { q:`Stock A is worth <span class="num">$${a}</span> and Stock B is worth <span class="num">$${b}</span>. What percentage of your total portfolio is Stock A? (round to nearest whole %)`, a:Math.round(a/(a+b)*100), tol:1, reward:115, hint:`% = (Stock A value ÷ total portfolio value) × 100` };
+    }
+  },
+  {
+    cat:'Price After Gain',
+    gen:()=>{
+      const price=Math.round(Math.random()*100+20), pct=Math.floor(Math.random()*30+5);
+      return { q:`A stock is currently <span class="num">$${price}</span>. It rises by <span class="num">${pct}%</span>. What is the new price? (round to nearest dollar)`, a:Math.round(price*(1+pct/100)), tol:1, reward:100, hint:`New price = old price × (1 + % ÷ 100)` };
+    }
+  },
+  {
+    cat:'Price After Loss',
+    gen:()=>{
+      const price=Math.round(Math.random()*150+30), pct=Math.floor(Math.random()*30+5);
+      return { q:`A stock is currently <span class="num">$${price}</span>. It drops by <span class="num">${pct}%</span>. What is the new price? (round to nearest dollar)`, a:Math.round(price*(1-pct/100)), tol:1, reward:100, hint:`New price = old price × (1 − % ÷ 100)` };
+    }
+  },
+  {
+    cat:'Ratio',
+    gen:()=>{
+      const a=Math.round(Math.random()*200+30), b=Math.round(Math.random()*200+30);
+      return { q:`Stock A trades at <span class="num">$${a}</span> and Stock B at <span class="num">$${b}</span>. Express the ratio A : B as a decimal rounded to <strong>2 decimal places</strong>.`, a:Math.round(a/b*100)/100, tol:0.02, reward:105, hint:`Ratio = Stock A price ÷ Stock B price` };
+    }
+  },
+  {
+    cat:'Return on Investment',
+    gen:()=>{
+      const invested=Math.round((Math.random()*3000+500)/100)*100;
+      const returnAmt=Math.round(invested*(0.8+Math.random()*0.6)/100)*100;
+      const roi=Math.round((returnAmt-invested)/invested*100);
+      return { q:`You invested <span class="num">$${invested}</span> in a stock and it is now worth <span class="num">$${returnAmt}</span>. What is your ROI (return on investment) as a %? (round to whole number)`, a:roi, tol:1, reward:130, hint:`ROI = (current value − invested) ÷ invested × 100` };
+    }
+  },
+];
+
+// ══════════════ STATE ══════════════
+const STARTING_CASH = 10000;
+const GOAL = 25000;
+
+let playerName = 'Trader';
+let cash = STARTING_CASH;
+let round = 1;
+let prices = {};
+let prevPrices = {};
+let portfolio = {}; // ticker -> { qty, avgCost }
+let streak = 0;
+let totalQuizEarned = 0;
+let tradeHistory = [];
+let currentQ = null;
+let activeNews = null;
+
+// Modal state
+let modalMode = null;
+let modalTicker = null;
+let modalQty = 1;
+
+// ══════════════ INIT ══════════════
+function initPrices() {
+  COMPANIES.forEach(c => {
+    prices[c.ticker] = Math.round((Math.random()*450+50)*100)/100;
+    prevPrices[c.ticker] = prices[c.ticker];
+    portfolio[c.ticker] = { qty:0, avgCost:0 };
+  });
+}
+
+// ══════════════ SCREEN NAV ══════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  const nameVal = document.getElementById('playerNameInput').value.trim();
+  playerName = nameVal || 'Trader';
+  document.getElementById('playerNameDisplay').textContent = playerName;
+  initPrices();
+  generateQuestion();
+  updateQuizHUD();
+  showScreen('quizScreen');
+}
+
+function goToMarket() {
+  renderMarket();
+  showScreen('marketScreen');
+}
+
+function goToQuiz() {
+  generateQuestion();
+  updateQuizHUD();
+  showScreen('quizScreen');
+}
+
+// ══════════════ QUIZ ══════════════
+function generateQuestion() {
+  const type = QUIZ_QUESTIONS[Math.floor(Math.random()*QUIZ_QUESTIONS.length)];
+  currentQ = type.gen();
+  currentQ.category = type.cat;
+  document.getElementById('quizQText').innerHTML = currentQ.q;
+  document.getElementById('quizCategoryBadge').textContent = type.cat;
+  document.getElementById('quizHintText').textContent = 'Formula: ' + currentQ.hint;
+  document.getElementById('quizAnsInput').value = '';
+  document.getElementById('quizAnsInput').className = 'quiz-ans-input';
+  document.getElementById('quizFeedbackBox').textContent = 'Solve the question above to earn cash for the market.';
+  document.getElementById('quizFeedbackBox').className = 'quiz-feedback-box idle';
+  updateQuizHUD();
+}
+
+function updateQuizHUD() {
+  document.getElementById('q-cash').textContent = '$'+cash.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('q-goal').textContent = '$'+GOAL.toLocaleString();
+  document.getElementById('q-round').textContent = round;
+  document.getElementById('quizRoundLabel').textContent = `ROUND ${round} — QUIZ PHASE`;
+  document.getElementById('streakCount').textContent = streak;
+  const bonus = streak >= 2 ? `(+$${streak*15} bonus/q)` : '';
+  document.getElementById('streakBonus').textContent = bonus;
+  // progress bar toward goal
+  const pct = Math.min(100, getNetWorth()/GOAL*100);
+  document.getElementById('quizProgressFill').style.width = pct+'%';
+}
+
+function submitAnswer() {
+  const raw = document.getElementById('quizAnsInput').value;
+  const val = parseFloat(raw);
+  if (isNaN(val)) {
+    document.getElementById('quizFeedbackBox').textContent = 'Please enter a number!';
+    document.getElementById('quizFeedbackBox').className = 'quiz-feedback-box wrong';
+    return;
+  }
+  const correct = Math.abs(val - currentQ.a) <= (currentQ.tol || 0);
+  const reward = currentQ.reward + streak*15;
+
+  if (correct) {
+    streak++;
+    cash += reward;
+    totalQuizEarned += reward;
+    document.getElementById('quizAnsInput').className = 'quiz-ans-input correct';
+    document.getElementById('quizFeedbackBox').className = 'quiz-feedback-box correct';
+    document.getElementById('quizFeedbackBox').innerHTML = `✅ Correct! <strong>+$${reward}</strong> added to your cash. ${streak >= 2 ? '🔥 Streak bonus active!' : ''}`;
+  } else {
+    streak = 0;
+    document.getElementById('quizAnsInput').className = 'quiz-ans-input wrong';
+    document.getElementById('quizFeedbackBox').className = 'quiz-feedback-box wrong';
+    document.getElementById('quizFeedbackBox').innerHTML = `❌ Not quite. The answer was <strong>${currentQ.a}</strong>. No penalty — keep going!`;
+  }
+
+  updateQuizHUD();
+  checkWin();
+
+  setTimeout(() => {
+    generateQuestion();
+  }, 2000);
+}
+
+document.getElementById('quizAnsInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAnswer();
+});
+
+// ══════════════ MARKET ══════════════
+function shiftPrices() {
+  prevPrices = {...prices};
+  activeNews = null;
+  if (Math.random() < 0.50) {
+    activeNews = NEWS_EVENTS[Math.floor(Math.random()*NEWS_EVENTS.length)];
+  }
+  COMPANIES.forEach(c => {
+    let move = (Math.random()-0.47)*0.22;
+    if (activeNews && activeNews.sectors.includes(c.sector)) {
+      move += (activeNews.mult - 1) * (0.5 + Math.random()*0.5);
+    }
+    if (Math.random() < 0.10) {
+      move += (Math.random()>0.5?1:-1) * (Math.random()*0.35+0.15);
+    }
+    prices[c.ticker] = Math.max(5, Math.round(prices[c.ticker]*(1+move)*100)/100);
+  });
+}
+
+function advanceRound() {
+  round++;
+  shiftPrices();
+  renderMarket();
+  checkWin();
+}
+
+function renderMarket() {
+  // update HUD
+  const holdings = getHoldingsValue();
+  const net = cash + holdings;
+  document.getElementById('m-cash').textContent = '$'+cash.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('m-holdings').textContent = '$'+holdings.toFixed(2);
+  document.getElementById('m-net').textContent = '$'+net.toFixed(2);
+  document.getElementById('m-round').textContent = round;
+  document.getElementById('mktRoundLabel').textContent = `Round ${round} prices`;
+
+  // goal bar
+  const pct = Math.min(100, net/GOAL*100);
+  document.getElementById('goalFill').style.width = pct+'%';
+  document.getElementById('goalPct').textContent = pct.toFixed(0)+'%';
+
+  // news
+  if (activeNews) {
+    document.getElementById('marketNewsBar').style.display = 'flex';
+    document.getElementById('marketNewsText').textContent = activeNews.text;
+  } else {
+    document.getElementById('marketNewsBar').style.display = 'none';
+  }
+
+  // stocks table
+  const body = document.getElementById('stocksBody');
+  body.innerHTML = '';
+  COMPANIES.forEach(c => {
+    const p = prices[c.ticker];
+    const pp = prevPrices[c.ticker];
+    const chg = p - pp;
+    const pctC = (chg/pp*100);
+    const owned = portfolio[c.ticker]?.qty || 0;
+    const val = owned * p;
+    const chgClass = chg > 0.001 ? 'up' : chg < -0.001 ? 'down' : 'flat';
+    const sign = chg >= 0 ? '+' : '';
+
+    const tr = document.createElement('tr');
+    tr.id = 'row-'+c.ticker;
+    tr.innerHTML = `
+      <td class="s-ticker">${c.ticker}</td>
+      <td class="s-name">${c.name}</td>
+      <td class="s-price">$${p.toFixed(2)}</td>
+      <td class="s-chg ${chgClass}">${sign}$${Math.abs(chg).toFixed(2)}</td>
+      <td class="s-chg ${chgClass}">${sign}${pctC.toFixed(1)}%</td>
+      <td class="s-owned">${owned > 0 ? owned : '—'}</td>
+      <td class="s-val">${val > 0 ? '$'+val.toFixed(2) : '—'}</td>
+      <td><button class="mini-btn b-buy" onclick="openModal('buy','${c.ticker}')">BUY</button></td>
+      <td><button class="mini-btn b-sell" ${owned===0?'disabled':''} onclick="openModal('sell','${c.ticker}')">SELL</button></td>
+    `;
+    body.appendChild(tr);
+
+    // flash animation
+    if (round > 1) {
+      tr.classList.add(chg >= 0 ? 'price-flash-up' : 'price-flash-down');
+    }
+  });
+
+  renderPortfolioSidebar();
+}
+
+function renderPortfolioSidebar() {
+  const el = document.getElementById('portfolioSidebar');
+  const held = COMPANIES.filter(c => portfolio[c.ticker]?.qty > 0);
+  if (!held.length) {
+    el.innerHTML = '<div class="port-empty">No holdings. Buy shares from the table!</div>';
+    return;
+  }
+  el.innerHTML = held.map(c => {
+    const {qty, avgCost} = portfolio[c.ticker];
+    const cur = qty * prices[c.ticker];
+    const cost = qty * avgCost;
+    const pnl = cur - cost;
+    const pnlPct = ((pnl/cost)*100).toFixed(1);
+    return `<div class="port-item">
+      <div><div class="pi-ticker">${c.ticker}</div><div class="pi-qty">${qty} shares</div></div>
+      <div><div class="pi-val">$${cur.toFixed(2)}</div><div class="pi-pnl ${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}$${pnl.toFixed(2)} (${pnl>=0?'+':''}${pnlPct}%)</div></div>
+    </div>`;
+  }).join('');
+}
+
+function getHoldingsValue() {
+  return COMPANIES.reduce((s,c) => s + (portfolio[c.ticker]?.qty||0)*prices[c.ticker], 0);
+}
+
+function getNetWorth() {
+  return cash + getHoldingsValue();
+}
+
+// ══════════════ MODAL ══════════════
+function openModal(mode, ticker) {
+  modalMode = mode;
+  modalTicker = ticker;
+  modalQty = 1;
+  const c = COMPANIES.find(x=>x.ticker===ticker);
+  const p = prices[ticker];
+  document.getElementById('tmTitle').textContent = mode==='buy' ? `BUY ${ticker}` : `SELL ${ticker}`;
+  document.getElementById('tmSubtitle').textContent = `${ticker} · ${c.name}`;
+  document.getElementById('tmPriceBig').textContent = '$'+p.toFixed(2)+' / share';
+  document.getElementById('tmConfirmBtn').textContent = mode==='buy' ? 'CONFIRM BUY' : 'CONFIRM SELL';
+  document.getElementById('tmConfirmBtn').className = 'tm-confirm '+mode;
+  updateModalDisplay();
+  document.getElementById('tradeModalBackdrop').classList.add('open');
+}
+
+function adjustQty(delta) {
+  const max = modalMode==='buy'
+    ? Math.max(1, Math.floor(cash/prices[modalTicker]))
+    : portfolio[modalTicker].qty;
+  modalQty = Math.max(1, Math.min(max, modalQty+delta));
+  updateModalDisplay();
+}
+
+function updateModalDisplay() {
+  document.getElementById('tmQtyNum').textContent = modalQty;
+  document.getElementById('tmTotal').textContent = '$'+(modalQty*prices[modalTicker]).toFixed(2);
+}
+
+function closeModal() {
+  document.getElementById('tradeModalBackdrop').classList.remove('open');
+}
+
+function confirmTrade() {
+  const p = prices[modalTicker];
+  const total = modalQty * p;
+  const c = COMPANIES.find(x=>x.ticker===modalTicker);
+
+  if (modalMode==='buy') {
+    if (total > cash) { alert('Not enough cash!'); return; }
+    cash -= total;
+    const pf = portfolio[modalTicker];
+    const newQty = pf.qty + modalQty;
+    pf.avgCost = (pf.qty*pf.avgCost + total) / newQty;
+    pf.qty = newQty;
+    addLog(`<span class="tl-buy">▲ BUY</span> ${modalQty}x ${modalTicker} @ $${p.toFixed(2)}`);
+  } else {
+    if (modalQty > portfolio[modalTicker].qty) { alert('Not enough shares!'); return; }
+    cash += total;
+    portfolio[modalTicker].qty -= modalQty;
+    if (portfolio[modalTicker].qty === 0) portfolio[modalTicker].avgCost = 0;
+    addLog(`<span class="tl-sell">▼ SELL</span> ${modalQty}x ${modalTicker} @ $${p.toFixed(2)}`);
+  }
+
+  closeModal();
+  renderMarket();
+  checkWin();
+}
+
+function addLog(msg) {
+  tradeHistory.unshift(msg);
+  const el = document.getElementById('tradeLog');
+  el.innerHTML = tradeHistory.slice(0,20).map(h=>`<div>${h}</div>`).join('');
+}
+
+document.getElementById('tradeModalBackdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('tradeModalBackdrop')) closeModal();
+});
+
+// ══════════════ WIN CHECK ══════════════
+function checkWin() {
+  if (getNetWorth() >= GOAL) {
+    // Show win screen
+    const net = getNetWorth();
+    document.getElementById('winNetWorth').textContent = '$'+net.toFixed(0);
+    document.getElementById('winRounds').textContent = round;
+    document.getElementById('winQuizCash').textContent = '$'+totalQuizEarned.toFixed(0);
+    document.getElementById('winMsg').innerHTML = `<strong>${playerName}</strong>, you grew your portfolio from $${STARTING_CASH.toLocaleString()} to <strong>$${net.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</strong> in ${round} round${round!==1?'s':''}! 🎉`;
+    setTimeout(() => showScreen('winScreen'), 600);
+  }
+}
+
+function resetGame() {
+  cash = STARTING_CASH;
+  round = 1;
+  streak = 0;
+  totalQuizEarned = 0;
+  tradeHistory = [];
+  activeNews = null;
+  currentQ = null;
+  COMPANIES.forEach(c => { portfolio[c.ticker] = { qty:0, avgCost:0 }; });
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('tradeLog').innerHTML = '<span style="color:#aaa">No activity yet.</span>';
+  showScreen('introScreen');
+}
+</script>
+</body>
+</html>
