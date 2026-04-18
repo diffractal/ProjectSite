@@ -41,274 +41,148 @@
 
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
       linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
   .app {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 820px;
+    position: relative; z-index: 1;
+    width: 100%; max-width: 820px;
     padding: 2.5rem 2rem 5rem;
   }
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 3.8rem;
-    letter-spacing: 0.04em;
-    line-height: 1;
-    color: var(--accent);
-    margin-bottom: 0.2rem;
+    font-size: 3.8rem; letter-spacing: 0.04em; line-height: 1;
+    color: var(--accent); margin-bottom: 0.2rem;
   }
   .logo span { color: var(--accent2); }
-
   .tagline {
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-family: var(--mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 3rem;
+    font-size: 0.85rem; color: var(--muted);
+    font-family: var(--mono); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 3rem;
   }
 
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    margin-bottom: 1.4rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem; margin-bottom: 1.4rem;
   }
-
   .card-title {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    margin-bottom: 1.1rem;
+    font-family: var(--mono); font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--muted); margin-bottom: 1.1rem;
   }
 
   input[type="text"], textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1.05rem;
-    padding: 0.85rem 1.1rem;
-    outline: none;
-    transition: border-color 0.2s;
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 9px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem; padding: 0.85rem 1.1rem;
+    outline: none; transition: border-color 0.2s;
   }
   input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
   textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
 
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 9px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.85rem 1.6rem;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    white-space: nowrap;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem; background: var(--accent); color: #fff; border: none;
+    border-radius: 9px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 500; padding: 0.85rem 1.6rem;
+    cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
   }
   .btn:hover { opacity: 0.88; }
   .btn:active { transform: scale(0.97); }
   .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
   .btn-ghost:hover { background: var(--surface2); opacity: 1; }
   .btn-success { background: var(--success); color: #000; }
   .btn-full { width: 100%; }
 
-  /* Landing */
-  .field-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-family: var(--mono);
-    letter-spacing: 0.08em;
-    margin-bottom: 0.45rem;
-    display: block;
-  }
+  .field-label { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 0.45rem; display: block; }
   .field { margin-bottom: 0.9rem; }
   .field:last-child { margin-bottom: 0; }
   .input-btn-row { display: flex; gap: 0.75rem; }
   .input-btn-row input { flex: 1; }
 
   /* Room code */
-  .room-code-label {
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    margin-bottom: 0.4rem;
-  }
-  .room-code {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 5.5rem;
-    letter-spacing: 0.2em;
+  .room-code-label { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 0.4rem; }
+  .room-code { font-family: 'Bebas Neue', sans-serif; font-size: 5.5rem; letter-spacing: 0.2em; color: var(--accent2); text-align: center; line-height: 1; padding: 0.3rem 0 0.5rem; word-break: break-all; }
+  .room-code-sub { text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+  /* In-game room code pill */
+  .room-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--mono); font-size: 0.75rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.3rem 0.9rem;
     color: var(--accent2);
-    text-align: center;
-    line-height: 1;
-    padding: 0.3rem 0 0.5rem;
-    word-break: break-all;
   }
-  .room-code-sub {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-  }
+  .room-pill-label { color: var(--muted); font-size: 0.65rem; }
 
   /* Timer */
   .timer-wrap { margin-bottom: 1.4rem; }
-  .timer-display {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 4.5rem;
-    letter-spacing: 0.05em;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    transition: color 0.3s;
-  }
+  .timer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem; }
+  .timer-display { font-family: 'Bebas Neue', sans-serif; font-size: 4.5rem; letter-spacing: 0.05em; text-align: center; margin-bottom: 0.5rem; transition: color 0.3s; }
   .timer-display.warning { color: var(--accent); }
   .timer-display.danger  { color: var(--danger); }
   .timer-bar-bg { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-  .timer-bar {
-    height: 100%;
-    background: var(--accent2);
-    border-radius: 4px;
-    transition: width 1s linear, background 0.3s;
-  }
+  .timer-bar { height: 100%; background: var(--accent2); border-radius: 4px; transition: width 1s linear, background 0.3s; }
   .timer-bar.warning { background: var(--accent); }
   .timer-bar.danger  { background: var(--danger); }
 
   /* Phase badge */
-  .phase-badge {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 0.3rem 0.9rem;
-    border-radius: 999px;
-    margin-bottom: 1.1rem;
-  }
+  .phase-badge { display: inline-block; font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; padding: 0.3rem 0.9rem; border-radius: 999px; }
   .phase-model    { background: rgba(255,107,53,0.15);  color: var(--accent);  border: 1px solid rgba(255,107,53,0.3); }
   .phase-describe { background: rgba(255,209,102,0.15); color: var(--accent2); border: 1px solid rgba(255,209,102,0.3); }
   .phase-wait     { background: rgba(136,136,136,0.12); color: var(--muted);   border: 1px solid rgba(136,136,136,0.2); }
-  .phase-reveal   { background: rgba(6,214,160,0.15);   color: var(--success); border: 1px solid rgba(6,214,160,0.3); }
 
   /* Player list */
-  .player-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 0.7rem;
-    margin-top: 0.85rem;
-  }
-  .player-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 0.65rem 1rem;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .player-chip .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--success);
-    flex-shrink: 0;
-  }
+  .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.7rem; margin-top: 0.85rem; }
+  .player-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; padding: 0.65rem 1rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.6rem; }
+  .player-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
   .player-chip.host .dot { background: var(--accent); }
+  .player-chip.submitted .dot { background: var(--accent2); }
 
   /* Settings grid */
-  .settings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.1rem;
-    margin-bottom: 1.4rem;
-  }
-  .settings-grid label {
-    font-size: 0.82rem;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 0.45rem;
-  }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.4rem; }
+  .settings-grid label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 0.45rem; }
 
   /* Drop zone */
   .drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 3rem 1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 3rem 1rem; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s; position: relative;
   }
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: var(--accent);
-    background: rgba(255,107,53,0.05);
-  }
-  .drop-zone input[type="file"] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer;
-    width: 100%; height: 100%;
-  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(255,107,53,0.05); }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
   .drop-icon  { font-size: 3rem; margin-bottom: 0.85rem; opacity: 0.45; }
   .drop-label { font-size: 1rem; color: var(--muted); margin-bottom: 0.4rem; }
   .drop-hint  { font-size: 0.8rem; color: var(--muted); opacity: 0.55; font-family: var(--mono); }
-  .preview-img {
-    width: 100%; max-height: 300px;
-    object-fit: contain; border-radius: 9px;
-    margin-top: 1.1rem; display: none;
-  }
+  .preview-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 9px; margin-top: 1.1rem; display: none; }
 
   /* Prompt display */
-  .prompt-display {
-    font-size: 1.65rem;
-    font-weight: 500;
-    padding: 0.75rem 0 1rem;
-    line-height: 1.4;
-    color: var(--accent2);
+  .prompt-display { font-size: 1.65rem; font-weight: 500; padding: 0.75rem 0 1rem; line-height: 1.4; color: var(--accent2); }
+
+  /* Waiting progress */
+  .wait-progress { margin-top: 1rem; }
+  .wait-progress-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+  .wait-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .wait-chip {
+    font-size: 0.82rem; padding: 0.3rem 0.75rem;
+    border-radius: 999px; border: 1px solid var(--border);
+    color: var(--muted); background: var(--surface2);
+    transition: all 0.3s;
   }
+  .wait-chip.done { background: rgba(6,214,160,0.12); border-color: rgba(6,214,160,0.3); color: var(--success); }
 
   /* Reveal */
   .group-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-  .group-tab {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.4rem 1rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    color: var(--muted);
-    background: transparent;
-    transition: all 0.15s;
-  }
+  .group-tab { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.4rem 1rem; border-radius: 999px; border: 1px solid var(--border); cursor: pointer; color: var(--muted); background: transparent; transition: all 0.15s; }
   .group-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .group-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
 
@@ -316,74 +190,29 @@
   .reveal-chains::-webkit-scrollbar { width: 4px; }
   .reveal-chains::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .chain-step {
-    padding: 1.4rem;
-    border-bottom: 1px solid var(--border);
-    animation: fadeSlide 0.4s ease both;
-  }
+  .chain-step { padding: 1.4rem; border-bottom: 1px solid var(--border); animation: fadeSlide 0.4s ease both; }
   .chain-step:last-child { border-bottom: none; }
-  .chain-step-type {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.6rem;
-    opacity: 0.7;
-  }
+  .chain-step-type { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; opacity: 0.7; }
   .chain-step-type.prompt-type { color: var(--accent2); }
   .chain-step-type.model-type  { color: var(--accent); }
   .chain-step-type.desc-type   { color: var(--success); }
-  .chain-step img {
-    width: 100%; max-height: 340px;
-    object-fit: contain; border-radius: 9px; background: #000;
-  }
+  .chain-step img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 9px; background: #000; }
   .chain-step p { font-size: 1.1rem; line-height: 1.65; }
 
-  /* Misc */
   .divider { height: 1px; background: var(--border); margin: 1.4rem 0; }
 
-  .status-msg {
-    text-align: center; padding: 2rem;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-  }
+  .status-msg { text-align: center; padding: 2rem; color: var(--muted); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.05em; }
 
-  .waiting-dots::after {
-    content: '';
-    animation: dots 1.5s steps(4, end) infinite;
-  }
-  @keyframes dots {
-    0%  { content: ''; }
-    25% { content: '.'; }
-    50% { content: '..'; }
-    75% { content: '...'; }
-  }
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .waiting-dots::after { content: ''; animation: dots 1.5s steps(4, end) infinite; }
+  @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
   .screen { display: none; }
   .screen.active { display: block; }
 
-  #landing-error {
-    color: var(--danger);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-    min-height: 1.2em;
-  }
+  #landing-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; min-height: 1.2em; }
 
-  .version {
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.1);
-    margin-top: 3rem;
-    letter-spacing: 0.1em;
-    user-select: none;
-  }
+  .version { text-align: center; font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.1); margin-top: 3rem; letter-spacing: 0.1em; user-select: none; }
 </style>
 </head>
 <body>
@@ -394,7 +223,6 @@
 
   <!-- ══ SCREEN: Landing ══ -->
   <div id="screen-landing" class="screen active">
-
     <div class="card">
       <div class="card-title">Join a game</div>
       <div class="field">
@@ -404,8 +232,8 @@
       <div class="field">
         <span class="field-label">Room code</span>
         <div class="input-btn-row">
-          <input type="text" id="join-code" placeholder="6-character code"
-                 maxlength="6" style="font-family:var(--mono);letter-spacing:0.15em;text-transform:uppercase;font-size:1.15rem;">
+          <input type="text" id="join-code" placeholder="6-character code" maxlength="6"
+                 style="font-family:var(--mono);letter-spacing:0.15em;text-transform:uppercase;font-size:1.15rem;">
           <button class="btn" onclick="joinGame()">Join</button>
         </div>
       </div>
@@ -431,9 +259,7 @@
       <div class="room-code-label">Room Code</div>
       <div class="room-code" id="lobby-code">——</div>
       <div class="room-code-sub">Share this code with your students</div>
-
       <div class="divider"></div>
-
       <div class="card-title">Players &nbsp;<span id="player-count" style="color:var(--text);font-family:var(--mono);">0</span></div>
       <div class="player-grid" id="player-list"></div>
     </div>
@@ -451,13 +277,12 @@
             <input type="text" id="setting-describe-time" value="2" style="font-family:var(--mono);">
           </div>
           <div>
-            <label>Rounds</label>
-            <input type="text" id="setting-rounds" value="4" style="font-family:var(--mono);">
-          </div>
-          <div>
             <label>Group size</label>
             <input type="text" id="setting-group-size" value="6" style="font-family:var(--mono);">
           </div>
+        </div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;font-family:var(--mono);">
+          Rounds auto-set to group size − 1
         </div>
         <button class="btn btn-full" onclick="startGame()">Start Game</button>
       </div>
@@ -471,12 +296,19 @@
   <!-- ══ SCREEN: Game ══ -->
   <div id="screen-game" class="screen">
 
+    <!-- Timer bar -->
     <div class="card timer-wrap">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+      <div class="timer-header">
         <span id="game-phase-badge" class="phase-badge phase-model">Modeling</span>
-        <span style="font-family:var(--mono);font-size:0.78rem;color:var(--muted);">
-          Round <span id="round-display">1</span>
-        </span>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-family:var(--mono);font-size:0.78rem;color:var(--muted);">
+            Round <span id="round-display">1</span> of <span id="round-total">5</span>
+          </span>
+          <span class="room-pill">
+            <span class="room-pill-label">Room</span>
+            <span id="game-room-code">——</span>
+          </span>
+        </div>
       </div>
       <div class="timer-display" id="timer-display">10:00</div>
       <div class="timer-bar-bg">
@@ -491,9 +323,7 @@
       <div class="divider"></div>
       <div class="card-title">Upload your ISO screenshot</div>
       <div class="drop-zone" id="drop-zone"
-           ondragover="handleDragOver(event)"
-           ondragleave="handleDragLeave(event)"
-           ondrop="handleDrop(event)">
+           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
         <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
         <div class="drop-icon">⬆</div>
         <div class="drop-label">Drag & drop your screenshot here</div>
@@ -510,22 +340,20 @@
     <!-- Describe phase -->
     <div id="phase-describe" class="card" style="display:none;">
       <div class="card-title">What do you see? Describe this model.</div>
-      <img id="describe-img"
-           style="width:100%;max-height:340px;object-fit:contain;border-radius:9px;background:#000;margin-bottom:1.1rem;"
-           alt="Model to describe">
-      <textarea id="description-input"
-                placeholder="Describe the shape in enough detail that someone could model it from scratch..."></textarea>
+      <img id="describe-img" style="width:100%;max-height:340px;object-fit:contain;border-radius:9px;background:#000;margin-bottom:1.1rem;" alt="Model to describe">
+      <textarea id="description-input" placeholder="Describe the shape in enough detail that someone could model it from scratch..."></textarea>
       <div style="margin-top:0.9rem;">
-        <button class="btn btn-success btn-full" onclick="submitDescription()">Submit Description</button>
+        <button class="btn btn-success btn-full" id="submit-desc-btn" onclick="submitDescription()">Submit Description</button>
       </div>
     </div>
 
-    <!-- Waiting -->
+    <!-- Waiting for others -->
     <div id="phase-wait" style="display:none;">
       <div class="card">
-        <span class="phase-badge phase-wait">Waiting</span>
-        <div class="status-msg" style="padding:1rem 0 0.5rem;">
-          Submitted! Waiting for other players<span class="waiting-dots"></span>
+        <span class="phase-badge phase-wait">Waiting for others</span>
+        <div class="wait-progress" id="wait-progress">
+          <div class="wait-progress-label">Submitted</div>
+          <div class="wait-chips" id="wait-chips"></div>
         </div>
       </div>
     </div>
@@ -541,15 +369,14 @@
       <div style="margin-top:1.6rem;">
         <div style="display:flex;gap:0.75rem;justify-content:center;align-items:center;">
           <button class="btn btn-ghost" onclick="revealPrev()">← Prev</button>
-          <span id="reveal-step-counter"
-                style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);min-width:90px;text-align:center;"></span>
+          <span id="reveal-step-counter" style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);min-width:90px;text-align:center;"></span>
           <button class="btn" onclick="revealNext()">Next →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="version">gartic model · v0.1.0</div>
+  <div class="version">gartic model · v0.1.1</div>
 
 </div>
 
@@ -566,7 +393,6 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "425963432923",
   appId: "1:425963432923:web:09a65ae5f4545d82b9d5fe"
 };
-
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
@@ -604,17 +430,21 @@ let state = {
   playerId: null,
   playerName: null,
   isHost: false,
+  // assignment
   groupId: null,
-  chainPosition: null,
+  chainPosition: null,   // my position index within the group
   groupSize: null,
-  currentRound: 0,
-  totalRounds: 4,
+  totalRounds: null,     // = groupSize - 1
+  // settings
   modelTime: 10,
   describeTime: 2,
-  phase: null,
+  // runtime
+  currentRound: 0,
+  phase: null,           // 'model' | 'describe' | 'wait'
   imageDataUrl: null,
   timerInterval: null,
   timerEnd: null,
+  // reveal
   revealGroups: [],
   revealGroupIdx: 0,
   revealStepIdx: 0,
@@ -635,25 +465,25 @@ function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
-
 function getPlayerId() {
-  if (!sessionStorage.getItem('gmPlayerId')) {
-    sessionStorage.setItem('gmPlayerId', 'p_' + Math.random().toString(36).slice(2, 10));
-  }
-  return sessionStorage.getItem('gmPlayerId');
+  if (!sessionStorage.getItem('gmPid'))
+    sessionStorage.setItem('gmPid', 'p_' + Math.random().toString(36).slice(2,10));
+  return sessionStorage.getItem('gmPid');
 }
-
-function esc(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function showError(msg) {
   const el = document.getElementById('landing-error');
   el.textContent = msg;
   setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 5000);
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 // ══════════════════════════════════════════════════════
@@ -667,17 +497,16 @@ function fileToBase64(file) {
     r.readAsDataURL(file);
   });
 }
-
 function compressImage(dataUrl, maxWidth = 1200) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
       const scale = Math.min(1, maxWidth / img.width);
-      const canvas = document.createElement('canvas');
-      canvas.width  = Math.round(img.width  * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL('image/jpeg', 0.82));
+      const c = document.createElement('canvas');
+      c.width  = Math.round(img.width  * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.82));
     };
     img.src = dataUrl;
   });
@@ -689,22 +518,11 @@ function compressImage(dataUrl, maxWidth = 1200) {
 async function createGame() {
   const name = document.getElementById('host-name').value.trim();
   if (!name) { showError('Enter your name first.'); return; }
-
   const code = genCode();
-  state.roomCode   = code;
-  state.playerId   = getPlayerId();
-  state.playerName = name;
-  state.isHost     = true;
-
-  await db.ref(`rooms/${code}`).set({
-    host: state.playerId,
-    status: 'lobby',
-    createdAt: Date.now()
-  });
-  await db.ref(`rooms/${code}/players/${state.playerId}`).set({
-    name, joinedAt: Date.now(), isHost: true
-  });
-
+  state.roomCode = code; state.playerId = getPlayerId();
+  state.playerName = name; state.isHost = true;
+  await db.ref(`rooms/${code}`).set({ host: state.playerId, status: 'lobby', createdAt: Date.now() });
+  await db.ref(`rooms/${code}/players/${state.playerId}`).set({ name, joinedAt: Date.now(), isHost: true });
   enterLobby();
 }
 
@@ -714,23 +532,14 @@ async function createGame() {
 async function joinGame() {
   const name = document.getElementById('join-name').value.trim();
   const code = document.getElementById('join-code').value.trim().toUpperCase();
-
   if (!name) { showError('Enter your name.'); return; }
   if (code.length !== 6) { showError('Enter the 6-character room code.'); return; }
-
   const snap = await db.ref(`rooms/${code}`).get();
   if (!snap.exists()) { showError('Room not found. Check the code.'); return; }
   if (snap.val().status !== 'lobby') { showError('That game has already started.'); return; }
-
-  state.roomCode   = code;
-  state.playerId   = getPlayerId();
-  state.playerName = name;
-  state.isHost     = false;
-
-  await db.ref(`rooms/${code}/players/${state.playerId}`).set({
-    name, joinedAt: Date.now(), isHost: false
-  });
-
+  state.roomCode = code; state.playerId = getPlayerId();
+  state.playerName = name; state.isHost = false;
+  await db.ref(`rooms/${code}/players/${state.playerId}`).set({ name, joinedAt: Date.now(), isHost: false });
   enterLobby();
 }
 
@@ -742,15 +551,10 @@ function enterLobby() {
   document.getElementById('lobby-code').textContent = state.roomCode;
   document.getElementById('host-controls').style.display = state.isHost ? 'block' : 'none';
   document.getElementById('waiting-msg').style.display   = state.isHost ? 'none'  : 'block';
-
-  db.ref(`rooms/${state.roomCode}/players`).on('value', snap => {
-    renderPlayers(snap.val() || {});
-  });
-
+  db.ref(`rooms/${state.roomCode}/players`).on('value', snap => renderPlayers(snap.val() || {}));
   db.ref(`rooms/${state.roomCode}/status`).on('value', snap => {
-    const s = snap.val();
-    if (s === 'playing') loadMyAssignment();
-    if (s === 'reveal')  loadReveal();
+    if (snap.val() === 'playing') loadMyAssignment();
+    if (snap.val() === 'reveal')  loadReveal();
   });
 }
 
@@ -758,11 +562,9 @@ function renderPlayers(players) {
   const entries = Object.values(players);
   document.getElementById('player-count').textContent = entries.length;
   document.getElementById('player-list').innerHTML = entries.map(p => `
-    <div class="player-chip ${p.isHost ? 'host' : ''}">
-      <span class="dot"></span>
-      <span>${esc(p.name)}${p.isHost ? ' ★' : ''}</span>
-    </div>
-  `).join('');
+    <div class="player-chip ${p.isHost?'host':''}">
+      <span class="dot"></span><span>${esc(p.name)}${p.isHost?' ★':''}</span>
+    </div>`).join('');
 }
 
 // ══════════════════════════════════════════════════════
@@ -771,33 +573,36 @@ function renderPlayers(players) {
 async function startGame() {
   const modelTime    = parseInt(document.getElementById('setting-model-time').value)    || 10;
   const describeTime = parseInt(document.getElementById('setting-describe-time').value) || 2;
-  const rounds       = parseInt(document.getElementById('setting-rounds').value)        || 4;
   const groupSize    = parseInt(document.getElementById('setting-group-size').value)    || 6;
+  const rounds       = groupSize - 1;  // auto
 
-  const snap    = await db.ref(`rooms/${state.roomCode}/players`).get();
-  const ids     = Object.keys(snap.val() || {});
+  const snap = await db.ref(`rooms/${state.roomCode}/players`).get();
+  const ids  = shuffle(Object.keys(snap.val() || {}));
   if (ids.length < 2) { alert('Need at least 2 players.'); return; }
 
-  // Shuffle
-  for (let i = ids.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [ids[i], ids[j]] = [ids[j], ids[i]];
-  }
-
-  // Groups
+  // Build groups
   const groups = [];
   for (let i = 0; i < ids.length; i += groupSize) groups.push(ids.slice(i, i + groupSize));
 
-  const shuffledPrompts = [...PROMPTS].sort(() => Math.random() - 0.5);
+  // Each player in a group needs a unique starting prompt
+  // We'll assign prompts per-player (not per-group) since everyone models simultaneously
+  const shuffledPrompts = shuffle([...PROMPTS]);
   const assignments = {};
+  let promptIdx = 0;
 
   for (let gi = 0; gi < groups.length; gi++) {
-    const group  = groups[gi];
-    const prompt = shuffledPrompts[gi % shuffledPrompts.length];
+    const group = groups[gi];
+    const actualSize = group.length;
     group.forEach((pid, pos) => {
-      assignments[pid] = { groupId: gi, position: pos, groupSize: group.length };
+      assignments[pid] = {
+        groupId: gi,
+        position: pos,
+        groupSize: actualSize,
+        startPrompt: shuffledPrompts[promptIdx % shuffledPrompts.length]
+      };
+      promptIdx++;
     });
-    await db.ref(`rooms/${state.roomCode}/groups/${gi}`).set({ prompt, size: group.length });
+    await db.ref(`rooms/${state.roomCode}/groups/${gi}`).set({ size: actualSize });
   }
 
   await db.ref(`rooms/${state.roomCode}/assignments`).set(assignments);
@@ -814,37 +619,55 @@ async function loadMyAssignment() {
     db.ref(`rooms/${state.roomCode}/assignments/${state.playerId}`).get(),
     db.ref(`rooms/${state.roomCode}/settings`).get(),
   ]);
-  const asn      = asnap.val();
-  const settings = ssnap.val();
-
+  const asn = asnap.val(); const settings = ssnap.val();
   state.groupId       = asn.groupId;
   state.chainPosition = asn.position;
   state.groupSize     = asn.groupSize;
+  state.startPrompt   = asn.startPrompt;
   state.totalRounds   = settings.rounds;
   state.modelTime     = settings.modelTime;
   state.describeTime  = settings.describeTime;
 
+  document.getElementById('game-room-code').textContent = state.roomCode;
+  document.getElementById('round-total').textContent    = state.totalRounds;
   showScreen('game');
 
   db.ref(`rooms/${state.roomCode}/round`).on('value', snap => {
     const round = snap.val();
     if (round === null) return;
     state.currentRound = round;
-    document.getElementById('round-display').textContent = Math.floor(round / 2) + 1;
+    document.getElementById('round-display').textContent = round + 1;
     determinePhase();
   });
 }
 
 // ══════════════════════════════════════════════════════
-//  DETERMINE PHASE
+//  CHAIN LOGIC
+//
+//  Each player owns a "chain" — the chain that started with their prompt.
+//  In round r, the chain that started with player at position p
+//  is currently held by player at position (p + r) % groupSize.
+//
+//  Equivalently: in round r, I (position myPos) am holding the chain
+//  that originated from position (myPos - r + groupSize) % groupSize.
+//
+//  Round 0 (model): I model my own startPrompt.
+//  Round 1 (describe): I received the screenshot from position
+//    (myPos - 1 + n) % n, submitted in round 0.
+//  Round 2 (model): I received the description from position
+//    (myPos - 1 + n) % n, submitted in round 1.
+//  etc.
+//
+//  Submission key: rooms/{code}/submissions/{groupId}/{pid}/r{round}
+//  Each submission contains: { imageDataUrl?, description?, playerName, timestamp }
 // ══════════════════════════════════════════════════════
 async function determinePhase() {
-  const r      = state.currentRound;
-  const myPos  = state.chainPosition;
-  const n      = state.groupSize;
-  const active = r % n;
+  const r     = state.currentRound;
+  const myPos = state.chainPosition;
+  const n     = state.groupSize;
 
-  if (r >= state.totalRounds * 2) {
+  // Game over?
+  if (r >= state.totalRounds) {
     db.ref(`rooms/${state.roomCode}/round`).off();
     loadReveal();
     return;
@@ -852,35 +675,51 @@ async function determinePhase() {
 
   // Already submitted this round?
   const already = await db.ref(
-    `rooms/${state.roomCode}/submissions/${state.groupId}/r${r}/${state.playerId}`
+    `rooms/${state.roomCode}/submissions/${state.groupId}/${state.playerId}/r${r}`
   ).get();
-  if (already.exists()) { showPhase('wait'); return; }
-
-  if (myPos !== active) { showPhase('wait'); return; }
+  if (already.exists()) {
+    showPhase('wait');
+    watchWaitProgress(r);
+    return;
+  }
 
   const isModelRound = (r % 2 === 0);
 
   if (isModelRound) {
     if (r === 0) {
-      const gsnap = await db.ref(`rooms/${state.roomCode}/groups/${state.groupId}/prompt`).get();
-      showPhase('model', gsnap.val());
+      // Model from my own starting prompt
+      showPhase('model', state.startPrompt);
     } else {
-      const prevPid = await getPlayerIdByPosition((r - 1) % n);
-      const dsnap   = await db.ref(
-        `rooms/${state.roomCode}/submissions/${state.groupId}/r${r-1}/${prevPid}/description`
+      // Get the description submitted in round r-1 by the player
+      // whose chain I'm currently holding.
+      // In round r-1 (describe), the chain I now hold was held by
+      // the player at position (myPos - (r-1) + n*n) % n
+      // = (myPos - r + 1 + n*n) % n
+      const prevHolder = posMod(myPos - r + 1, n);
+      const prevPid    = await getPidByPosition(prevHolder);
+      const dsnap = await db.ref(
+        `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
       ).get();
-      showPhase('model', dsnap.val() || '(no description received)');
+      const desc = dsnap.val()?.description || '(no description received)';
+      showPhase('model', desc);
     }
   } else {
-    const prevPid = await getPlayerIdByPosition((r - 1) % n);
-    const isnap   = await db.ref(
-      `rooms/${state.roomCode}/submissions/${state.groupId}/r${r-1}/${prevPid}/imageDataUrl`
+    // Describe phase: get the screenshot submitted in round r-1
+    // by the player at position (myPos - r + 1 + n*n) % n
+    const prevHolder = posMod(myPos - r + 1, n);
+    const prevPid    = await getPidByPosition(prevHolder);
+    const isnap = await db.ref(
+      `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
     ).get();
-    showPhase('describe', null, isnap.val());
+    const imgUrl = isnap.val()?.imageDataUrl || null;
+    showPhase('describe', null, imgUrl);
   }
 }
 
-async function getPlayerIdByPosition(pos) {
+// modulo that always returns positive
+function posMod(a, n) { return ((a % n) + n) % n; }
+
+async function getPidByPosition(pos) {
   const snap = await db.ref(`rooms/${state.roomCode}/assignments`).get();
   const all  = snap.val() || {};
   for (const [pid, a] of Object.entries(all)) {
@@ -892,7 +731,7 @@ async function getPlayerIdByPosition(pos) {
 // ══════════════════════════════════════════════════════
 //  SHOW PHASE UI
 // ══════════════════════════════════════════════════════
-function showPhase(phase, promptText, imgDataUrl) {
+function showPhase(phase, promptOrDesc, imgDataUrl) {
   state.phase = phase;
   document.getElementById('phase-model').style.display    = 'none';
   document.getElementById('phase-describe').style.display = 'none';
@@ -902,24 +741,55 @@ function showPhase(phase, promptText, imgDataUrl) {
 
   if (phase === 'model') {
     document.getElementById('phase-model').style.display = 'block';
-    document.getElementById('model-prompt').textContent  = promptText || '';
+    document.getElementById('model-prompt').textContent  = promptOrDesc || '';
     badge.className   = 'phase-badge phase-model';
     badge.textContent = 'Modeling';
     resetDropZone();
     startTimer(state.modelTime * 60);
+
   } else if (phase === 'describe') {
     document.getElementById('phase-describe').style.display = 'block';
     document.getElementById('describe-img').src             = imgDataUrl || '';
     document.getElementById('description-input').value      = '';
+    document.getElementById('submit-desc-btn').disabled     = false;
     badge.className   = 'phase-badge phase-describe';
     badge.textContent = 'Describing';
     startTimer(state.describeTime * 60);
+
   } else {
     document.getElementById('phase-wait').style.display = 'block';
     badge.className   = 'phase-badge phase-wait';
     badge.textContent = 'Waiting';
     clearTimer();
   }
+}
+
+// ══════════════════════════════════════════════════════
+//  WAIT PROGRESS — show who has submitted
+// ══════════════════════════════════════════════════════
+async function watchWaitProgress(round) {
+  // Get all players in my group
+  const asnap   = await db.ref(`rooms/${state.roomCode}/assignments`).get();
+  const psnap   = await db.ref(`rooms/${state.roomCode}/players`).get();
+  const all     = asnap.val() || {};
+  const players = psnap.val() || {};
+
+  const groupMembers = Object.entries(all)
+    .filter(([pid, a]) => a.groupId === state.groupId)
+    .map(([pid]) => ({ pid, name: players[pid]?.name || '?' }));
+
+  const subRef = db.ref(`rooms/${state.roomCode}/submissions/${state.groupId}`);
+  subRef.on('value', snap => {
+    const subs = snap.val() || {};
+    const chips = groupMembers.map(m => {
+      const done = !!subs[m.pid]?.[`r${round}`];
+      return `<span class="wait-chip ${done?'done':''}">${esc(m.name)}</span>`;
+    }).join('');
+    document.getElementById('wait-chips').innerHTML = chips;
+  });
+
+  // Clean up listener when round advances
+  db.ref(`rooms/${state.roomCode}/round`).once('value', () => subRef.off());
 }
 
 // ══════════════════════════════════════════════════════
@@ -931,38 +801,28 @@ function startTimer(seconds) {
   const totalMs  = seconds * 1000;
 
   function tick() {
-    const remaining = Math.max(0, state.timerEnd - Date.now());
-    const mins = Math.floor(remaining / 60000);
-    const secs = Math.floor((remaining % 60000) / 1000);
-    const pct  = remaining / totalMs * 100;
+    const rem  = Math.max(0, state.timerEnd - Date.now());
+    const mins = Math.floor(rem / 60000);
+    const secs = Math.floor((rem % 60000) / 1000);
+    const pct  = rem / totalMs * 100;
 
     const disp = document.getElementById('timer-display');
     const bar  = document.getElementById('timer-bar');
     disp.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     bar.style.width  = pct + '%';
 
-    if (remaining <= 30000) {
-      disp.className = 'timer-display danger';
-      bar.className  = 'timer-bar danger';
-    } else if (remaining <= 120000) {
-      disp.className = 'timer-display warning';
-      bar.className  = 'timer-bar warning';
-    } else {
-      disp.className = 'timer-display';
-      bar.className  = 'timer-bar';
-    }
+    if (rem <= 30000)  { disp.className = 'timer-display danger';  bar.className = 'timer-bar danger'; }
+    else if (rem <= 120000) { disp.className = 'timer-display warning'; bar.className = 'timer-bar warning'; }
+    else               { disp.className = 'timer-display';          bar.className = 'timer-bar'; }
 
-    if (remaining === 0) { clearTimer(); autoSubmit(); }
+    if (rem === 0) { clearTimer(); autoSubmit(); }
   }
-
   tick();
   state.timerInterval = setInterval(tick, 1000);
 }
-
 function clearTimer() {
   if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
 }
-
 function autoSubmit() {
   if (state.phase === 'model')    submitModel();
   else if (state.phase === 'describe') submitDescription();
@@ -973,29 +833,23 @@ function autoSubmit() {
 // ══════════════════════════════════════════════════════
 function handleDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
 function handleDragLeave()  { document.getElementById('drop-zone').classList.remove('drag-over'); }
-
 async function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').classList.remove('drag-over');
+  e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) await setImageFile(file);
+  if (file?.type.startsWith('image/')) await setImageFile(file);
 }
-
 async function handleFileSelect(e) {
   const file = e.target.files[0];
   if (file) await setImageFile(file);
 }
-
 async function setImageFile(file) {
-  const raw        = await fileToBase64(file);
-  const compressed = await compressImage(raw);
-  state.imageDataUrl = compressed;
-  const preview = document.getElementById('preview-img');
-  preview.src           = compressed;
-  preview.style.display = 'block';
+  const raw  = await fileToBase64(file);
+  const comp = await compressImage(raw);
+  state.imageDataUrl = comp;
+  const p = document.getElementById('preview-img');
+  p.src = comp; p.style.display = 'block';
   document.getElementById('submit-model-btn').disabled = false;
 }
-
 function resetDropZone() {
   state.imageDataUrl = null;
   const p = document.getElementById('preview-img');
@@ -1003,14 +857,10 @@ function resetDropZone() {
   document.getElementById('file-input').value = '';
   document.getElementById('submit-model-btn').disabled = true;
 }
-
 document.addEventListener('paste', async e => {
   if (state.phase !== 'model') return;
   for (const item of (e.clipboardData?.items || [])) {
-    if (item.type.startsWith('image/')) {
-      await setImageFile(item.getAsFile());
-      break;
-    }
+    if (item.type.startsWith('image/')) { await setImageFile(item.getAsFile()); break; }
   }
 });
 
@@ -1021,37 +871,48 @@ async function submitModel() {
   const btn = document.getElementById('submit-model-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
-  await submitRound(state.imageDataUrl || null, null);
+  const data = {
+    playerName: state.playerName,
+    timestamp:  Date.now(),
+    type: 'model'
+  };
+  if (state.imageDataUrl) data.imageDataUrl = state.imageDataUrl;
+  await writeSubmission(data);
 }
 
 // ══════════════════════════════════════════════════════
 //  SUBMIT DESCRIPTION
 // ══════════════════════════════════════════════════════
 async function submitDescription() {
+  const btn  = document.getElementById('submit-desc-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
   const desc = document.getElementById('description-input').value.trim() || '(no description)';
-  await submitRound(null, desc);
+  await writeSubmission({
+    playerName:  state.playerName,
+    timestamp:   Date.now(),
+    type:        'describe',
+    description: desc
+  });
 }
 
 // ══════════════════════════════════════════════════════
-//  WRITE TO FIREBASE
+//  WRITE SUBMISSION + TRIGGER ROUND ADVANCE (HOST)
 // ══════════════════════════════════════════════════════
-async function submitRound(imageDataUrl, description) {
-  const r    = state.currentRound;
-  const data = { submittedAt: Date.now() };
-  if (imageDataUrl) data.imageDataUrl = imageDataUrl;
-  if (description)  data.description  = description;
-
+async function writeSubmission(data) {
+  const r = state.currentRound;
   await db.ref(
-    `rooms/${state.roomCode}/submissions/${state.groupId}/r${r}/${state.playerId}`
+    `rooms/${state.roomCode}/submissions/${state.groupId}/${state.playerId}/r${r}`
   ).set(data);
 
   showPhase('wait');
+  watchWaitProgress(r);
+
   if (state.isHost) watchForRoundAdvance(r);
 }
 
 // ══════════════════════════════════════════════════════
-//  HOST: WATCH ROUND COMPLETION
+//  HOST: ADVANCE ROUND WHEN EVERYONE SUBMITS
 // ══════════════════════════════════════════════════════
 function watchForRoundAdvance(round) {
   const subRef = db.ref(`rooms/${state.roomCode}/submissions`);
@@ -1064,23 +925,24 @@ function watchForRoundAdvance(round) {
     ]);
     const assignments = asnap.val() || {};
     const groups      = gsnap.val() || {};
-    const totalRounds = (ssnap.val() || {}).rounds || 4;
+    const totalRounds = (ssnap.val()||{}).rounds || 5;
 
-    let allSubmitted = true;
+    let allDone = true;
     for (const [gi, group] of Object.entries(groups)) {
-      const activePos = round % group.size;
-      const activePid = Object.entries(assignments).find(([pid, a]) =>
-        String(a.groupId) === String(gi) && a.position === activePos
-      )?.[0];
-      if (!activePid || !allSubs[gi]?.[`r${round}`]?.[activePid]) {
-        allSubmitted = false; break;
+      // Find all players in this group
+      const members = Object.entries(assignments)
+        .filter(([pid, a]) => String(a.groupId) === String(gi))
+        .map(([pid]) => pid);
+      for (const pid of members) {
+        if (!allSubs[gi]?.[pid]?.[`r${round}`]) { allDone = false; break; }
       }
+      if (!allDone) break;
     }
 
-    if (allSubmitted) {
+    if (allDone) {
       subRef.off();
       const next = round + 1;
-      if (next >= totalRounds * 2) {
+      if (next >= totalRounds) {
         await db.ref(`rooms/${state.roomCode}/status`).set('reveal');
       } else {
         await db.ref(`rooms/${state.roomCode}/round`).set(next);
@@ -1107,62 +969,103 @@ async function loadReveal() {
   const allSubs     = subSnap.val() || {};
   const assignments = asnap.val() || {};
   const groups      = gsnap.val() || {};
+  const settings    = ssnap.val() || {};
   const players     = psnap.val() || {};
-  const rounds      = (ssnap.val() || {}).rounds || 4;
+  const totalRounds = settings.rounds || 5;
 
   state.revealGroups = [];
 
   for (const [gi, group] of Object.entries(groups)) {
-    const n     = group.size;
-    const steps = [{ type: 'prompt', content: group.prompt }];
+    const n = group.size;
 
-    for (let r = 0; r < rounds * 2; r++) {
-      const activePos = r % n;
-      const activePid = Object.entries(assignments).find(([pid, a]) =>
-        String(a.groupId) === String(gi) && a.position === activePos
-      )?.[0];
-      if (!activePid) continue;
-      const sub = allSubs[gi]?.[`r${r}`]?.[activePid];
-      if (!sub) continue;
-      const playerName = players[activePid]?.name || 'Unknown';
-      if (r % 2 === 0) {
-        steps.push({ type: 'model', imageDataUrl: sub.imageDataUrl, player: playerName });
-      } else {
-        steps.push({ type: 'describe', content: sub.description, player: playerName });
+    // Get all players in this group sorted by position
+    const members = Object.entries(assignments)
+      .filter(([pid, a]) => String(a.groupId) === String(gi))
+      .sort(([,a],[,b]) => a.position - b.position)
+      .map(([pid, a]) => ({ pid, pos: a.position, name: players[pid]?.name || '?' }));
+
+    // Build one chain per starting player
+    const chains = members.map(starter => {
+      const steps = [];
+
+      // Step 0: the original prompt
+      const starterAsn = assignments[starter.pid];
+      steps.push({ type: 'prompt', content: starterAsn.startPrompt, player: starter.name });
+
+      // For each round, find who held this chain
+      for (let r = 0; r < totalRounds; r++) {
+        // In round r, the chain that started at position p is held by position (p + r) % n
+        const holderPos = posMod(starter.pos + r, n);
+        const holder    = members.find(m => m.pos === holderPos);
+        if (!holder) continue;
+
+        const sub = allSubs[gi]?.[holder.pid]?.[`r${r}`];
+        if (!sub) continue;
+
+        if (sub.type === 'model') {
+          steps.push({ type: 'model', imageDataUrl: sub.imageDataUrl, player: holder.name });
+        } else {
+          steps.push({ type: 'describe', content: sub.description, player: holder.name });
+        }
       }
-    }
-    state.revealGroups.push({ gi, steps });
+      return { startPlayer: starter.name, steps };
+    });
+
+    state.revealGroups.push({ gi, chains });
   }
 
-  document.getElementById('reveal-group-tabs').innerHTML = state.revealGroups.map((g, i) =>
-    `<button class="group-tab ${i===0?'active':''}" onclick="selectRevealGroup(${i})">
+  // Build UI — show chains as sub-tabs within each group
+  state.revealGroupIdx = 0;
+  state.revealStepIdx  = 0;
+  state.revealChainIdx = 0;
+
+  renderRevealTabs();
+  renderRevealChain();
+}
+
+function renderRevealTabs() {
+  const groups = state.revealGroups;
+  document.getElementById('reveal-group-tabs').innerHTML = groups.map((g, i) =>
+    `<button class="group-tab ${i===state.revealGroupIdx?'active':''}" onclick="selectRevealGroup(${i})">
       Group ${parseInt(g.gi)+1}
     </button>`
   ).join('');
-
-  state.revealGroupIdx = 0;
-  state.revealStepIdx  = 0;
-  renderRevealGroup(0);
 }
 
 function selectRevealGroup(idx) {
   state.revealGroupIdx = idx;
+  state.revealChainIdx = 0;
   state.revealStepIdx  = 0;
-  document.querySelectorAll('.group-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-  renderRevealGroup(idx);
+  renderRevealTabs();
+  renderRevealChain();
 }
 
-function renderRevealGroup(idx) {
-  const group     = state.revealGroups[idx];
-  const container = document.getElementById('reveal-chains-container');
+function renderRevealChain() {
+  const group = state.revealGroups[state.revealGroupIdx];
   if (!group) return;
+  const chain = group.chains[state.revealChainIdx];
+  if (!chain) return;
 
-  const steps = group.steps.slice(0, state.revealStepIdx + 1);
-  container.innerHTML = steps.map((step, i) => {
-    const delay = `animation-delay:${i * 0.07}s`;
+  const steps = chain.steps.slice(0, state.revealStepIdx + 1);
+  const container = document.getElementById('reveal-chains-container');
+
+  // Chain header
+  const chainNav = group.chains.length > 1 ? `
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      ${group.chains.map((c,i) => `
+        <button class="group-tab ${i===state.revealChainIdx?'active':''}"
+                onclick="selectRevealChain(${i})" style="font-size:0.65rem;">
+          ${esc(c.startPlayer)}'s chain
+        </button>`).join('')}
+    </div>` : `<div style="margin-bottom:0.75rem;font-family:var(--mono);font-size:0.7rem;color:var(--muted);">
+      ${esc(chain.startPlayer)}'s chain
+    </div>`;
+
+  container.innerHTML = chainNav + steps.map((step, i) => {
+    const delay = `animation-delay:${i*0.07}s`;
     if (step.type === 'prompt') {
       return `<div class="chain-step" style="${delay}">
-        <div class="chain-step-type prompt-type">Original Prompt</div>
+        <div class="chain-step-type prompt-type">Original Prompt — ${esc(step.player)}</div>
         <p>${esc(step.content)}</p>
       </div>`;
     } else if (step.type === 'model') {
@@ -1181,20 +1084,41 @@ function renderRevealGroup(idx) {
   }).join('');
 
   document.getElementById('reveal-step-counter').textContent =
-    `Step ${state.revealStepIdx + 1} of ${group.steps.length}`;
+    `Step ${state.revealStepIdx + 1} of ${chain.steps.length}`;
+}
+
+function selectRevealChain(idx) {
+  state.revealChainIdx = idx;
+  state.revealStepIdx  = 0;
+  renderRevealChain();
 }
 
 function revealNext() {
   const group = state.revealGroups[state.revealGroupIdx];
-  if (group && state.revealStepIdx < group.steps.length - 1) {
+  if (!group) return;
+  const chain = group.chains[state.revealChainIdx];
+  if (!chain) return;
+
+  if (state.revealStepIdx < chain.steps.length - 1) {
     state.revealStepIdx++;
-    renderRevealGroup(state.revealGroupIdx);
+    renderRevealChain();
+  } else if (state.revealChainIdx < group.chains.length - 1) {
+    // Auto-advance to next chain
+    state.revealChainIdx++;
+    state.revealStepIdx = 0;
+    renderRevealChain();
   }
 }
+
 function revealPrev() {
   if (state.revealStepIdx > 0) {
     state.revealStepIdx--;
-    renderRevealGroup(state.revealGroupIdx);
+    renderRevealChain();
+  } else if (state.revealChainIdx > 0) {
+    state.revealChainIdx--;
+    const group = state.revealGroups[state.revealGroupIdx];
+    state.revealStepIdx = group.chains[state.revealChainIdx].steps.length - 1;
+    renderRevealChain();
   }
 }
 </script>
