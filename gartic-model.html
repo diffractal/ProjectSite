@@ -19,7 +19,7 @@
     --accent: #ff6b35;
     --accent2: #ffd166;
     --text: #f0ede8;
-    --muted: #999;
+    --muted: #aaa;
     --success: #06d6a0;
     --danger: #ef476f;
     --radius: 14px;
@@ -32,7 +32,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    font-size: 17px;
+    font-size: 19px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -51,47 +51,79 @@
 
   .app {
     position: relative; z-index: 1;
-    width: 100%; max-width: 820px;
+    width: 100%; max-width: 860px;
     padding: 2.5rem 2rem 5rem;
   }
 
+  /* ── Logo & header ── */
+  .logo-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.2rem;
+  }
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 3.8rem; letter-spacing: 0.04em; line-height: 1;
-    color: var(--accent); margin-bottom: 0.2rem;
+    font-size: 4.2rem; letter-spacing: 0.04em; line-height: 1;
+    color: var(--accent);
   }
   .logo span { color: var(--accent2); }
   .tagline {
-    font-size: 0.85rem; color: var(--muted);
+    font-size: 0.9rem; color: var(--muted);
     font-family: var(--mono); letter-spacing: 0.12em;
-    text-transform: uppercase; margin-bottom: 3rem;
+    text-transform: uppercase; margin-bottom: 2.5rem;
   }
 
+  /* Phone image */
+  .phone-img-wrap {
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 110px;
+    height: 110px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phone-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+  }
+
+  /* ── Cards ── */
   .card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 2rem; margin-bottom: 1.4rem;
   }
   .card-title {
-    font-family: var(--mono); font-size: 0.75rem;
+    font-family: var(--mono); font-size: 0.8rem;
     text-transform: uppercase; letter-spacing: 0.15em;
     color: var(--muted); margin-bottom: 1.1rem;
   }
 
+  /* ── Inputs ── */
   input[type="text"], textarea {
     width: 100%; background: var(--surface2);
     border: 1px solid var(--border); border-radius: 9px;
     color: var(--text); font-family: 'DM Sans', sans-serif;
-    font-size: 1.05rem; padding: 0.85rem 1.1rem;
+    font-size: 1.1rem; padding: 0.9rem 1.15rem;
     outline: none; transition: border-color 0.2s;
   }
   input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
-  textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+  textarea { resize: vertical; min-height: 130px; line-height: 1.65; font-size: 1.05rem; }
 
+  /* ── Buttons ── */
   .btn {
     display: inline-flex; align-items: center; justify-content: center;
     gap: 0.5rem; background: var(--accent); color: #fff; border: none;
     border-radius: 9px; font-family: 'DM Sans', sans-serif;
-    font-size: 1rem; font-weight: 500; padding: 0.85rem 1.6rem;
+    font-size: 1.05rem; font-weight: 500; padding: 0.9rem 1.7rem;
     cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
   }
   .btn:hover { opacity: 0.88; }
@@ -99,90 +131,121 @@
   .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
   .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
   .btn-ghost:hover { background: var(--surface2); opacity: 1; }
-  .btn-success { background: var(--success); color: #000; }
+  .btn-success { background: var(--success); color: #000; font-size: 1.1rem; }
   .btn-full { width: 100%; }
 
-  .field-label { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 0.45rem; display: block; }
-  .field { margin-bottom: 0.9rem; }
+  /* ── Landing form ── */
+  .field-label { font-size: 0.85rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.08em; margin-bottom: 0.5rem; display: block; }
+  .field { margin-bottom: 1rem; }
   .field:last-child { margin-bottom: 0; }
   .input-btn-row { display: flex; gap: 0.75rem; }
   .input-btn-row input { flex: 1; }
 
-  /* Room code */
-  .room-code-label { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 0.4rem; }
-  .room-code { font-family: 'Bebas Neue', sans-serif; font-size: 5.5rem; letter-spacing: 0.2em; color: var(--accent2); text-align: center; line-height: 1; padding: 0.3rem 0 0.5rem; word-break: break-all; }
-  .room-code-sub { text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  /* ── Room code lobby ── */
+  .room-code-label { text-align: center; font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 0.4rem; }
+  .room-code { font-family: 'Bebas Neue', sans-serif; font-size: 6rem; letter-spacing: 0.2em; color: var(--accent2); text-align: center; line-height: 1; padding: 0.3rem 0 0.5rem; word-break: break-all; }
+  .room-code-sub { text-align: center; color: var(--muted); font-size: 1rem; margin-bottom: 1.5rem; }
 
-  /* In-game room code pill */
-  .room-pill {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    font-family: var(--mono); font-size: 0.75rem;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 999px; padding: 0.3rem 0.9rem;
-    color: var(--accent2);
+  /* ── In-game top bar ── */
+  .game-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.75rem;
   }
-  .room-pill-label { color: var(--muted); font-size: 0.65rem; }
-
-  /* Timer */
-  .timer-wrap { margin-bottom: 1.4rem; }
-  .timer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem; }
-  .timer-display { font-family: 'Bebas Neue', sans-serif; font-size: 4.5rem; letter-spacing: 0.05em; text-align: center; margin-bottom: 0.5rem; transition: color 0.3s; }
-  .timer-display.warning { color: var(--accent); }
-  .timer-display.danger  { color: var(--danger); }
-  .timer-bar-bg { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-  .timer-bar { height: 100%; background: var(--accent2); border-radius: 4px; transition: width 1s linear, background 0.3s; }
-  .timer-bar.warning { background: var(--accent); }
-  .timer-bar.danger  { background: var(--danger); }
-
-  /* Phase badge */
-  .phase-badge { display: inline-block; font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; padding: 0.3rem 0.9rem; border-radius: 999px; }
+  .phase-badge {
+    display: inline-block; font-family: var(--mono); font-size: 0.82rem;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    padding: 0.35rem 1rem; border-radius: 999px; font-weight: 500;
+  }
   .phase-model    { background: rgba(255,107,53,0.15);  color: var(--accent);  border: 1px solid rgba(255,107,53,0.3); }
   .phase-describe { background: rgba(255,209,102,0.15); color: var(--accent2); border: 1px solid rgba(255,209,102,0.3); }
   .phase-wait     { background: rgba(136,136,136,0.12); color: var(--muted);   border: 1px solid rgba(136,136,136,0.2); }
 
-  /* Player list */
-  .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.7rem; margin-top: 0.85rem; }
-  .player-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; padding: 0.65rem 1rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.6rem; }
-  .player-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+  .round-pill {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 0.08em;
+    color: var(--text);
+  }
+  .round-pill span { color: var(--muted); font-size: 1.1rem; }
+
+  .room-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--mono); font-size: 0.78rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.32rem 0.9rem;
+    color: var(--accent2);
+  }
+  .room-pill-label { color: var(--muted); font-size: 0.68rem; }
+
+  /* ── Timer ── */
+  .timer-wrap { margin-bottom: 1.4rem; }
+  .timer-display {
+    font-family: 'Bebas Neue', sans-serif; font-size: 5rem;
+    letter-spacing: 0.05em; text-align: center; margin-bottom: 0.5rem; transition: color 0.3s;
+  }
+  .timer-display.warning { color: var(--accent); }
+  .timer-display.danger  { color: var(--danger); }
+  .timer-bar-bg { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .timer-bar { height: 100%; background: var(--accent2); border-radius: 4px; transition: width 1s linear, background 0.3s; }
+  .timer-bar.warning { background: var(--accent); }
+  .timer-bar.danger  { background: var(--danger); }
+
+  /* ── Player list ── */
+  .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-top: 0.9rem; }
+  .player-chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 0.7rem 1rem; font-size: 1rem;
+    display: flex; align-items: center; gap: 0.65rem;
+  }
+  .player-chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
   .player-chip.host .dot { background: var(--accent); }
-  .player-chip.submitted .dot { background: var(--accent2); }
 
-  /* Settings grid */
+  /* ── Settings ── */
   .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.4rem; }
-  .settings-grid label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 0.45rem; }
+  .settings-grid label { font-size: 0.88rem; color: var(--muted); display: block; margin-bottom: 0.5rem; }
 
-  /* Drop zone */
+  /* ── Drop zone ── */
   .drop-zone {
     border: 2px dashed var(--border); border-radius: var(--radius);
-    padding: 3rem 1rem; text-align: center; cursor: pointer;
-    transition: border-color 0.2s, background 0.2s; position: relative;
+    padding: 2.5rem 1rem; text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    cursor: default;
   }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(255,107,53,0.05); }
-  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .drop-icon  { font-size: 3rem; margin-bottom: 0.85rem; opacity: 0.45; }
-  .drop-label { font-size: 1rem; color: var(--muted); margin-bottom: 0.4rem; }
-  .drop-hint  { font-size: 0.8rem; color: var(--muted); opacity: 0.55; font-family: var(--mono); }
+  .drop-zone.drag-over { border-color: var(--accent); background: rgba(255,107,53,0.05); }
+  .drop-icon  { font-size: 2.8rem; margin-bottom: 0.75rem; opacity: 0.4; }
+  .drop-label { font-size: 1rem; color: var(--muted); margin-bottom: 0.3rem; }
+  .drop-hint  { font-size: 0.82rem; color: var(--muted); opacity: 0.55; font-family: var(--mono); }
+
+  .browse-btn-wrap { margin-top: 1rem; position: relative; display: inline-block; }
+  .browse-btn-wrap input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
   .preview-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 9px; margin-top: 1.1rem; display: none; }
 
-  /* Prompt display */
-  .prompt-display { font-size: 1.65rem; font-weight: 500; padding: 0.75rem 0 1rem; line-height: 1.4; color: var(--accent2); }
+  /* ── Prompt display ── */
+  .prompt-display { font-size: 1.8rem; font-weight: 500; padding: 0.75rem 0 1rem; line-height: 1.35; color: var(--accent2); }
 
-  /* Waiting progress */
-  .wait-progress { margin-top: 1rem; }
-  .wait-progress-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
-  .wait-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  /* ── Wait progress ── */
+  .wait-progress { margin-top: 1.2rem; }
+  .wait-progress-label { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.7rem; }
+  .wait-chips { display: flex; flex-wrap: wrap; gap: 0.55rem; }
   .wait-chip {
-    font-size: 0.82rem; padding: 0.3rem 0.75rem;
+    font-size: 0.95rem; padding: 0.38rem 0.9rem;
     border-radius: 999px; border: 1px solid var(--border);
-    color: var(--muted); background: var(--surface2);
-    transition: all 0.3s;
+    color: var(--muted); background: var(--surface2); transition: all 0.3s;
   }
   .wait-chip.done { background: rgba(6,214,160,0.12); border-color: rgba(6,214,160,0.3); color: var(--success); }
 
-  /* Reveal */
+  /* ── Reveal ── */
   .group-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-  .group-tab { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.4rem 1rem; border-radius: 999px; border: 1px solid var(--border); cursor: pointer; color: var(--muted); background: transparent; transition: all 0.15s; }
+  .group-tab {
+    font-family: var(--mono); font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.1em; padding: 0.42rem 1.1rem; border-radius: 999px;
+    border: 1px solid var(--border); cursor: pointer; color: var(--muted);
+    background: transparent; transition: all 0.15s;
+  }
   .group-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .group-tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
 
@@ -190,27 +253,26 @@
   .reveal-chains::-webkit-scrollbar { width: 4px; }
   .reveal-chains::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  .chain-step { padding: 1.4rem; border-bottom: 1px solid var(--border); animation: fadeSlide 0.4s ease both; }
+  .chain-step { padding: 1.5rem; border-bottom: 1px solid var(--border); animation: fadeSlide 0.4s ease both; }
   .chain-step:last-child { border-bottom: none; }
-  .chain-step-type { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; opacity: 0.7; }
+  .chain-step-type { font-family: var(--mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.65rem; opacity: 0.75; }
   .chain-step-type.prompt-type { color: var(--accent2); }
   .chain-step-type.model-type  { color: var(--accent); }
   .chain-step-type.desc-type   { color: var(--success); }
-  .chain-step img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 9px; background: #000; }
-  .chain-step p { font-size: 1.1rem; line-height: 1.65; }
+  .chain-step img { width: 100%; max-height: 360px; object-fit: contain; border-radius: 9px; background: #000; }
+  .chain-step p { font-size: 1.15rem; line-height: 1.7; }
 
   .divider { height: 1px; background: var(--border); margin: 1.4rem 0; }
 
-  .status-msg { text-align: center; padding: 2rem; color: var(--muted); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.05em; }
+  .status-msg { text-align: center; padding: 2rem; color: var(--muted); font-family: var(--mono); font-size: 0.9rem; letter-spacing: 0.05em; }
 
-  .waiting-dots::after { content: ''; animation: dots 1.5s steps(4, end) infinite; }
+  .waiting-dots::after { content: ''; animation: dots 1.5s steps(4,end) infinite; }
   @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
   @keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
   .screen { display: none; }
   .screen.active { display: block; }
-
-  #landing-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; min-height: 1.2em; }
+  #landing-error { color: var(--danger); font-size: 0.95rem; margin-top: 0.5rem; min-height: 1.3em; }
 
   .version { text-align: center; font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.1); margin-top: 3rem; letter-spacing: 0.1em; user-select: none; }
 </style>
@@ -218,11 +280,18 @@
 <body>
 <div class="app">
 
-  <div class="logo">Gartic <span>Model</span></div>
-  <div class="tagline">The 3D Modeling Telephone Game</div>
-
   <!-- ══ SCREEN: Landing ══ -->
   <div id="screen-landing" class="screen active">
+    <div class="logo-row">
+      <div>
+        <div class="logo">Gartic <span>Model</span></div>
+      </div>
+      <div class="phone-img-wrap">
+        <img src="Images/gartic-phone.png" alt="Gartic Phone">
+      </div>
+    </div>
+    <div class="tagline">The 3D Modeling Telephone Game</div>
+
     <div class="card">
       <div class="card-title">Join a game</div>
       <div class="field">
@@ -233,7 +302,7 @@
         <span class="field-label">Room code</span>
         <div class="input-btn-row">
           <input type="text" id="join-code" placeholder="6-character code" maxlength="6"
-                 style="font-family:var(--mono);letter-spacing:0.15em;text-transform:uppercase;font-size:1.15rem;">
+                 style="font-family:var(--mono);letter-spacing:0.15em;text-transform:uppercase;font-size:1.2rem;">
           <button class="btn" onclick="joinGame()">Join</button>
         </div>
       </div>
@@ -255,6 +324,9 @@
 
   <!-- ══ SCREEN: Lobby ══ -->
   <div id="screen-lobby" class="screen">
+    <div class="logo">Gartic <span style="color:var(--accent2);">Model</span></div>
+    <div class="tagline">The 3D Modeling Telephone Game</div>
+
     <div class="card">
       <div class="room-code-label">Room Code</div>
       <div class="room-code" id="lobby-code">——</div>
@@ -273,18 +345,12 @@
             <input type="text" id="setting-model-time" value="10" style="font-family:var(--mono);">
           </div>
           <div>
-            <label>Describe time (minutes)</label>
-            <input type="text" id="setting-describe-time" value="2" style="font-family:var(--mono);">
-          </div>
-          <div>
             <label>Group size</label>
             <input type="text" id="setting-group-size" value="6" style="font-family:var(--mono);">
           </div>
         </div>
-        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;font-family:var(--mono);">
-          Rounds auto-set to group size − 1
-        </div>
         <button class="btn btn-full" onclick="startGame()">Start Game</button>
+        <div id="start-error" style="color:var(--danger);font-size:0.9rem;margin-top:0.75rem;display:none;"></div>
       </div>
     </div>
 
@@ -296,19 +362,16 @@
   <!-- ══ SCREEN: Game ══ -->
   <div id="screen-game" class="screen">
 
-    <!-- Timer bar -->
     <div class="card timer-wrap">
-      <div class="timer-header">
+      <div class="game-topbar">
         <span id="game-phase-badge" class="phase-badge phase-model">Modeling</span>
-        <div style="display:flex;align-items:center;gap:0.75rem;">
-          <span style="font-family:var(--mono);font-size:0.78rem;color:var(--muted);">
-            Round <span id="round-display">1</span> of <span id="round-total">5</span>
-          </span>
-          <span class="room-pill">
-            <span class="room-pill-label">Room</span>
-            <span id="game-room-code">——</span>
-          </span>
+        <div class="round-pill">
+          Round <span id="round-display">1</span> <span>of <span id="round-total">5</span></span>
         </div>
+        <span class="room-pill">
+          <span class="room-pill-label">Room</span>
+          <span id="game-room-code">——</span>
+        </span>
       </div>
       <div class="timer-display" id="timer-display">10:00</div>
       <div class="timer-bar-bg">
@@ -322,15 +385,27 @@
       <div class="prompt-display" id="model-prompt"></div>
       <div class="divider"></div>
       <div class="card-title">Upload your ISO screenshot</div>
+
       <div class="drop-zone" id="drop-zone"
-           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-        <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+           ondragover="handleDragOver(event)"
+           ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)">
         <div class="drop-icon">⬆</div>
         <div class="drop-label">Drag & drop your screenshot here</div>
-        <div class="drop-hint">or click to browse &nbsp;·&nbsp; Ctrl+V to paste from clipboard</div>
+        <div class="drop-hint">or use the button below · Ctrl+V to paste</div>
       </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center;flex-wrap:wrap;">
+        <div class="browse-btn-wrap">
+          <button class="btn btn-ghost">Browse Files</button>
+          <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+        <span id="file-name-display" style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);flex:1;">No file selected</span>
+      </div>
+
       <img id="preview-img" class="preview-img" alt="Your screenshot preview">
-      <div style="margin-top:1.1rem;">
+
+      <div style="margin-top:1.2rem;">
         <button class="btn btn-success btn-full" id="submit-model-btn" onclick="submitModel()" disabled>
           Submit Screenshot
         </button>
@@ -340,19 +415,24 @@
     <!-- Describe phase -->
     <div id="phase-describe" class="card" style="display:none;">
       <div class="card-title">What do you see? Describe this model.</div>
-      <img id="describe-img" style="width:100%;max-height:340px;object-fit:contain;border-radius:9px;background:#000;margin-bottom:1.1rem;" alt="Model to describe">
-      <textarea id="description-input" placeholder="Describe the shape in enough detail that someone could model it from scratch..."></textarea>
-      <div style="margin-top:0.9rem;">
-        <button class="btn btn-success btn-full" id="submit-desc-btn" onclick="submitDescription()">Submit Description</button>
+      <img id="describe-img"
+           style="width:100%;max-height:360px;object-fit:contain;border-radius:9px;background:#000;margin-bottom:1.2rem;"
+           alt="Model to describe">
+      <textarea id="description-input"
+                placeholder="Describe the shape in enough detail that someone could model it from scratch..."></textarea>
+      <div style="margin-top:1rem;">
+        <button class="btn btn-success btn-full" id="submit-desc-btn" onclick="submitDescription()">
+          Submit Description
+        </button>
       </div>
     </div>
 
-    <!-- Waiting for others -->
+    <!-- Waiting -->
     <div id="phase-wait" style="display:none;">
       <div class="card">
         <span class="phase-badge phase-wait">Waiting for others</span>
         <div class="wait-progress" id="wait-progress">
-          <div class="wait-progress-label">Submitted</div>
+          <div class="wait-progress-label" style="margin-top:1rem;">Submitted</div>
           <div class="wait-chips" id="wait-chips"></div>
         </div>
       </div>
@@ -362,23 +442,25 @@
 
   <!-- ══ SCREEN: Reveal ══ -->
   <div id="screen-reveal" class="screen">
+    <div class="logo" style="margin-bottom:0.2rem;">Gartic <span style="color:var(--accent2);">Model</span></div>
+    <div class="tagline">Chain Reveal</div>
     <div class="card">
-      <div class="card-title">Game Over — Chain Reveal</div>
       <div id="reveal-group-tabs" class="group-tabs"></div>
       <div class="reveal-chains" id="reveal-chains-container"></div>
       <div style="margin-top:1.6rem;">
         <div style="display:flex;gap:0.75rem;justify-content:center;align-items:center;">
           <button class="btn btn-ghost" onclick="revealPrev()">← Prev</button>
-          <span id="reveal-step-counter" style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);min-width:90px;text-align:center;"></span>
+          <span id="reveal-step-counter"
+                style="font-family:var(--mono);font-size:0.88rem;color:var(--muted);min-width:100px;text-align:center;"></span>
           <button class="btn" onclick="revealNext()">Next →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="version">gartic model · v0.1.1</div>
+  <div class="version">gartic model · v0.1.2</div>
 
-</div>
+</div><!-- /app -->
 
 <script>
 // ══════════════════════════════════════════════════════
@@ -425,45 +507,40 @@ const PROMPTS = [
 // ══════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════
+const DESCRIBE_TIME_SEC = 60; // fixed at 1 minute
+
 let state = {
   roomCode: null,
   playerId: null,
   playerName: null,
   isHost: false,
-  // assignment
   groupId: null,
-  chainPosition: null,   // my position index within the group
+  chainPosition: null,
   groupSize: null,
-  totalRounds: null,     // = groupSize - 1
-  // settings
+  totalRounds: null,
   modelTime: 10,
-  describeTime: 2,
-  // runtime
   currentRound: 0,
-  phase: null,           // 'model' | 'describe' | 'wait'
+  phase: null,
   imageDataUrl: null,
   timerInterval: null,
   timerEnd: null,
-  // reveal
+  startPrompt: null,
   revealGroups: [],
   revealGroupIdx: 0,
+  revealChainIdx: 0,
   revealStepIdx: 0,
 };
 
 // ══════════════════════════════════════════════════════
-//  SCREENS
+//  UTILS
 // ══════════════════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
-
-// ══════════════════════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════════════════════
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
 }
 function getPlayerId() {
   if (!sessionStorage.getItem('gmPid'))
@@ -478,33 +555,38 @@ function showError(msg) {
   el.textContent = msg;
   setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 5000);
 }
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function showStartError(msg) {
+  const el = document.getElementById('start-error');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
 }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function posMod(a, n) { return ((a % n) + n) % n; }
 
 // ══════════════════════════════════════════════════════
 //  IMAGE HELPERS
 // ══════════════════════════════════════════════════════
 function fileToBase64(file) {
-  return new Promise((res, rej) => {
+  return new Promise((res,rej) => {
     const r = new FileReader();
-    r.onload = e => res(e.target.result);
-    r.onerror = rej;
+    r.onload = e => res(e.target.result); r.onerror = rej;
     r.readAsDataURL(file);
   });
 }
-function compressImage(dataUrl, maxWidth = 1200) {
+function compressImage(dataUrl, maxWidth=1200) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
-      const scale = Math.min(1, maxWidth / img.width);
+      const scale = Math.min(1, maxWidth/img.width);
       const c = document.createElement('canvas');
-      c.width  = Math.round(img.width  * scale);
-      c.height = Math.round(img.height * scale);
+      c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
       resolve(c.toDataURL('image/jpeg', 0.82));
     };
@@ -513,7 +595,7 @@ function compressImage(dataUrl, maxWidth = 1200) {
 }
 
 // ══════════════════════════════════════════════════════
-//  CREATE GAME
+//  CREATE / JOIN
 // ══════════════════════════════════════════════════════
 async function createGame() {
   const name = document.getElementById('host-name').value.trim();
@@ -526,9 +608,6 @@ async function createGame() {
   enterLobby();
 }
 
-// ══════════════════════════════════════════════════════
-//  JOIN GAME
-// ══════════════════════════════════════════════════════
 async function joinGame() {
   const name = document.getElementById('join-name').value.trim();
   const code = document.getElementById('join-code').value.trim().toUpperCase();
@@ -551,7 +630,7 @@ function enterLobby() {
   document.getElementById('lobby-code').textContent = state.roomCode;
   document.getElementById('host-controls').style.display = state.isHost ? 'block' : 'none';
   document.getElementById('waiting-msg').style.display   = state.isHost ? 'none'  : 'block';
-  db.ref(`rooms/${state.roomCode}/players`).on('value', snap => renderPlayers(snap.val() || {}));
+  db.ref(`rooms/${state.roomCode}/players`).on('value', snap => renderPlayers(snap.val()||{}));
   db.ref(`rooms/${state.roomCode}/status`).on('value', snap => {
     if (snap.val() === 'playing') loadMyAssignment();
     if (snap.val() === 'reveal')  loadReveal();
@@ -561,52 +640,58 @@ function enterLobby() {
 function renderPlayers(players) {
   const entries = Object.values(players);
   document.getElementById('player-count').textContent = entries.length;
-  document.getElementById('player-list').innerHTML = entries.map(p => `
-    <div class="player-chip ${p.isHost?'host':''}">
+  document.getElementById('player-list').innerHTML = entries.map(p =>
+    `<div class="player-chip ${p.isHost?'host':''}">
       <span class="dot"></span><span>${esc(p.name)}${p.isHost?' ★':''}</span>
-    </div>`).join('');
+    </div>`
+  ).join('');
 }
 
 // ══════════════════════════════════════════════════════
 //  START GAME
 // ══════════════════════════════════════════════════════
 async function startGame() {
-  const modelTime    = parseInt(document.getElementById('setting-model-time').value)    || 10;
-  const describeTime = parseInt(document.getElementById('setting-describe-time').value) || 2;
-  const groupSize    = parseInt(document.getElementById('setting-group-size').value)    || 6;
-  const rounds       = groupSize - 1;  // auto
+  const modelTime = parseInt(document.getElementById('setting-model-time').value) || 10;
+  const groupSize = parseInt(document.getElementById('setting-group-size').value) || 6;
 
   const snap = await db.ref(`rooms/${state.roomCode}/players`).get();
-  const ids  = shuffle(Object.keys(snap.val() || {}));
-  if (ids.length < 2) { alert('Need at least 2 players.'); return; }
+  const ids  = shuffle(Object.keys(snap.val()||{}));
+  if (ids.length < 3) { showStartError('Need at least 3 players to start.'); return; }
 
   // Build groups
   const groups = [];
-  for (let i = 0; i < ids.length; i += groupSize) groups.push(ids.slice(i, i + groupSize));
+  for (let i = 0; i < ids.length; i += groupSize) groups.push(ids.slice(i, i+groupSize));
 
-  // Each player in a group needs a unique starting prompt
-  // We'll assign prompts per-player (not per-group) since everyone models simultaneously
+  // Warn if last group is too small
+  const minSize = Math.min(...groups.map(g => g.length));
+  if (minSize < 3) {
+    showStartError(`Last group would only have ${minSize} player(s). Reduce group size or wait for more players.`);
+    return;
+  }
+
+  // Rounds = min group size - 1
+  const rounds = minSize - 1;
+
   const shuffledPrompts = shuffle([...PROMPTS]);
   const assignments = {};
   let promptIdx = 0;
 
   for (let gi = 0; gi < groups.length; gi++) {
     const group = groups[gi];
-    const actualSize = group.length;
     group.forEach((pid, pos) => {
       assignments[pid] = {
         groupId: gi,
         position: pos,
-        groupSize: actualSize,
+        groupSize: group.length,
         startPrompt: shuffledPrompts[promptIdx % shuffledPrompts.length]
       };
       promptIdx++;
     });
-    await db.ref(`rooms/${state.roomCode}/groups/${gi}`).set({ size: actualSize });
+    await db.ref(`rooms/${state.roomCode}/groups/${gi}`).set({ size: group.length });
   }
 
   await db.ref(`rooms/${state.roomCode}/assignments`).set(assignments);
-  await db.ref(`rooms/${state.roomCode}/settings`).set({ modelTime, describeTime, rounds, groupSize });
+  await db.ref(`rooms/${state.roomCode}/settings`).set({ modelTime, rounds, groupSize });
   await db.ref(`rooms/${state.roomCode}/round`).set(0);
   await db.ref(`rooms/${state.roomCode}/status`).set('playing');
 }
@@ -626,7 +711,6 @@ async function loadMyAssignment() {
   state.startPrompt   = asn.startPrompt;
   state.totalRounds   = settings.rounds;
   state.modelTime     = settings.modelTime;
-  state.describeTime  = settings.describeTime;
 
   document.getElementById('game-room-code').textContent = state.roomCode;
   document.getElementById('round-total').textContent    = state.totalRounds;
@@ -636,44 +720,41 @@ async function loadMyAssignment() {
     const round = snap.val();
     if (round === null) return;
     state.currentRound = round;
+    // Display as 1-based
     document.getElementById('round-display').textContent = round + 1;
     determinePhase();
   });
 }
 
 // ══════════════════════════════════════════════════════
-//  CHAIN LOGIC
+//  DETERMINE PHASE
 //
-//  Each player owns a "chain" — the chain that started with their prompt.
-//  In round r, the chain that started with player at position p
-//  is currently held by player at position (p + r) % groupSize.
+//  Chain ownership in round r:
+//  The chain that started with player at position p
+//  is held by position (p + r) % n in round r.
 //
-//  Equivalently: in round r, I (position myPos) am holding the chain
-//  that originated from position (myPos - r + groupSize) % groupSize.
+//  So in round r, I hold the chain from position:
+//    originPos = (myPos - r + n*n) % n  (posMod handles this)
 //
-//  Round 0 (model): I model my own startPrompt.
-//  Round 1 (describe): I received the screenshot from position
-//    (myPos - 1 + n) % n, submitted in round 0.
-//  Round 2 (model): I received the description from position
-//    (myPos - 1 + n) % n, submitted in round 1.
+//  Round 0 (model): model my own startPrompt
+//  Round 1 (describe): describe screenshot from round 0
+//    held by position (myPos - 1 + n) % n
+//  Round 2 (model): model from description in round 1
+//    held by position (myPos - 1 + n) % n  (same prev holder)
 //  etc.
-//
-//  Submission key: rooms/{code}/submissions/{groupId}/{pid}/r{round}
-//  Each submission contains: { imageDataUrl?, description?, playerName, timestamp }
 // ══════════════════════════════════════════════════════
 async function determinePhase() {
   const r     = state.currentRound;
   const myPos = state.chainPosition;
   const n     = state.groupSize;
 
-  // Game over?
   if (r >= state.totalRounds) {
     db.ref(`rooms/${state.roomCode}/round`).off();
     loadReveal();
     return;
   }
 
-  // Already submitted this round?
+  // Already submitted?
   const already = await db.ref(
     `rooms/${state.roomCode}/submissions/${state.groupId}/${state.playerId}/r${r}`
   ).get();
@@ -687,42 +768,32 @@ async function determinePhase() {
 
   if (isModelRound) {
     if (r === 0) {
-      // Model from my own starting prompt
       showPhase('model', state.startPrompt);
     } else {
-      // Get the description submitted in round r-1 by the player
-      // whose chain I'm currently holding.
-      // In round r-1 (describe), the chain I now hold was held by
-      // the player at position (myPos - (r-1) + n*n) % n
-      // = (myPos - r + 1 + n*n) % n
-      const prevHolder = posMod(myPos - r + 1, n);
-      const prevPid    = await getPidByPosition(prevHolder);
-      const dsnap = await db.ref(
+      // Get description from previous round
+      // prev holder = player who had this chain in round r-1
+      // = position (myPos - r + 1 + n*big) % n
+      const prevPos = posMod(myPos - r + 1, n);
+      const prevPid = await getPidByPosition(prevPos);
+      const dsnap   = await db.ref(
         `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
       ).get();
-      const desc = dsnap.val()?.description || '(no description received)';
-      showPhase('model', desc);
+      showPhase('model', dsnap.val()?.description || '(no description received)');
     }
   } else {
-    // Describe phase: get the screenshot submitted in round r-1
-    // by the player at position (myPos - r + 1 + n*n) % n
-    const prevHolder = posMod(myPos - r + 1, n);
-    const prevPid    = await getPidByPosition(prevHolder);
-    const isnap = await db.ref(
+    // Get screenshot from previous round
+    const prevPos = posMod(myPos - r + 1, n);
+    const prevPid = await getPidByPosition(prevPos);
+    const isnap   = await db.ref(
       `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
     ).get();
-    const imgUrl = isnap.val()?.imageDataUrl || null;
-    showPhase('describe', null, imgUrl);
+    showPhase('describe', null, isnap.val()?.imageDataUrl || null);
   }
 }
 
-// modulo that always returns positive
-function posMod(a, n) { return ((a % n) + n) % n; }
-
 async function getPidByPosition(pos) {
   const snap = await db.ref(`rooms/${state.roomCode}/assignments`).get();
-  const all  = snap.val() || {};
-  for (const [pid, a] of Object.entries(all)) {
+  for (const [pid, a] of Object.entries(snap.val()||{})) {
     if (a.groupId === state.groupId && a.position === pos) return pid;
   }
   return null;
@@ -742,8 +813,7 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
   if (phase === 'model') {
     document.getElementById('phase-model').style.display = 'block';
     document.getElementById('model-prompt').textContent  = promptOrDesc || '';
-    badge.className   = 'phase-badge phase-model';
-    badge.textContent = 'Modeling';
+    badge.className = 'phase-badge phase-model'; badge.textContent = 'Modeling';
     resetDropZone();
     startTimer(state.modelTime * 60);
 
@@ -752,43 +822,39 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
     document.getElementById('describe-img').src             = imgDataUrl || '';
     document.getElementById('description-input').value      = '';
     document.getElementById('submit-desc-btn').disabled     = false;
-    badge.className   = 'phase-badge phase-describe';
-    badge.textContent = 'Describing';
-    startTimer(state.describeTime * 60);
+    document.getElementById('submit-desc-btn').textContent  = 'Submit Description';
+    badge.className = 'phase-badge phase-describe'; badge.textContent = 'Describing';
+    startTimer(DESCRIBE_TIME_SEC);
 
   } else {
     document.getElementById('phase-wait').style.display = 'block';
-    badge.className   = 'phase-badge phase-wait';
-    badge.textContent = 'Waiting';
+    badge.className = 'phase-badge phase-wait'; badge.textContent = 'Waiting';
     clearTimer();
   }
 }
 
 // ══════════════════════════════════════════════════════
-//  WAIT PROGRESS — show who has submitted
+//  WAIT PROGRESS
 // ══════════════════════════════════════════════════════
 async function watchWaitProgress(round) {
-  // Get all players in my group
-  const asnap   = await db.ref(`rooms/${state.roomCode}/assignments`).get();
-  const psnap   = await db.ref(`rooms/${state.roomCode}/players`).get();
-  const all     = asnap.val() || {};
-  const players = psnap.val() || {};
-
-  const groupMembers = Object.entries(all)
-    .filter(([pid, a]) => a.groupId === state.groupId)
+  const [asnap, psnap] = await Promise.all([
+    db.ref(`rooms/${state.roomCode}/assignments`).get(),
+    db.ref(`rooms/${state.roomCode}/players`).get(),
+  ]);
+  const all     = asnap.val()||{};
+  const players = psnap.val()||{};
+  const members = Object.entries(all)
+    .filter(([pid,a]) => a.groupId === state.groupId)
     .map(([pid]) => ({ pid, name: players[pid]?.name || '?' }));
 
   const subRef = db.ref(`rooms/${state.roomCode}/submissions/${state.groupId}`);
   subRef.on('value', snap => {
-    const subs = snap.val() || {};
-    const chips = groupMembers.map(m => {
+    const subs = snap.val()||{};
+    document.getElementById('wait-chips').innerHTML = members.map(m => {
       const done = !!subs[m.pid]?.[`r${round}`];
       return `<span class="wait-chip ${done?'done':''}">${esc(m.name)}</span>`;
     }).join('');
-    document.getElementById('wait-chips').innerHTML = chips;
   });
-
-  // Clean up listener when round advances
   db.ref(`rooms/${state.roomCode}/round`).once('value', () => subRef.off());
 }
 
@@ -799,22 +865,18 @@ function startTimer(seconds) {
   clearTimer();
   state.timerEnd = Date.now() + seconds * 1000;
   const totalMs  = seconds * 1000;
-
   function tick() {
     const rem  = Math.max(0, state.timerEnd - Date.now());
-    const mins = Math.floor(rem / 60000);
-    const secs = Math.floor((rem % 60000) / 1000);
-    const pct  = rem / totalMs * 100;
-
+    const mins = Math.floor(rem/60000);
+    const secs = Math.floor((rem%60000)/1000);
+    const pct  = rem/totalMs*100;
     const disp = document.getElementById('timer-display');
     const bar  = document.getElementById('timer-bar');
     disp.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     bar.style.width  = pct + '%';
-
-    if (rem <= 30000)  { disp.className = 'timer-display danger';  bar.className = 'timer-bar danger'; }
-    else if (rem <= 120000) { disp.className = 'timer-display warning'; bar.className = 'timer-bar warning'; }
-    else               { disp.className = 'timer-display';          bar.className = 'timer-bar'; }
-
+    if (rem <= 30000)       { disp.className='timer-display danger';  bar.className='timer-bar danger'; }
+    else if (rem <= 120000) { disp.className='timer-display warning'; bar.className='timer-bar warning'; }
+    else                    { disp.className='timer-display';         bar.className='timer-bar'; }
     if (rem === 0) { clearTimer(); autoSubmit(); }
   }
   tick();
@@ -843,6 +905,7 @@ async function handleFileSelect(e) {
   if (file) await setImageFile(file);
 }
 async function setImageFile(file) {
+  document.getElementById('file-name-display').textContent = file.name;
   const raw  = await fileToBase64(file);
   const comp = await compressImage(raw);
   state.imageDataUrl = comp;
@@ -855,11 +918,12 @@ function resetDropZone() {
   const p = document.getElementById('preview-img');
   p.style.display = 'none'; p.src = '';
   document.getElementById('file-input').value = '';
+  document.getElementById('file-name-display').textContent = 'No file selected';
   document.getElementById('submit-model-btn').disabled = true;
 }
 document.addEventListener('paste', async e => {
   if (state.phase !== 'model') return;
-  for (const item of (e.clipboardData?.items || [])) {
+  for (const item of (e.clipboardData?.items||[])) {
     if (item.type.startsWith('image/')) { await setImageFile(item.getAsFile()); break; }
   }
 });
@@ -871,20 +935,19 @@ async function submitModel() {
   const btn = document.getElementById('submit-model-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
-  const data = {
+  await writeSubmission({
     playerName: state.playerName,
     timestamp:  Date.now(),
-    type: 'model'
-  };
-  if (state.imageDataUrl) data.imageDataUrl = state.imageDataUrl;
-  await writeSubmission(data);
+    type: 'model',
+    ...(state.imageDataUrl ? { imageDataUrl: state.imageDataUrl } : {})
+  });
 }
 
 // ══════════════════════════════════════════════════════
 //  SUBMIT DESCRIPTION
 // ══════════════════════════════════════════════════════
 async function submitDescription() {
-  const btn  = document.getElementById('submit-desc-btn');
+  const btn = document.getElementById('submit-desc-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
   const desc = document.getElementById('description-input').value.trim() || '(no description)';
@@ -897,44 +960,41 @@ async function submitDescription() {
 }
 
 // ══════════════════════════════════════════════════════
-//  WRITE SUBMISSION + TRIGGER ROUND ADVANCE (HOST)
+//  WRITE SUBMISSION
 // ══════════════════════════════════════════════════════
 async function writeSubmission(data) {
   const r = state.currentRound;
   await db.ref(
     `rooms/${state.roomCode}/submissions/${state.groupId}/${state.playerId}/r${r}`
   ).set(data);
-
   showPhase('wait');
   watchWaitProgress(r);
-
   if (state.isHost) watchForRoundAdvance(r);
 }
 
 // ══════════════════════════════════════════════════════
-//  HOST: ADVANCE ROUND WHEN EVERYONE SUBMITS
+//  HOST: ADVANCE ROUND
 // ══════════════════════════════════════════════════════
 function watchForRoundAdvance(round) {
   const subRef = db.ref(`rooms/${state.roomCode}/submissions`);
   subRef.on('value', async snap => {
-    const allSubs = snap.val() || {};
+    const allSubs = snap.val()||{};
     const [asnap, gsnap, ssnap] = await Promise.all([
       db.ref(`rooms/${state.roomCode}/assignments`).get(),
       db.ref(`rooms/${state.roomCode}/groups`).get(),
       db.ref(`rooms/${state.roomCode}/settings`).get(),
     ]);
-    const assignments = asnap.val() || {};
-    const groups      = gsnap.val() || {};
-    const totalRounds = (ssnap.val()||{}).rounds || 5;
+    const assignments = asnap.val()||{};
+    const groups      = gsnap.val()||{};
+    const totalRounds = (ssnap.val()||{}).rounds||5;
 
     let allDone = true;
     for (const [gi, group] of Object.entries(groups)) {
-      // Find all players in this group
       const members = Object.entries(assignments)
-        .filter(([pid, a]) => String(a.groupId) === String(gi))
-        .map(([pid]) => pid);
+        .filter(([pid,a]) => String(a.groupId)===String(gi))
+        .map(([pid])=>pid);
       for (const pid of members) {
-        if (!allSubs[gi]?.[pid]?.[`r${round}`]) { allDone = false; break; }
+        if (!allSubs[gi]?.[pid]?.[`r${round}`]) { allDone=false; break; }
       }
       if (!allDone) break;
     }
@@ -957,7 +1017,6 @@ function watchForRoundAdvance(round) {
 // ══════════════════════════════════════════════════════
 async function loadReveal() {
   showScreen('reveal');
-
   const [subSnap, asnap, gsnap, ssnap, psnap] = await Promise.all([
     db.ref(`rooms/${state.roomCode}/submissions`).get(),
     db.ref(`rooms/${state.roomCode}/assignments`).get(),
@@ -965,71 +1024,55 @@ async function loadReveal() {
     db.ref(`rooms/${state.roomCode}/settings`).get(),
     db.ref(`rooms/${state.roomCode}/players`).get(),
   ]);
-
-  const allSubs     = subSnap.val() || {};
-  const assignments = asnap.val() || {};
-  const groups      = gsnap.val() || {};
-  const settings    = ssnap.val() || {};
-  const players     = psnap.val() || {};
-  const totalRounds = settings.rounds || 5;
+  const allSubs     = subSnap.val()||{};
+  const assignments = asnap.val()||{};
+  const groups      = gsnap.val()||{};
+  const players     = psnap.val()||{};
+  const totalRounds = (ssnap.val()||{}).rounds||5;
 
   state.revealGroups = [];
 
   for (const [gi, group] of Object.entries(groups)) {
     const n = group.size;
-
-    // Get all players in this group sorted by position
     const members = Object.entries(assignments)
-      .filter(([pid, a]) => String(a.groupId) === String(gi))
-      .sort(([,a],[,b]) => a.position - b.position)
-      .map(([pid, a]) => ({ pid, pos: a.position, name: players[pid]?.name || '?' }));
+      .filter(([pid,a]) => String(a.groupId)===String(gi))
+      .sort(([,a],[,b]) => a.position-b.position)
+      .map(([pid,a]) => ({ pid, pos:a.position, name:players[pid]?.name||'?', startPrompt:a.startPrompt }));
 
-    // Build one chain per starting player
     const chains = members.map(starter => {
-      const steps = [];
-
-      // Step 0: the original prompt
-      const starterAsn = assignments[starter.pid];
-      steps.push({ type: 'prompt', content: starterAsn.startPrompt, player: starter.name });
-
-      // For each round, find who held this chain
+      const steps = [{ type:'prompt', content:starter.startPrompt, player:starter.name }];
       for (let r = 0; r < totalRounds; r++) {
-        // In round r, the chain that started at position p is held by position (p + r) % n
         const holderPos = posMod(starter.pos + r, n);
         const holder    = members.find(m => m.pos === holderPos);
         if (!holder) continue;
-
         const sub = allSubs[gi]?.[holder.pid]?.[`r${r}`];
         if (!sub) continue;
-
         if (sub.type === 'model') {
-          steps.push({ type: 'model', imageDataUrl: sub.imageDataUrl, player: holder.name });
+          steps.push({ type:'model', imageDataUrl:sub.imageDataUrl, player:holder.name });
         } else {
-          steps.push({ type: 'describe', content: sub.description, player: holder.name });
+          steps.push({ type:'describe', content:sub.description, player:holder.name });
         }
       }
-      return { startPlayer: starter.name, steps };
+      return { startPlayer:starter.name, steps };
     });
 
     state.revealGroups.push({ gi, chains });
   }
 
-  // Build UI — show chains as sub-tabs within each group
   state.revealGroupIdx = 0;
-  state.revealStepIdx  = 0;
   state.revealChainIdx = 0;
-
+  state.revealStepIdx  = 0;
   renderRevealTabs();
   renderRevealChain();
 }
 
 function renderRevealTabs() {
-  const groups = state.revealGroups;
-  document.getElementById('reveal-group-tabs').innerHTML = groups.map((g, i) =>
-    `<button class="group-tab ${i===state.revealGroupIdx?'active':''}" onclick="selectRevealGroup(${i})">
-      Group ${parseInt(g.gi)+1}
-    </button>`
-  ).join('');
+  document.getElementById('reveal-group-tabs').innerHTML =
+    state.revealGroups.map((g,i) =>
+      `<button class="group-tab ${i===state.revealGroupIdx?'active':''}" onclick="selectRevealGroup(${i})">
+        Group ${parseInt(g.gi)+1}
+      </button>`
+    ).join('');
 }
 
 function selectRevealGroup(idx) {
@@ -1047,44 +1090,43 @@ function renderRevealChain() {
   if (!chain) return;
 
   const steps = chain.steps.slice(0, state.revealStepIdx + 1);
-  const container = document.getElementById('reveal-chains-container');
 
-  // Chain header
-  const chainNav = group.chains.length > 1 ? `
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
-      ${group.chains.map((c,i) => `
-        <button class="group-tab ${i===state.revealChainIdx?'active':''}"
-                onclick="selectRevealChain(${i})" style="font-size:0.65rem;">
-          ${esc(c.startPlayer)}'s chain
-        </button>`).join('')}
-    </div>` : `<div style="margin-bottom:0.75rem;font-family:var(--mono);font-size:0.7rem;color:var(--muted);">
-      ${esc(chain.startPlayer)}'s chain
-    </div>`;
+  const chainNav = group.chains.length > 1
+    ? `<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+        ${group.chains.map((c,i) =>
+          `<button class="group-tab ${i===state.revealChainIdx?'active':''}"
+                   onclick="selectRevealChain(${i})" style="font-size:0.68rem;">
+            ${esc(c.startPlayer)}'s chain
+          </button>`).join('')}
+      </div>`
+    : `<div style="margin-bottom:0.75rem;font-family:var(--mono);font-size:0.75rem;color:var(--muted);">
+        ${esc(chain.startPlayer)}'s chain
+      </div>`;
 
-  container.innerHTML = chainNav + steps.map((step, i) => {
-    const delay = `animation-delay:${i*0.07}s`;
-    if (step.type === 'prompt') {
-      return `<div class="chain-step" style="${delay}">
-        <div class="chain-step-type prompt-type">Original Prompt — ${esc(step.player)}</div>
-        <p>${esc(step.content)}</p>
-      </div>`;
-    } else if (step.type === 'model') {
-      return `<div class="chain-step" style="${delay}">
-        <div class="chain-step-type model-type">Model by ${esc(step.player)}</div>
-        ${step.imageDataUrl
-          ? `<img src="${step.imageDataUrl}" alt="Model">`
-          : '<p style="color:var(--muted)">(no screenshot submitted)</p>'}
-      </div>`;
-    } else {
-      return `<div class="chain-step" style="${delay}">
-        <div class="chain-step-type desc-type">Description by ${esc(step.player)}</div>
-        <p>${esc(step.content)}</p>
-      </div>`;
-    }
-  }).join('');
+  document.getElementById('reveal-chains-container').innerHTML =
+    chainNav + steps.map((step, i) => {
+      const d = `animation-delay:${i*0.07}s`;
+      if (step.type === 'prompt') return `
+        <div class="chain-step" style="${d}">
+          <div class="chain-step-type prompt-type">Original Prompt — ${esc(step.player)}</div>
+          <p>${esc(step.content)}</p>
+        </div>`;
+      if (step.type === 'model') return `
+        <div class="chain-step" style="${d}">
+          <div class="chain-step-type model-type">Model by ${esc(step.player)}</div>
+          ${step.imageDataUrl
+            ? `<img src="${step.imageDataUrl}" alt="Model">`
+            : '<p style="color:var(--muted)">(no screenshot submitted)</p>'}
+        </div>`;
+      return `
+        <div class="chain-step" style="${d}">
+          <div class="chain-step-type desc-type">Description by ${esc(step.player)}</div>
+          <p>${esc(step.content)}</p>
+        </div>`;
+    }).join('');
 
   document.getElementById('reveal-step-counter').textContent =
-    `Step ${state.revealStepIdx + 1} of ${chain.steps.length}`;
+    `Step ${state.revealStepIdx+1} of ${chain.steps.length}`;
 }
 
 function selectRevealChain(idx) {
@@ -1098,28 +1140,24 @@ function revealNext() {
   if (!group) return;
   const chain = group.chains[state.revealChainIdx];
   if (!chain) return;
-
   if (state.revealStepIdx < chain.steps.length - 1) {
     state.revealStepIdx++;
-    renderRevealChain();
   } else if (state.revealChainIdx < group.chains.length - 1) {
-    // Auto-advance to next chain
     state.revealChainIdx++;
     state.revealStepIdx = 0;
-    renderRevealChain();
   }
+  renderRevealChain();
 }
 
 function revealPrev() {
   if (state.revealStepIdx > 0) {
     state.revealStepIdx--;
-    renderRevealChain();
   } else if (state.revealChainIdx > 0) {
     state.revealChainIdx--;
     const group = state.revealGroups[state.revealGroupIdx];
     state.revealStepIdx = group.chains[state.revealChainIdx].steps.length - 1;
-    renderRevealChain();
   }
+  renderRevealChain();
 }
 </script>
 </body>
