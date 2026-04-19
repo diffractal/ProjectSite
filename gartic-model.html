@@ -75,13 +75,13 @@
     text-transform: uppercase; margin-bottom: 2.5rem;
   }
 
-  /* Phone image — 165px for V2 */
+  /* Phone image — full 16:9 rectangle at 165px tall for V2 */
   .phone-img-wrap {
     flex-shrink: 0;
     border: 2px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
-    width: 165px;
+    width: 294px;   /* 165 * (1920/1080) ≈ 293px, rounded up */
     height: 165px;
     background: var(--surface2);
     display: flex;
@@ -91,7 +91,7 @@
   .phone-img-wrap img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     border-radius: 8px;
   }
