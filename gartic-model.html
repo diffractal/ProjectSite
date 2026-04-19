@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -75,14 +75,14 @@
     text-transform: uppercase; margin-bottom: 2.5rem;
   }
 
-  /* Phone image */
+  /* Phone image — 165px for V2 */
   .phone-img-wrap {
     flex-shrink: 0;
     border: 2px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
-    width: 110px;
-    height: 110px;
+    width: 165px;
+    height: 165px;
     background: var(--surface2);
     display: flex;
     align-items: center;
@@ -108,15 +108,17 @@
   }
 
   /* ── Inputs ── */
-  input[type="text"], textarea {
+  input[type="text"], textarea, select {
     width: 100%; background: var(--surface2);
     border: 1px solid var(--border); border-radius: 9px;
     color: var(--text); font-family: 'DM Sans', sans-serif;
     font-size: 1.1rem; padding: 0.9rem 1.15rem;
     outline: none; transition: border-color 0.2s;
+    appearance: none;
   }
-  input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent); }
   textarea { resize: vertical; min-height: 130px; line-height: 1.65; font-size: 1.05rem; }
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1.1rem center; padding-right: 2.5rem; }
 
   /* ── Buttons ── */
   .btn {
@@ -140,6 +142,28 @@
   .field:last-child { margin-bottom: 0; }
   .input-btn-row { display: flex; gap: 0.75rem; }
   .input-btn-row input { flex: 1; }
+
+  /* ── Difficulty selector ── */
+  .diff-selector {
+    display: flex; gap: 0.6rem; margin-bottom: 1.2rem;
+  }
+  .diff-btn {
+    flex: 1; padding: 0.7rem 0.5rem; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--muted); font-family: var(--mono); font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.15s; text-align: center;
+  }
+  .diff-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .diff-btn.active-easy   { background: rgba(6,214,160,0.15); border-color: var(--success); color: var(--success); }
+  .diff-btn.active-medium { background: rgba(255,209,102,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .diff-btn.active-hard   { background: rgba(239,71,111,0.15); border-color: var(--danger); color: var(--danger); }
+
+  .diff-label {
+    font-family: var(--mono); font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin-bottom: 0.5rem;
+  }
 
   /* ── Room code lobby ── */
   .room-code-label { text-align: center; font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 0.4rem; }
@@ -238,6 +262,44 @@
   }
   .wait-chip.done { background: rgba(6,214,160,0.12); border-color: rgba(6,214,160,0.3); color: var(--success); }
 
+  /* ── Emoji Reactions ── */
+  .emoji-bar {
+    margin-top: 1.5rem;
+  }
+  .emoji-bar-label {
+    font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem;
+  }
+  .emoji-buttons {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+  }
+  .emoji-btn {
+    font-size: 1.5rem; padding: 0.35rem 0.6rem; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface2);
+    cursor: pointer; transition: transform 0.15s, background 0.15s;
+    line-height: 1;
+  }
+  .emoji-btn:hover { transform: scale(1.2); background: var(--surface); }
+  .emoji-btn:active { transform: scale(0.9); }
+  .emoji-feed {
+    min-height: 2.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+  }
+  .emoji-reaction {
+    font-size: 1.4rem; animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    display: inline-block;
+  }
+  @keyframes popIn {
+    from { transform: scale(0) translateY(8px); opacity: 0; }
+    to   { transform: scale(1) translateY(0);   opacity: 1; }
+  }
+  .reaction-entry {
+    display: flex; align-items: center; gap: 0.3rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.2rem 0.6rem;
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .reaction-name { font-size: 0.75rem; color: var(--muted); font-family: var(--mono); }
+
   /* ── Reveal ── */
   .group-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .group-tab {
@@ -275,6 +337,35 @@
   #landing-error { color: var(--danger); font-size: 0.95rem; margin-top: 0.5rem; min-height: 1.3em; }
 
   .version { text-align: center; font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.1); margin-top: 3rem; letter-spacing: 0.1em; user-select: none; }
+
+  /* ── Difficulty badge in-game ── */
+  .diff-badge {
+    display: inline-block; font-family: var(--mono); font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0.25rem 0.75rem; border-radius: 999px;
+  }
+  .diff-badge.easy   { background: rgba(6,214,160,0.15);   border: 1px solid rgba(6,214,160,0.3);   color: var(--success); }
+  .diff-badge.medium { background: rgba(255,209,102,0.15); border: 1px solid rgba(255,209,102,0.3); color: var(--accent2); }
+  .diff-badge.hard   { background: rgba(239,71,111,0.15);  border: 1px solid rgba(239,71,111,0.3);  color: var(--danger); }
+
+  /* ── Lobby player count info ── */
+  .lobby-info {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  .player-count-badge {
+    font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
+  }
+  .player-count-badge strong { color: var(--text); }
+
+  /* ── Reveal nav ── */
+  .reveal-nav {
+    display: flex; gap: 0.75rem; justify-content: center; align-items: center; margin-top: 1.6rem;
+  }
+  .reveal-progress-text {
+    font-family: var(--mono); font-size: 0.88rem; color: var(--muted);
+    min-width: 140px; text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -332,23 +423,44 @@
       <div class="room-code" id="lobby-code">——</div>
       <div class="room-code-sub">Share this code with your students</div>
       <div class="divider"></div>
-      <div class="card-title">Players &nbsp;<span id="player-count" style="color:var(--text);font-family:var(--mono);">0</span></div>
+      <div class="lobby-info">
+        <div class="card-title" style="margin-bottom:0;">Players</div>
+        <div class="player-count-badge">
+          <strong id="player-count">0</strong> joined · min 5 to start
+        </div>
+      </div>
       <div class="player-grid" id="player-list"></div>
     </div>
 
+    <!-- Host controls -->
     <div id="host-controls" style="display:none;">
       <div class="card">
         <div class="card-title">Game Settings</div>
+
+        <div class="field">
+          <span class="field-label">Difficulty</span>
+          <div class="diff-selector">
+            <button class="diff-btn active-easy" id="diff-easy"   onclick="setDifficulty('easy')">🟢 Easy</button>
+            <button class="diff-btn"             id="diff-medium" onclick="setDifficulty('medium')">🟡 Medium</button>
+            <button class="diff-btn"             id="diff-hard"   onclick="setDifficulty('hard')">🔴 Hard</button>
+          </div>
+        </div>
+
         <div class="settings-grid">
           <div>
             <label>Model time (minutes)</label>
             <input type="text" id="setting-model-time" value="10" style="font-family:var(--mono);">
           </div>
           <div>
-            <label>Group size</label>
-            <input type="text" id="setting-group-size" value="6" style="font-family:var(--mono);">
+            <label>Modeling rounds per player</label>
+            <select id="setting-rounds">
+              <option value="3">3 rounds</option>
+              <option value="4">4 rounds</option>
+              <option value="5" selected>5 rounds</option>
+            </select>
           </div>
         </div>
+
         <button class="btn btn-full" onclick="startGame()">Start Game</button>
         <div id="start-error" style="color:var(--danger);font-size:0.9rem;margin-top:0.75rem;display:none;"></div>
       </div>
@@ -368,10 +480,13 @@
         <div class="round-pill">
           Round <span id="round-display">1</span> <span>of <span id="round-total">5</span></span>
         </div>
-        <span class="room-pill">
-          <span class="room-pill-label">Room</span>
-          <span id="game-room-code">——</span>
-        </span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span id="game-diff-badge" class="diff-badge easy">Easy</span>
+          <span class="room-pill">
+            <span class="room-pill-label">Room</span>
+            <span id="game-room-code">——</span>
+          </span>
+        </div>
       </div>
       <div class="timer-display" id="timer-display">10:00</div>
       <div class="timer-bar-bg">
@@ -384,7 +499,8 @@
       <div class="card-title">Your prompt to model</div>
       <div class="prompt-display" id="model-prompt"></div>
       <div class="divider"></div>
-      <div class="card-title">Upload your ISO screenshot</div>
+      <div class="card-title">Upload your best screenshot</div>
+      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">Choose the view that best shows off your model — any angle works!</div>
 
       <div class="drop-zone" id="drop-zone"
            ondragover="handleDragOver(event)"
@@ -435,6 +551,22 @@
           <div class="wait-progress-label" style="margin-top:1rem;">Submitted</div>
           <div class="wait-chips" id="wait-chips"></div>
         </div>
+
+        <!-- Emoji Reactions -->
+        <div class="emoji-bar">
+          <div class="emoji-bar-label">React while you wait</div>
+          <div class="emoji-buttons">
+            <button class="emoji-btn" onclick="sendReaction('🔥')">🔥</button>
+            <button class="emoji-btn" onclick="sendReaction('😂')">😂</button>
+            <button class="emoji-btn" onclick="sendReaction('👏')">👏</button>
+            <button class="emoji-btn" onclick="sendReaction('😱')">😱</button>
+            <button class="emoji-btn" onclick="sendReaction('💀')">💀</button>
+            <button class="emoji-btn" onclick="sendReaction('🤔')">🤔</button>
+            <button class="emoji-btn" onclick="sendReaction('✨')">✨</button>
+            <button class="emoji-btn" onclick="sendReaction('🎨')">🎨</button>
+          </div>
+          <div class="emoji-feed" id="emoji-feed"></div>
+        </div>
       </div>
     </div>
 
@@ -447,18 +579,15 @@
     <div class="card">
       <div id="reveal-group-tabs" class="group-tabs"></div>
       <div class="reveal-chains" id="reveal-chains-container"></div>
-      <div style="margin-top:1.6rem;">
-        <div style="display:flex;gap:0.75rem;justify-content:center;align-items:center;">
-          <button class="btn btn-ghost" onclick="revealPrev()">← Prev</button>
-          <span id="reveal-step-counter"
-                style="font-family:var(--mono);font-size:0.88rem;color:var(--muted);min-width:100px;text-align:center;"></span>
-          <button class="btn" onclick="revealNext()">Next →</button>
-        </div>
+      <div class="reveal-nav">
+        <button class="btn btn-ghost" onclick="revealPrev()">← Prev</button>
+        <span id="reveal-step-counter" class="reveal-progress-text"></span>
+        <button class="btn" onclick="revealNext()">Next →</button>
       </div>
     </div>
   </div>
 
-  <div class="version">gartic model · v0.1.2</div>
+  <div class="version">gartic model · v0.2.0</div>
 
 </div><!-- /app -->
 
@@ -479,57 +608,112 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database();
 
 // ══════════════════════════════════════════════════════
-//  PROMPTS
+//  PROMPTS  — edit these lists freely!
+//  Easy:   simple, recognizable shapes with clear geometry
+//  Medium: more complex objects with multiple components
+//  Hard:   abstract, nuanced, or architecturally demanding
 // ══════════════════════════════════════════════════════
-const PROMPTS = [
-  "A carved jack-o-lantern pumpkin",
-  "An Aztec step pyramid",
-  "A simple house with a triangular roof and chimney",
-  "A chess pawn",
-  "A park bench",
-  "A trophy cup",
-  "A mushroom",
-  "A simple rocket ship",
-  "A traffic cone",
-  "A horseshoe magnet",
-  "A coffee mug with a handle",
-  "A simple bridge with two towers",
-  "A bowling pin",
-  "A fire hydrant",
-  "A classic round alarm clock",
-  "A simple lighthouse",
-  "An igloo",
-  "A crescent moon",
-  "A simple crown",
-  "A pencil sharpener"
-];
+const PROMPT_BANKS = {
+  easy: [
+    "A coffee mug with a handle",
+    "A traffic cone",
+    "A mushroom",
+    "A bowling pin",
+    "A chess pawn",
+    "A simple crown",
+    "A crescent moon",
+    "A trophy cup",
+    "An igloo",
+    "A simple rocket ship",
+    "A pencil sharpener",
+    "A fire hydrant",
+    "A park bench",
+    "A horseshoe magnet",
+    "A simple lighthouse",
+    "A classic round alarm clock",
+    "A chess rook (castle)",
+    "A traffic light",
+    "A simple birdhouse",
+    "A beach ball",
+  ],
+  medium: [
+    "A carved jack-o-lantern pumpkin",
+    "An Aztec step pyramid",
+    "A simple house with a triangular roof and chimney",
+    "A simple bridge with two towers",
+    "A simple rocket with fins and nose cone",
+    "A classic red barn",
+    "A sailing ship with mast and sails",
+    "A grandfather clock",
+    "A medieval castle with two towers",
+    "A typewriter",
+    "A vintage telephone",
+    "A hot air balloon",
+    "A cactus with two arms",
+    "An umbrella opened wide",
+    "A double-decker bus",
+    "A windmill with four blades",
+    "A snowman with hat and scarf",
+    "A rocking chair",
+    "A pair of headphones",
+    "A Viking helmet with horns",
+  ],
+  hard: [
+    "The Eiffel Tower",
+    "A detailed human hand, open palm",
+    "A DNA double helix strand",
+    "A nautilus shell cross-section",
+    "A suspension bridge",
+    "An ornate chandelier",
+    "A dragon curled around a pillar",
+    "A detailed rose with stem and leaves",
+    "A human skull",
+    "An ancient Greek temple with columns",
+    "A spiral staircase viewed from below",
+    "A complex gear mechanism with interlocking parts",
+    "A knotted rope ball",
+    "A crumpled piece of paper",
+    "A human ear",
+    "A working clock with exposed gears",
+    "A submarine with conning tower and propeller",
+    "A peacock with open tail feathers",
+    "A tangled set of headphone cords",
+    "A realistic human foot",
+  ]
+};
 
 // ══════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════
-const DESCRIBE_TIME_SEC = 60; // fixed at 1 minute
+const DESCRIBE_TIME_SEC = 60;
 
 let state = {
-  roomCode: null,
-  playerId: null,
-  playerName: null,
-  isHost: false,
-  groupId: null,
+  roomCode:      null,
+  playerId:      null,
+  playerName:    null,
+  isHost:        false,
+  groupId:       null,
   chainPosition: null,
-  groupSize: null,
-  totalRounds: null,
-  modelTime: 10,
-  currentRound: 0,
-  phase: null,
-  imageDataUrl: null,
+  groupSize:     null,
+  totalRounds:   null,
+  modelTime:     10,
+  currentRound:  0,
+  phase:         null,
+  imageDataUrl:  null,
   timerInterval: null,
-  timerEnd: null,
-  startPrompt: null,
-  revealGroups: [],
+  timerEnd:      null,
+  startPrompt:   null,
+  difficulty:    'easy',
+  modelingRounds: 5,
+  revealGroups:  [],
   revealGroupIdx: 0,
   revealChainIdx: 0,
-  revealStepIdx: 0,
+  revealStepIdx:  0,
+  emojiListener:  null,
 };
+
+// Selected difficulty in host UI
+let selectedDifficulty = 'easy';
 
 // ══════════════════════════════════════════════════════
 //  UTILS
@@ -571,6 +755,17 @@ function shuffle(arr) {
 function posMod(a, n) { return ((a % n) + n) % n; }
 
 // ══════════════════════════════════════════════════════
+//  DIFFICULTY SELECTOR (host UI)
+// ══════════════════════════════════════════════════════
+function setDifficulty(level) {
+  selectedDifficulty = level;
+  ['easy','medium','hard'].forEach(d => {
+    const btn = document.getElementById('diff-' + d);
+    btn.className = 'diff-btn' + (d === level ? ` active-${d}` : '');
+  });
+}
+
+// ══════════════════════════════════════════════════════
 //  IMAGE HELPERS
 // ══════════════════════════════════════════════════════
 function fileToBase64(file) {
@@ -595,6 +790,66 @@ function compressImage(dataUrl, maxWidth=1200) {
 }
 
 // ══════════════════════════════════════════════════════
+//  SOUND EFFECTS
+// ══════════════════════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playTone(freq, type, duration, volume=0.3, fadeOut=true) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    if (fadeOut) gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) { /* audio not available */ }
+}
+
+function playWarningBeep() {
+  // Single mid beep for 30-second warning
+  playTone(880, 'sine', 0.18, 0.25);
+}
+
+function playDangerBeep() {
+  // Urgent short beep for last-10-second ticks
+  playTone(1100, 'square', 0.08, 0.15);
+}
+
+function playRoundEndSound() {
+  // Descending three-note chime
+  const ctx = getAudioCtx();
+  [523, 392, 330].forEach((freq, i) => {
+    setTimeout(() => playTone(freq, 'sine', 0.35, 0.28), i * 140);
+  });
+}
+
+function playRoundStartSound() {
+  // Ascending two-note fanfare
+  [392, 523].forEach((freq, i) => {
+    setTimeout(() => playTone(freq, 'sine', 0.3, 0.25), i * 130);
+  });
+}
+
+function playEmojiSound() {
+  playTone(660, 'sine', 0.12, 0.15);
+}
+
+// Track sound state for timer
+let lastWarningFired = false;
+let dangerBeepInterval = null;
+
+// ══════════════════════════════════════════════════════
 //  CREATE / JOIN
 // ══════════════════════════════════════════════════════
 async function createGame() {
@@ -615,7 +870,8 @@ async function joinGame() {
   if (code.length !== 6) { showError('Enter the 6-character room code.'); return; }
   const snap = await db.ref(`rooms/${code}`).get();
   if (!snap.exists()) { showError('Room not found. Check the code.'); return; }
-  if (snap.val().status !== 'lobby') { showError('That game has already started.'); return; }
+  const roomData = snap.val();
+  if (roomData.status !== 'lobby') { showError('That game has already started.'); return; }
   state.roomCode = code; state.playerId = getPlayerId();
   state.playerName = name; state.isHost = false;
   await db.ref(`rooms/${code}/players/${state.playerId}`).set({ name, joinedAt: Date.now(), isHost: false });
@@ -651,47 +907,47 @@ function renderPlayers(players) {
 //  START GAME
 // ══════════════════════════════════════════════════════
 async function startGame() {
-  const modelTime = parseInt(document.getElementById('setting-model-time').value) || 10;
-  const groupSize = parseInt(document.getElementById('setting-group-size').value) || 6;
+  const modelTime     = parseInt(document.getElementById('setting-model-time').value) || 10;
+  const modelingRounds = parseInt(document.getElementById('setting-rounds').value) || 5;
+  const difficulty    = selectedDifficulty;
 
   const snap = await db.ref(`rooms/${state.roomCode}/players`).get();
   const ids  = shuffle(Object.keys(snap.val()||{}));
-  if (ids.length < 3) { showStartError('Need at least 3 players to start.'); return; }
 
-  // Build groups
-  const groups = [];
-  for (let i = 0; i < ids.length; i += groupSize) groups.push(ids.slice(i, i+groupSize));
-
-  // Warn if last group is too small
-  const minSize = Math.min(...groups.map(g => g.length));
-  if (minSize < 3) {
-    showStartError(`Last group would only have ${minSize} player(s). Reduce group size or wait for more players.`);
+  if (ids.length < 5) {
+    showStartError('Need at least 5 players to start.');
     return;
   }
 
-  // Rounds = min group size - 1
-  const rounds = minSize - 1;
+  // All players form one group
+  const groupSize = ids.length;
 
-  const shuffledPrompts = shuffle([...PROMPTS]);
+  // Total rounds = modelingRounds * 2 - 1
+  // (players alternate model/describe; last round is always model)
+  const totalRounds = modelingRounds * 2 - 1;
+
+  // Pick prompts from the correct difficulty bank
+  const bank = shuffle([...PROMPT_BANKS[difficulty]]);
   const assignments = {};
-  let promptIdx = 0;
 
-  for (let gi = 0; gi < groups.length; gi++) {
-    const group = groups[gi];
-    group.forEach((pid, pos) => {
-      assignments[pid] = {
-        groupId: gi,
-        position: pos,
-        groupSize: group.length,
-        startPrompt: shuffledPrompts[promptIdx % shuffledPrompts.length]
-      };
-      promptIdx++;
-    });
-    await db.ref(`rooms/${state.roomCode}/groups/${gi}`).set({ size: group.length });
-  }
+  ids.forEach((pid, pos) => {
+    assignments[pid] = {
+      groupId:     0,
+      position:    pos,
+      groupSize:   groupSize,
+      startPrompt: bank[pos % bank.length]
+    };
+  });
 
+  await db.ref(`rooms/${state.roomCode}/groups/0`).set({ size: groupSize });
   await db.ref(`rooms/${state.roomCode}/assignments`).set(assignments);
-  await db.ref(`rooms/${state.roomCode}/settings`).set({ modelTime, rounds, groupSize });
+  await db.ref(`rooms/${state.roomCode}/settings`).set({
+    modelTime,
+    totalRounds,
+    modelingRounds,
+    difficulty,
+    groupSize
+  });
   await db.ref(`rooms/${state.roomCode}/round`).set(0);
   await db.ref(`rooms/${state.roomCode}/status`).set('playing');
 }
@@ -704,23 +960,31 @@ async function loadMyAssignment() {
     db.ref(`rooms/${state.roomCode}/assignments/${state.playerId}`).get(),
     db.ref(`rooms/${state.roomCode}/settings`).get(),
   ]);
-  const asn = asnap.val(); const settings = ssnap.val();
+  const asn      = asnap.val();
+  const settings = ssnap.val();
+
   state.groupId       = asn.groupId;
   state.chainPosition = asn.position;
   state.groupSize     = asn.groupSize;
   state.startPrompt   = asn.startPrompt;
-  state.totalRounds   = settings.rounds;
+  state.totalRounds   = settings.totalRounds;
   state.modelTime     = settings.modelTime;
+  state.difficulty    = settings.difficulty;
 
   document.getElementById('game-room-code').textContent = state.roomCode;
   document.getElementById('round-total').textContent    = state.totalRounds;
+
+  // Set difficulty badge
+  const diffBadge = document.getElementById('game-diff-badge');
+  diffBadge.textContent = state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1);
+  diffBadge.className = `diff-badge ${state.difficulty}`;
+
   showScreen('game');
 
   db.ref(`rooms/${state.roomCode}/round`).on('value', snap => {
     const round = snap.val();
     if (round === null) return;
     state.currentRound = round;
-    // Display as 1-based
     document.getElementById('round-display').textContent = round + 1;
     determinePhase();
   });
@@ -729,19 +993,15 @@ async function loadMyAssignment() {
 // ══════════════════════════════════════════════════════
 //  DETERMINE PHASE
 //
+//  Rounds alternate: 0=model, 1=describe, 2=model, ...
+//  totalRounds = modelingRounds*2 - 1 (always ends on model)
+//
 //  Chain ownership in round r:
 //  The chain that started with player at position p
 //  is held by position (p + r) % n in round r.
 //
-//  So in round r, I hold the chain from position:
-//    originPos = (myPos - r + n*n) % n  (posMod handles this)
-//
-//  Round 0 (model): model my own startPrompt
-//  Round 1 (describe): describe screenshot from round 0
-//    held by position (myPos - 1 + n) % n
-//  Round 2 (model): model from description in round 1
-//    held by position (myPos - 1 + n) % n  (same prev holder)
-//  etc.
+//  So in round r, I hold the chain from:
+//    originPos = posMod(myPos - r, n)
 // ══════════════════════════════════════════════════════
 async function determinePhase() {
   const r     = state.currentRound;
@@ -770,9 +1030,6 @@ async function determinePhase() {
     if (r === 0) {
       showPhase('model', state.startPrompt);
     } else {
-      // Get description from previous round
-      // prev holder = player who had this chain in round r-1
-      // = position (myPos - r + 1 + n*big) % n
       const prevPos = posMod(myPos - r + 1, n);
       const prevPid = await getPidByPosition(prevPos);
       const dsnap   = await db.ref(
@@ -781,7 +1038,6 @@ async function determinePhase() {
       showPhase('model', dsnap.val()?.description || '(no description received)');
     }
   } else {
-    // Get screenshot from previous round
     const prevPos = posMod(myPos - r + 1, n);
     const prevPid = await getPidByPosition(prevPos);
     const isnap   = await db.ref(
@@ -810,11 +1066,16 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
 
   const badge = document.getElementById('game-phase-badge');
 
+  // Stop any danger beep interval
+  if (dangerBeepInterval) { clearInterval(dangerBeepInterval); dangerBeepInterval = null; }
+  lastWarningFired = false;
+
   if (phase === 'model') {
     document.getElementById('phase-model').style.display = 'block';
     document.getElementById('model-prompt').textContent  = promptOrDesc || '';
     badge.className = 'phase-badge phase-model'; badge.textContent = 'Modeling';
     resetDropZone();
+    playRoundStartSound();
     startTimer(state.modelTime * 60);
 
   } else if (phase === 'describe') {
@@ -824,12 +1085,14 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
     document.getElementById('submit-desc-btn').disabled     = false;
     document.getElementById('submit-desc-btn').textContent  = 'Submit Description';
     badge.className = 'phase-badge phase-describe'; badge.textContent = 'Describing';
+    playRoundStartSound();
     startTimer(DESCRIBE_TIME_SEC);
 
   } else {
     document.getElementById('phase-wait').style.display = 'block';
     badge.className = 'phase-badge phase-wait'; badge.textContent = 'Waiting';
     clearTimer();
+    watchEmojiReactions();
   }
 }
 
@@ -844,7 +1107,7 @@ async function watchWaitProgress(round) {
   const all     = asnap.val()||{};
   const players = psnap.val()||{};
   const members = Object.entries(all)
-    .filter(([pid,a]) => a.groupId === state.groupId)
+    .filter(([pid,a]) => String(a.groupId) === String(state.groupId))
     .map(([pid]) => ({ pid, name: players[pid]?.name || '?' }));
 
   const subRef = db.ref(`rooms/${state.roomCode}/submissions/${state.groupId}`);
@@ -859,12 +1122,55 @@ async function watchWaitProgress(round) {
 }
 
 // ══════════════════════════════════════════════════════
+//  EMOJI REACTIONS
+// ══════════════════════════════════════════════════════
+function watchEmojiReactions() {
+  // Detach any old listener
+  if (state.emojiListener) {
+    db.ref(`rooms/${state.roomCode}/reactions`).off('child_added', state.emojiListener);
+  }
+
+  // Only show reactions from the last 10 seconds on connect (avoid replaying old ones)
+  const since = Date.now() - 10000;
+  const feed = document.getElementById('emoji-feed');
+  feed.innerHTML = '';
+
+  state.emojiListener = db.ref(`rooms/${state.roomCode}/reactions`)
+    .orderByChild('ts')
+    .startAt(since)
+    .limitToLast(30)
+    .on('child_added', snap => {
+      const { emoji, name } = snap.val()||{};
+      if (!emoji) return;
+      playEmojiSound();
+      const el = document.createElement('div');
+      el.className = 'reaction-entry';
+      el.innerHTML = `<span class="emoji-reaction">${esc(emoji)}</span><span class="reaction-name">${esc(name)}</span>`;
+      feed.appendChild(el);
+      // Scroll feed into view, cap at 20 items
+      while (feed.children.length > 20) feed.removeChild(feed.firstChild);
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+}
+
+async function sendReaction(emoji) {
+  if (!state.roomCode || !state.playerName) return;
+  await db.ref(`rooms/${state.roomCode}/reactions`).push({
+    emoji,
+    name: state.playerName,
+    ts: Date.now()
+  });
+}
+
+// ══════════════════════════════════════════════════════
 //  TIMER
 // ══════════════════════════════════════════════════════
 function startTimer(seconds) {
   clearTimer();
-  state.timerEnd = Date.now() + seconds * 1000;
-  const totalMs  = seconds * 1000;
+  lastWarningFired = false;
+  state.timerEnd  = Date.now() + seconds * 1000;
+  const totalMs   = seconds * 1000;
+
   function tick() {
     const rem  = Math.max(0, state.timerEnd - Date.now());
     const mins = Math.floor(rem/60000);
@@ -874,17 +1180,33 @@ function startTimer(seconds) {
     const bar  = document.getElementById('timer-bar');
     disp.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     bar.style.width  = pct + '%';
-    if (rem <= 30000)       { disp.className='timer-display danger';  bar.className='timer-bar danger'; }
-    else if (rem <= 120000) { disp.className='timer-display warning'; bar.className='timer-bar warning'; }
-    else                    { disp.className='timer-display';         bar.className='timer-bar'; }
-    if (rem === 0) { clearTimer(); autoSubmit(); }
+
+    if (rem <= 10000 && rem > 0) {
+      disp.className='timer-display danger';  bar.className='timer-bar danger';
+      // Beep every second in last 10
+      if (secs !== state._lastDangerSec) {
+        state._lastDangerSec = secs;
+        playDangerBeep();
+      }
+    } else if (rem <= 30000) {
+      disp.className='timer-display danger';  bar.className='timer-bar danger';
+      if (!lastWarningFired) { lastWarningFired = true; playWarningBeep(); }
+    } else if (rem <= 120000) {
+      disp.className='timer-display warning'; bar.className='timer-bar warning';
+    } else {
+      disp.className='timer-display';         bar.className='timer-bar';
+    }
+
+    if (rem === 0) { clearTimer(); playRoundEndSound(); autoSubmit(); }
   }
   tick();
   state.timerInterval = setInterval(tick, 1000);
 }
+
 function clearTimer() {
   if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
 }
+
 function autoSubmit() {
   if (state.phase === 'model')    submitModel();
   else if (state.phase === 'describe') submitDescription();
@@ -935,6 +1257,7 @@ async function submitModel() {
   const btn = document.getElementById('submit-model-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
+  playRoundEndSound();
   await writeSubmission({
     playerName: state.playerName,
     timestamp:  Date.now(),
@@ -950,6 +1273,7 @@ async function submitDescription() {
   const btn = document.getElementById('submit-desc-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   clearTimer();
+  playRoundEndSound();
   const desc = document.getElementById('description-input').value.trim() || '(no description)';
   await writeSubmission({
     playerName:  state.playerName,
@@ -984,9 +1308,9 @@ function watchForRoundAdvance(round) {
       db.ref(`rooms/${state.roomCode}/groups`).get(),
       db.ref(`rooms/${state.roomCode}/settings`).get(),
     ]);
-    const assignments = asnap.val()||{};
-    const groups      = gsnap.val()||{};
-    const totalRounds = (ssnap.val()||{}).rounds||5;
+    const assignments  = asnap.val()||{};
+    const groups       = gsnap.val()||{};
+    const totalRounds  = (ssnap.val()||{}).totalRounds || 9;
 
     let allDone = true;
     for (const [gi, group] of Object.entries(groups)) {
@@ -1028,7 +1352,7 @@ async function loadReveal() {
   const assignments = asnap.val()||{};
   const groups      = gsnap.val()||{};
   const players     = psnap.val()||{};
-  const totalRounds = (ssnap.val()||{}).rounds||5;
+  const totalRounds = (ssnap.val()||{}).totalRounds || 9;
 
   state.revealGroups = [];
 
@@ -1159,6 +1483,29 @@ function revealPrev() {
   }
   renderRevealChain();
 }
+
+// ══════════════════════════════════════════════════════
+//  FIREBASE SECURITY RULES (applied in Firebase console)
+//  {
+//    "rules": {
+//      "rooms": {
+//        "$roomId": {
+//          ".read": "auth == null",   // public read for now
+//          ".write": "auth == null",  // tighten in V3 with auth
+//          "submissions": {
+//            "$groupId": {
+//              "$playerId": {
+//                ".write": "auth == null"
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+//  TODO V3: Lock down with Firebase Auth so players can only
+//  write their own submissions and read their own room.
+// ══════════════════════════════════════════════════════
 </script>
 </body>
 </html>
