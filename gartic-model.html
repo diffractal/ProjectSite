@@ -102,7 +102,7 @@
     border-radius: var(--radius); padding: 2rem; margin-bottom: 1.4rem;
   }
   .card-title {
-    font-family: var(--mono); font-size: 0.8rem;
+    font-family: var(--mono); font-size: 1rem;
     text-transform: uppercase; letter-spacing: 0.15em;
     color: var(--muted); margin-bottom: 1.1rem;
   }
@@ -176,9 +176,9 @@
     flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.75rem;
   }
   .phase-badge {
-    display: inline-block; font-family: var(--mono); font-size: 0.82rem;
+    display: inline-block; font-family: var(--mono); font-size: 1rem;
     text-transform: uppercase; letter-spacing: 0.12em;
-    padding: 0.35rem 1rem; border-radius: 999px; font-weight: 500;
+    padding: 0.4rem 1.1rem; border-radius: 999px; font-weight: 500;
   }
   .phase-model    { background: rgba(255,107,53,0.15);  color: var(--accent);  border: 1px solid rgba(255,107,53,0.3); }
   .phase-describe { background: rgba(255,209,102,0.15); color: var(--accent2); border: 1px solid rgba(255,209,102,0.3); }
@@ -189,7 +189,7 @@
     font-size: 1.6rem; letter-spacing: 0.08em;
     color: var(--text);
   }
-  .round-pill span { color: var(--muted); font-size: 1.1rem; }
+  .round-pill span { color: var(--muted); font-size: 1.6rem; }
 
   .room-pill {
     display: inline-flex; align-items: center; gap: 0.4rem;
@@ -253,10 +253,10 @@
 
   /* ── Wait progress ── */
   .wait-progress { margin-top: 1.2rem; }
-  .wait-progress-label { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.7rem; }
+  .wait-progress-label { font-family: var(--mono); font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.7rem; }
   .wait-chips { display: flex; flex-wrap: wrap; gap: 0.55rem; }
   .wait-chip {
-    font-size: 0.95rem; padding: 0.38rem 0.9rem;
+    font-size: 1.1rem; padding: 0.45rem 1.1rem;
     border-radius: 999px; border: 1px solid var(--border);
     color: var(--muted); background: var(--surface2); transition: all 0.3s;
   }
@@ -317,7 +317,7 @@
 
   .chain-step { padding: 1.5rem; border-bottom: 1px solid var(--border); animation: fadeSlide 0.4s ease both; }
   .chain-step:last-child { border-bottom: none; }
-  .chain-step-type { font-family: var(--mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.65rem; opacity: 0.75; }
+  .chain-step-type { font-family: var(--mono); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.65rem; opacity: 0.75; }
   .chain-step-type.prompt-type { color: var(--accent2); }
   .chain-step-type.model-type  { color: var(--accent); }
   .chain-step-type.desc-type   { color: var(--success); }
@@ -337,6 +337,39 @@
   #landing-error { color: var(--danger); font-size: 0.95rem; margin-top: 0.5rem; min-height: 1.3em; }
 
   .version { text-align: center; font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.1); margin-top: 3rem; letter-spacing: 0.1em; user-select: none; }
+
+  /* ── Host indicator ── */
+  .host-indicator {
+    display: none;
+    position: fixed; bottom: 1.2rem; right: 1.2rem; z-index: 100;
+    background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.4);
+    border-radius: 999px; padding: 0.4rem 1rem;
+    font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent);
+    backdrop-filter: blur(6px);
+  }
+  .host-indicator.visible { display: block; }
+
+  /* ── Grace period warning overlay ── */
+  .grace-warning {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    pointer-events: none;
+    animation: flashBorder 0.5s ease infinite alternate;
+  }
+  .grace-warning.active { display: block; box-shadow: inset 0 0 0 5px var(--danger); }
+  .grace-banner {
+    display: none; position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+    z-index: 201; background: var(--danger); color: #fff;
+    font-family: var(--mono); font-size: 0.9rem; text-transform: uppercase;
+    letter-spacing: 0.1em; padding: 0.65rem 1.5rem; border-radius: 999px;
+    white-space: nowrap; pointer-events: none;
+    animation: flashBorder 0.4s ease infinite alternate;
+  }
+  .grace-banner.active { display: block; }
+  @keyframes flashBorder {
+    from { opacity: 1; }
+    to   { opacity: 0.55; }
+  }
 
   /* ── Difficulty badge in-game ── */
   .diff-badge {
@@ -369,6 +402,9 @@
 </style>
 </head>
 <body>
+<div class="host-indicator" id="host-indicator">★ Host</div>
+<div class="grace-warning" id="grace-warning"></div>
+<div class="grace-banner" id="grace-banner"></div>
 <div class="app">
 
   <!-- ══ SCREEN: Landing ══ -->
@@ -421,7 +457,7 @@
     <div class="card">
       <div class="room-code-label">Room Code</div>
       <div class="room-code" id="lobby-code">——</div>
-      <div class="room-code-sub">Share this code with your students</div>
+      <div class="room-code-sub">Enter this code to join the game</div>
       <div class="divider"></div>
       <div class="lobby-info">
         <div class="card-title" style="margin-bottom:0;">Players</div>
@@ -449,14 +485,14 @@
         <div class="settings-grid">
           <div>
             <label>Model time (minutes)</label>
-            <input type="text" id="setting-model-time" value="10" style="font-family:var(--mono);">
+            <input type="text" id="setting-model-time" value="8" style="font-family:var(--mono);">
           </div>
           <div>
             <label>Modeling rounds per player</label>
             <select id="setting-rounds">
-              <option value="3">3 rounds</option>
+              <option value="3" selected>3 rounds</option>
               <option value="4">4 rounds</option>
-              <option value="5" selected>5 rounds</option>
+              <option value="5">5 rounds</option>
             </select>
           </div>
         </div>
@@ -500,30 +536,34 @@
       <div class="prompt-display" id="model-prompt"></div>
       <div class="divider"></div>
       <div class="card-title">Upload your best screenshot</div>
-      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">Choose the view that best shows off your model — any angle works!</div>
 
-      <div class="drop-zone" id="drop-zone"
-           ondragover="handleDragOver(event)"
-           ondragleave="handleDragLeave(event)"
-           ondrop="handleDrop(event)">
-        <div class="drop-icon">⬆</div>
-        <div class="drop-label">Drag & drop your screenshot here</div>
-        <div class="drop-hint">or use the button below · Ctrl+V to paste</div>
-      </div>
-
-      <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center;flex-wrap:wrap;">
-        <div class="browse-btn-wrap">
-          <button class="btn btn-ghost">Browse Files</button>
-          <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+      <div id="upload-area">
+        <div class="drop-zone" id="drop-zone"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          <div class="drop-icon">⬆</div>
+          <div class="drop-label">Drag & drop your screenshot here</div>
+          <div class="drop-hint">or use the button below · Ctrl+V to paste</div>
         </div>
-        <span id="file-name-display" style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);flex:1;">No file selected</span>
+
+        <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center;flex-wrap:wrap;">
+          <div class="browse-btn-wrap">
+            <button class="btn btn-ghost">Browse Files</button>
+            <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+          </div>
+          <span id="file-name-display" style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);flex:1;">No file selected</span>
+        </div>
       </div>
 
       <img id="preview-img" class="preview-img" alt="Your screenshot preview">
 
-      <div style="margin-top:1.2rem;">
-        <button class="btn btn-success btn-full" id="submit-model-btn" onclick="submitModel()" disabled>
+      <div style="margin-top:1.2rem;display:flex;gap:0.75rem;align-items:center;">
+        <button class="btn btn-success" style="flex:1;" id="submit-model-btn" onclick="submitModel()" disabled>
           Submit Screenshot
+        </button>
+        <button class="btn btn-ghost" id="change-screenshot-btn" onclick="resetDropZone()" style="display:none;white-space:nowrap;">
+          × Change
         </button>
       </div>
     </div>
@@ -552,7 +592,7 @@
           <div class="wait-chips" id="wait-chips"></div>
         </div>
 
-        <!-- Emoji Reactions -->
+        <!-- EMOJI REACTIONS — commented out for v0.2, re-enable in future version
         <div class="emoji-bar">
           <div class="emoji-bar-label">React while you wait</div>
           <div class="emoji-buttons">
@@ -567,6 +607,7 @@
           </div>
           <div class="emoji-feed" id="emoji-feed"></div>
         </div>
+        -->
       </div>
     </div>
 
@@ -584,10 +625,13 @@
         <span id="reveal-step-counter" class="reveal-progress-text"></span>
         <button class="btn" onclick="revealNext()">Next →</button>
       </div>
+      <div style="margin-top:1.2rem;text-align:center;">
+        <button class="btn btn-ghost" onclick="startNewGame()" style="font-size:0.95rem;">↩ New Game</button>
+      </div>
     </div>
   </div>
 
-  <div class="version">gartic model · v0.2.0</div>
+  <div class="version">gartic model · v0.2.1</div>
 
 </div><!-- /app -->
 
@@ -635,6 +679,20 @@ const PROMPT_BANKS = {
     "A traffic light",
     "A simple birdhouse",
     "A beach ball",
+    "A simple tent",
+    "A slice of pizza",
+    "A fork",
+    "A stop sign",
+    "A padlock",
+    "A simple chair",
+    "A pair of dice",
+    "A domino",
+    "A thumbs up hand",
+    "A simple star shape",
+    "A key",
+    "A snowflake",
+    "A simple boat",
+    "A speech bubble",
   ],
   medium: [
     "A carved jack-o-lantern pumpkin",
@@ -657,6 +715,20 @@ const PROMPT_BANKS = {
     "A rocking chair",
     "A pair of headphones",
     "A Viking helmet with horns",
+    "A simple biplane",
+    "A gas pump",
+    "A treasure chest with open lid",
+    "A classic Saturn rocket",
+    "An oil lamp",
+    "A vintage camera",
+    "A shopping cart",
+    "A mailbox on a post",
+    "A water tower",
+    "A church with a steeple",
+    "A garden gnome",
+    "A gramophone",
+    "A spinning top",
+    "A simple tank",
   ],
   hard: [
     "The Eiffel Tower",
@@ -679,6 +751,20 @@ const PROMPT_BANKS = {
     "A peacock with open tail feathers",
     "A tangled set of headphone cords",
     "A realistic human foot",
+    "A human spine",
+    "A wave about to break",
+    "A melting candle",
+    "A bonsai tree",
+    "A detailed oak tree with roots exposed",
+    "A human brain",
+    "A detailed butterfly with wings open",
+    "A violin",
+    "An elaborate wedding cake with three tiers",
+    "A detailed human eye",
+    "A coral reef formation",
+    "A coiled snake",
+    "A medieval suit of armor",
+    "A bunch of grapes",
   ]
 };
 
@@ -696,7 +782,7 @@ let state = {
   chainPosition: null,
   groupSize:     null,
   totalRounds:   null,
-  modelTime:     10,
+  modelTime:     8,
   currentRound:  0,
   phase:         null,
   imageDataUrl:  null,
@@ -886,6 +972,7 @@ function enterLobby() {
   document.getElementById('lobby-code').textContent = state.roomCode;
   document.getElementById('host-controls').style.display = state.isHost ? 'block' : 'none';
   document.getElementById('waiting-msg').style.display   = state.isHost ? 'none'  : 'block';
+  if (state.isHost) document.getElementById('host-indicator').classList.add('visible');
   db.ref(`rooms/${state.roomCode}/players`).on('value', snap => renderPlayers(snap.val()||{}));
   db.ref(`rooms/${state.roomCode}/status`).on('value', snap => {
     if (snap.val() === 'playing') loadMyAssignment();
@@ -926,8 +1013,9 @@ async function startGame() {
   // (players alternate model/describe; last round is always model)
   const totalRounds = modelingRounds * 2 - 1;
 
-  // Pick prompts from the correct difficulty bank
+  // Pick prompts — shuffle then slice to guarantee unique prompts per player within one game
   const bank = shuffle([...PROMPT_BANKS[difficulty]]);
+  const usedPrompts = bank.slice(0, groupSize); // unique per player up to bank length
   const assignments = {};
 
   ids.forEach((pid, pos) => {
@@ -935,7 +1023,7 @@ async function startGame() {
       groupId:     0,
       position:    pos,
       groupSize:   groupSize,
-      startPrompt: bank[pos % bank.length]
+      startPrompt: usedPrompts[pos % usedPrompts.length]
     };
   });
 
@@ -1066,8 +1154,9 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
 
   const badge = document.getElementById('game-phase-badge');
 
-  // Stop any danger beep interval
+  // Stop any running timers / grace period
   if (dangerBeepInterval) { clearInterval(dangerBeepInterval); dangerBeepInterval = null; }
+  if (typeof endGracePeriod === 'function') endGracePeriod();
   lastWarningFired = false;
 
   if (phase === 'model') {
@@ -1092,7 +1181,6 @@ function showPhase(phase, promptOrDesc, imgDataUrl) {
     document.getElementById('phase-wait').style.display = 'block';
     badge.className = 'phase-badge phase-wait'; badge.textContent = 'Waiting';
     clearTimer();
-    watchEmojiReactions();
   }
 }
 
@@ -1118,23 +1206,28 @@ async function watchWaitProgress(round) {
       return `<span class="wait-chip ${done?'done':''}">${esc(m.name)}</span>`;
     }).join('');
   });
-  db.ref(`rooms/${state.roomCode}/round`).once('value', () => subRef.off());
+  // Clean up subRef listener when round actually advances (not immediately like .once does)
+  let roundCleanupCb;
+  const roundRef2 = db.ref(`rooms/${state.roomCode}/round`);
+  roundCleanupCb = roundRef2.on('value', snap => {
+    if (snap.val() !== round && snap.val() !== null) {
+      subRef.off();
+      roundRef2.off('value', roundCleanupCb);
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════
 //  EMOJI REACTIONS
 // ══════════════════════════════════════════════════════
+/* EMOJI REACTIONS — commented out for v0.2, re-enable in future version
 function watchEmojiReactions() {
-  // Detach any old listener
   if (state.emojiListener) {
     db.ref(`rooms/${state.roomCode}/reactions`).off('child_added', state.emojiListener);
   }
-
-  // Only show reactions from the last 10 seconds on connect (avoid replaying old ones)
   const since = Date.now() - 10000;
   const feed = document.getElementById('emoji-feed');
   feed.innerHTML = '';
-
   state.emojiListener = db.ref(`rooms/${state.roomCode}/reactions`)
     .orderByChild('ts')
     .startAt(since)
@@ -1147,12 +1240,10 @@ function watchEmojiReactions() {
       el.className = 'reaction-entry';
       el.innerHTML = `<span class="emoji-reaction">${esc(emoji)}</span><span class="reaction-name">${esc(name)}</span>`;
       feed.appendChild(el);
-      // Scroll feed into view, cap at 20 items
       while (feed.children.length > 20) feed.removeChild(feed.firstChild);
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 }
-
 async function sendReaction(emoji) {
   if (!state.roomCode || !state.playerName) return;
   await db.ref(`rooms/${state.roomCode}/reactions`).push({
@@ -1161,6 +1252,7 @@ async function sendReaction(emoji) {
     ts: Date.now()
   });
 }
+*/
 
 // ══════════════════════════════════════════════════════
 //  TIMER
@@ -1208,8 +1300,61 @@ function clearTimer() {
 }
 
 function autoSubmit() {
-  if (state.phase === 'model')    submitModel();
-  else if (state.phase === 'describe') submitDescription();
+  if (state.phase === 'describe') {
+    submitDescription();
+  } else if (state.phase === 'model') {
+    if (state.imageDataUrl) {
+      submitModel();
+    } else {
+      startGracePeriod();
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  GRACE PERIOD — 10s warning when model timer expires with no screenshot
+// ══════════════════════════════════════════════════════
+let graceInterval = null;
+
+function startGracePeriod() {
+  playWarningBeep();
+  document.getElementById('grace-warning').classList.add('active');
+  document.getElementById('grace-banner').classList.add('active');
+  let remaining = 10;
+  updateGraceBanner(remaining);
+
+  graceInterval = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      endGracePeriod();
+      submitModel(); // submits blank
+    } else {
+      playDangerBeep();
+      updateGraceBanner(remaining);
+    }
+  }, 1000);
+
+  // Poll: if student uploads during grace period, cancel and submit
+  state._graceUploadCheck = setInterval(() => {
+    if (state.imageDataUrl) {
+      clearInterval(state._graceUploadCheck);
+      state._graceUploadCheck = null;
+      endGracePeriod();
+      submitModel();
+    }
+  }, 300);
+}
+
+function updateGraceBanner(sec) {
+  document.getElementById('grace-banner').textContent =
+    `⏰ No screenshot yet — ${sec}s to upload or a blank will be submitted`;
+}
+
+function endGracePeriod() {
+  if (graceInterval) { clearInterval(graceInterval); graceInterval = null; }
+  if (state._graceUploadCheck) { clearInterval(state._graceUploadCheck); state._graceUploadCheck = null; }
+  document.getElementById('grace-warning').classList.remove('active');
+  document.getElementById('grace-banner').classList.remove('active');
 }
 
 // ══════════════════════════════════════════════════════
@@ -1233,6 +1378,8 @@ async function setImageFile(file) {
   state.imageDataUrl = comp;
   const p = document.getElementById('preview-img');
   p.src = comp; p.style.display = 'block';
+  document.getElementById('upload-area').style.display = 'none';
+  document.getElementById('change-screenshot-btn').style.display = 'inline-flex';
   document.getElementById('submit-model-btn').disabled = false;
 }
 function resetDropZone() {
@@ -1241,6 +1388,8 @@ function resetDropZone() {
   p.style.display = 'none'; p.src = '';
   document.getElementById('file-input').value = '';
   document.getElementById('file-name-display').textContent = 'No file selected';
+  document.getElementById('upload-area').style.display = 'block';
+  document.getElementById('change-screenshot-btn').style.display = 'none';
   document.getElementById('submit-model-btn').disabled = true;
 }
 document.addEventListener('paste', async e => {
@@ -1482,6 +1631,37 @@ function revealPrev() {
     state.revealStepIdx = group.chains[state.revealChainIdx].steps.length - 1;
   }
   renderRevealChain();
+}
+
+// ══════════════════════════════════════════════════════
+//  NEW GAME
+// ══════════════════════════════════════════════════════
+function startNewGame() {
+  endGracePeriod();
+  clearTimer();
+  if (state.roomCode) {
+    db.ref(`rooms/${state.roomCode}/players`).off();
+    db.ref(`rooms/${state.roomCode}/status`).off();
+    db.ref(`rooms/${state.roomCode}/round`).off();
+    db.ref(`rooms/${state.roomCode}/submissions`).off();
+  }
+  document.getElementById('host-indicator').classList.remove('visible');
+  state = {
+    roomCode: null, playerId: null, playerName: null, isHost: false,
+    groupId: null, chainPosition: null, groupSize: null, totalRounds: null,
+    modelTime: 8, currentRound: 0, phase: null, imageDataUrl: null,
+    timerInterval: null, timerEnd: null, startPrompt: null,
+    difficulty: 'easy', modelingRounds: 3,
+    revealGroups: [], revealGroupIdx: 0, revealChainIdx: 0, revealStepIdx: 0,
+    emojiListener: null, _graceUploadCheck: null, _lastDangerSec: null,
+  };
+  selectedDifficulty = 'easy';
+  setDifficulty('easy');
+  document.getElementById('join-name').value = '';
+  document.getElementById('join-code').value = '';
+  document.getElementById('host-name').value = '';
+  document.getElementById('landing-error').textContent = '';
+  showScreen('landing');
 }
 
 // ══════════════════════════════════════════════════════
