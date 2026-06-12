@@ -631,7 +631,7 @@
     </div>
   </div>
 
-  <div class="version">gartic model · v0.2.2</div>
+  <div class="version">gartic model · v0.2.3</div>
 
 </div><!-- /app -->
 
@@ -1101,11 +1101,15 @@ async function determinePhase() {
 
   const isModelRound = (r % 2 === 0);
 
+  // The chain I hold in round r originated at posMod(myPos - r, n).
+  // Its holder in round r-1 was at origin + (r-1) = myPos - 1.
+  // So the previous holder is ALWAYS one position behind me.
+  const prevPos = posMod(myPos - 1, n);
+
   if (isModelRound) {
     if (r === 0) {
       showPhase('model', state.startPrompt);
     } else {
-      const prevPos = posMod(myPos - r + 1, n);
       const prevPid = await getPidByPosition(prevPos);
       const dsnap   = await db.ref(
         `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
@@ -1113,7 +1117,6 @@ async function determinePhase() {
       showPhase('model', dsnap.val()?.description || '(no description received)');
     }
   } else {
-    const prevPos = posMod(myPos - r + 1, n);
     const prevPid = await getPidByPosition(prevPos);
     const isnap   = await db.ref(
       `rooms/${state.roomCode}/submissions/${state.groupId}/${prevPid}/r${r-1}`
