@@ -89,7 +89,7 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
   </div>
 
   <div>
-    <label for="duty">Line thickness: <span id="dutyOut"></span></label>
+    <label for="duty"><span id="dutyName">Line thickness</span>: <span id="dutyOut"></span></label>
     <input id="duty" type="range" min="1" max="90" step="0.1" value="50">
     <label class="check"><input id="auto" type="checkbox" checked> Auto: about 50% of the area black</label>
   </div>
@@ -119,13 +119,16 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
 
 <script>
 /* Changelog
+   v0.5  New patterns: concentric circles, radial sunburst, square dot lattice, hex dot lattice.
+         Patterns can now be filled shapes (rays, dots) as well as stroked lines; the thickness label
+         and readout adapt to the pattern.
    v0.4  Fixed button font, DPI field stepping, and auto-thickness snapping (finer slider step);
          thickness readout rounded to the nearest percent.
    v0.3  Much finer spacing allowed (limits are now per pattern, not a fixed tile count); hex/Penrose
          draw each edge once; preview updates are debounced.
    v0.2  Penrose tiling pattern; version label.
    v0.1  Lines, square, isometric and hex patterns; PNG/SVG export. */
-const VERSION = 'v0.4';
+const VERSION = 'v0.5';
 const $ = id => document.getElementById(id);
 const f = n => Math.round(n * 1e5) / 1e5;
 const INCH = { in: 1, mm: 1 / 25.4 };
@@ -133,9 +136,13 @@ let unit = 'in', last = null;
 $('ver').textContent = VERSION;
 
 /* ---------- Pattern registry ----------
-   To add a pattern (e.g. Penrose): add an entry with
-   gen(rect, spacing) -> SVG path string in inches, rect = [x0,y0,x1,y1],
-   and ink = line-width / spacing that gives ~50% black coverage. */
+   To add a pattern: add an entry with
+   gen(rect, spacing, thickness) -> SVG path string in inches (or a flat [x1,y1,x2,y2,...] segment list),
+   rect = [x0,y0,x1,y1], thickness = the slider value as a 0-1 fraction,
+   and ink = the slider fraction that gives ~50% black coverage.
+   Optional flags: fill (path is filled instead of stroked), dots (gen returns flat [x,y,...] dot centers,
+   drawn as circles of diameter spacing*thickness), angular (thickness is an angle fraction, not a length),
+   tname / of (labels for the thickness control), max (largest spacing-cell count allowed). */
 const LINE_HINT = 'Distance between neighboring parallel lines.';
 const lines = angles => (r, d) => {
   const [x0, y0, x1, y1] = r, ox = x0 + d / 2, oy = y0 + d / 2;
@@ -205,6 +212,45 @@ const penrose = (r, d) => {              // P3 rhombs via Robinson-triangle subd
   for (let i = 0; i < T.length; i += 7) { seg(T[i+1], T[i+2], T[i+3], T[i+4]); seg(T[i+1], T[i+2], T[i+5], T[i+6]); }
   return out;                            // flat [x1,y1,x2,y2, ...]
 };
+const rings = (r, d) => {               // concentric circles about the center of the pattern area, radii d, 2d, 3d...
+  const [x0, y0, x1, y1] = r, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, Rm = Math.hypot(x1 - x0, y1 - y0) / 2 + d;
+  let s = '';
+  for (let k = 1; k * d <= Rm; k++) {
+    const R = k * d;
+    s += `M${f(cx + R)} ${f(cy)}A${f(R)} ${f(R)} 0 1 0 ${f(cx - R)} ${f(cy)}A${f(R)} ${f(R)} 0 1 0 ${f(cx + R)} ${f(cy)}`;
+  }
+  return s;
+};
+const rayCount = (r, d) => Math.max(2, 2 * Math.round(Math.PI * (Math.min(r[2] - r[0], r[3] - r[1]) / 2) / d));
+const sunburst = (r, d, t) => {         // black wedges from the center; d = ray spacing at the nearest edge, t = wedge/pitch angle
+  const [x0, y0, x1, y1] = r, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, N = rayCount(r, d);
+  const step = 2 * Math.PI / N, half = t * step / 2;
+  const Rm = Math.hypot(x1 - x0, y1 - y0) / 2 / Math.cos(half) * 1.001;   // chord of the wedge must still clear the corners
+  let s = '';
+  for (let i = 0; i < N; i++) {
+    const a0 = i * step - half, a1 = i * step + half;
+    s += `M${f(cx)} ${f(cy)}L${f(cx + Rm * Math.cos(a0))} ${f(cy + Rm * Math.sin(a0))}L${f(cx + Rm * Math.cos(a1))} ${f(cy + Rm * Math.sin(a1))}Z`;
+  }
+  return s;
+};
+const dotsSquare = (r, d) => {          // flat [x,y,...] dot centers
+  const [x0, y0, x1, y1] = r, nx = Math.floor((x1 - x0) / d + 1e-9), ny = Math.floor((y1 - y0) / d + 1e-9), out = [];
+  for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) out.push(x0 + d / 2 + i * d, y0 + d / 2 + j * d);
+  return out;
+};
+const dotsHex = (r, d) => {             // triangular lattice, nearest-neighbor distance d, same centers as the hex grid cells
+  const [x0, y0, x1, y1] = r, R = d / Math.sqrt(3), rowH = 1.5 * R, out = [];
+  const rows = Math.ceil((y1 - y0) / rowH) + 2, cols = Math.ceil((x1 - x0) / d) + 2;
+  for (let j = -1; j <= rows; j++) {
+    const cy = y0 + R + j * rowH, sh = (Math.abs(j) % 2) * d / 2;
+    if (cy < y0 - d / 2 || cy > y1 + d / 2) continue;
+    for (let i = -1; i <= cols; i++) {
+      const cx = x0 + d / 2 + sh + i * d;
+      if (cx >= x0 - d / 2 && cx <= x1 + d / 2) out.push(cx, cy);
+    }
+  }
+  return out;
+};
 const SQ = 1 - Math.SQRT1_2;            // line/spacing giving 50% black for square & hex cells
 const PATTERNS = {
   v:   { label: 'Vertical lines',   ink: 0.5,        hint: LINE_HINT, gen: lines([90]) },
@@ -212,6 +258,14 @@ const PATTERNS = {
   sq:  { label: 'Square grid',      ink: SQ,         hint: LINE_HINT, gen: lines([0, 90]) },
   iso: { label: 'Isometric grid',   ink: SQ * 2 / 3, hint: LINE_HINT + ' Lines run at 0°, 60° and 120°.', gen: lines([0, 60, 120]) },
   hex: { label: 'Hex grid',         ink: SQ,         hint: 'Distance between opposite flat sides of each hexagon.', gen: hexes, max: 1e6 },
+  ring:{ label: 'Concentric circles', ink: 0.5, tname: 'Ring thickness',
+         hint: 'Distance between neighboring rings, measured outward from the center.', gen: rings },
+  sun: { label: 'Radial sunburst',  ink: 0.5,        tname: 'Ray width', of: 'the angle between rays', angular: true, fill: true,
+         hint: 'Distance between neighboring rays where the sunburst reaches the nearest edge. The ray count is rounded to an even number.', gen: sunburst },
+  sqd: { label: 'Square dot lattice', ink: Math.sqrt(2 / Math.PI), tname: 'Dot diameter', dots: true, fill: true,
+         hint: 'Distance between neighboring dot centers.', gen: dotsSquare, max: 1e6 },
+  hxd: { label: 'Hex dot lattice',  ink: Math.sqrt(Math.sqrt(3) / Math.PI), tname: 'Dot diameter', dots: true, fill: true,
+         hint: 'Distance between neighboring dot centers. The dots sit at the centers of the hex grid cells.', gen: dotsHex, max: 1e6 },
   pen: { label: 'Penrose tiling',   ink: 0.24,       hint: 'Edge length of every rhombus (thin and thick). Auto thickness is approximate.', gen: penrose, max: 1.5e6 }
 };
 for (const [k, p] of Object.entries(PATTERNS)) $('pattern').add(new Option(p.label, k));
@@ -231,19 +285,29 @@ function model() {
   return { W, H, d, b, dpi, rect, lw, pat, u,
            pxW: Math.round(W * dpi), pxH: Math.round(H * dpi),
            fg: $('invert').checked ? '#fff' : '#000', bg: $('invert').checked ? '#000' : '#fff',
-           path: pat.gen(rect, d) };
+           path: pat.gen(rect, d, $('duty').value / 100) };
 }
 
-const toPath2D = p => {                 // patterns return an SVG path string or a flat [x1,y1,x2,y2,...] list
+const toPath2D = (p, m) => {            // patterns return an SVG path string, a flat [x1,y1,x2,y2,...] segment list, or dot centers
   if (typeof p === 'string') return new Path2D(p);
   const q = new Path2D();
-  for (let i = 0; i < p.length; i += 4) { q.moveTo(p[i], p[i + 1]); q.lineTo(p[i + 2], p[i + 3]); }
+  if (m.pat.dots) {
+    const r = m.lw / 2;
+    for (let i = 0; i < p.length; i += 2) { q.moveTo(p[i] + r, p[i + 1]); q.arc(p[i], p[i + 1], r, 0, 2 * Math.PI); }
+  } else {
+    for (let i = 0; i < p.length; i += 4) { q.moveTo(p[i], p[i + 1]); q.lineTo(p[i + 2], p[i + 3]); }
+  }
   return q;
 };
-const toSvgD = p => {
+const toSvgD = (p, m) => {
   if (typeof p === 'string') return p;
   const parts = [];
-  for (let i = 0; i < p.length; i += 4) parts.push(`M${f(p[i])} ${f(p[i + 1])}L${f(p[i + 2])} ${f(p[i + 3])}`);
+  if (m.pat.dots) {
+    const r = +(m.lw / 2).toFixed(7), a = `a${r} ${r} 0 1 0 `;
+    for (let i = 0; i < p.length; i += 2) parts.push(`M${f(p[i] + r)} ${f(p[i + 1])}${a}${-2 * r} 0${a}${2 * r} 0Z`);
+  } else {
+    for (let i = 0; i < p.length; i += 4) parts.push(`M${f(p[i])} ${f(p[i + 1])}L${f(p[i + 2])} ${f(p[i + 3])}`);
+  }
   return parts.join('');
 };
 
@@ -254,8 +318,9 @@ function paint(ctx, s, m) {
   ctx.save(); ctx.scale(s, s);
   const [x0, y0, x1, y1] = m.rect;
   ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
-  ctx.lineWidth = m.lw; ctx.strokeStyle = m.fg; ctx.lineJoin = 'miter'; ctx.lineCap = 'round';
-  ctx.stroke(toPath2D(m.path));
+  const p = toPath2D(m.path, m);
+  if (m.pat.fill) { ctx.fillStyle = m.fg; ctx.fill(p); }
+  else { ctx.lineWidth = m.lw; ctx.strokeStyle = m.fg; ctx.lineJoin = 'miter'; ctx.lineCap = 'round'; ctx.stroke(p); }
   ctx.restore();
 }
 
@@ -264,21 +329,24 @@ const schedule = () => { clearTimeout(timer); $('info').textContent = 'Rendering
 
 function render() {
   const m = model(), info = $('info'), warn = $('warn');
-  $('pitchHint').textContent = PATTERNS[$('pattern').value].hint;
+  const pat = PATTERNS[$('pattern').value], basis = pat.of || 'spacing';
+  $('pitchHint').textContent = pat.hint;
+  $('dutyName').textContent = pat.tname || 'Line thickness';
   const t = $('duty').value / 100;
-  $('dutyOut').textContent = `${Math.round(+$('duty').value)}% of spacing`;
+  $('dutyOut').textContent = `${Math.round(+$('duty').value)}% of ${basis}`;
   if (m.err) { last = null; info.textContent = ''; warn.textContent = m.err; $('png').disabled = $('svg').disabled = true; return; }
   last = m;
   const tu = m.lw / INCH[unit], warns = [];
-  $('dutyOut').textContent = `${Math.round(t * 100)}% of spacing (${+tu.toFixed(3)} ${unit})`;
+  $('dutyOut').textContent = `${Math.round(t * 100)}% of ${basis}` + (pat.angular ? '' : ` (${+tu.toFixed(3)} ${unit})`);
   const mp = m.pxW * m.pxH / 1e6, tooBig = mp > 150 || Math.max(m.pxW, m.pxH) > 32000;
   if (tooBig) warns.push('This image is too large for a browser canvas. Lower the resolution or the size.');
-  if (m.lw * m.dpi < 2) warns.push('Lines are under 2 px wide at this resolution. Raise the resolution or the thickness.');
+  if (!pat.angular && m.lw * m.dpi < 2) warns.push(pat.dots ? 'Dots are under 2 px wide at this resolution. Raise the resolution or the dot diameter.' : 'Lines are under 2 px wide at this resolution. Raise the resolution or the thickness.');
   if (m.d * m.dpi < 6) warns.push('Spacing is only a few pixels. Raise the resolution.');
-  if (Array.isArray(m.path) && m.path.length / 4 > 5e5) warns.push('The SVG will be very large here; PNG is the better choice.');
+  if (Array.isArray(m.path) && m.path.length / (m.pat.dots ? 2 : 4) > (m.pat.dots ? 2.5e5 : 5e5)) warns.push('The SVG will be very large here; PNG is the better choice.');
   $('png').disabled = tooBig; $('svg').disabled = false;
   const sz = x => +(x / INCH[unit]).toFixed(unit === 'in' ? 3 : 1);
-  info.textContent = `${sz(m.W)} × ${sz(m.H)} ${unit} · ${m.pxW} × ${m.pxH} px (${mp.toFixed(1)} MP) · line ${+(m.lw * m.dpi).toFixed(1)} px. Preview is downsampled; the download is full resolution.`;
+  const meas = pat.angular ? `${rayCount(m.rect, m.d)} rays` : `${pat.dots ? 'dot' : 'line'} ${+(m.lw * m.dpi).toFixed(1)} px`;
+  info.textContent = `${sz(m.W)} × ${sz(m.H)} ${unit} · ${m.pxW} × ${m.pxH} px (${mp.toFixed(1)} MP) · ${meas}. Preview is downsampled; the download is full resolution.`;
   warn.textContent = warns.join(' ');
   const cv = $('cv'), s = 1100 / Math.max(m.W, m.H);
   cv.width = Math.round(m.W * s); cv.height = Math.round(m.H * s);
@@ -332,10 +400,11 @@ $('png').onclick = () => {
 $('svg').onclick = () => {
   if (!last) return;
   const m = last, [x0, y0, x1, y1] = m.rect;
+  const look = m.pat.fill ? `fill="${m.fg}" stroke="none"` : `fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter" stroke-linecap="round"`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${f(m.W)}in" height="${f(m.H)}in" viewBox="0 0 ${f(m.W)} ${f(m.H)}">` +
     `<defs><clipPath id="c"><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1 - x0)}" height="${f(y1 - y0)}"/></clipPath></defs>` +
     `<rect width="${f(m.W)}" height="${f(m.H)}" fill="${m.bg}"/>` +
-    `<g clip-path="url(#c)"><path d="${toSvgD(m.path)}" fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter" stroke-linecap="round"/></g></svg>`;
+    `<g clip-path="url(#c)"><path d="${toSvgD(m.path, m)}" ${look}/></g></svg>`;
   save(new Blob([svg], { type: 'image/svg+xml' }), 'svg');
 };
 
