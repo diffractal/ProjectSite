@@ -35,7 +35,7 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:.2rem 0}
 .seg input:focus-visible+span,input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .check{display:flex;gap:.5rem;align-items:center;font-weight:500;margin:0}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-button{padding:.65rem .8rem;border-radius:6px;border:1px solid var(--accent);font:600 .95rem inherit;font-family:inherit;
+button{padding:.65rem .8rem;border-radius:6px;border:1px solid var(--accent);font-weight:600;font-size:.95rem;font-family:inherit;
   cursor:pointer;background:var(--accent);color:var(--accent-ink)}
 button.alt{background:transparent;color:var(--accent)}
 button:disabled{opacity:.45;cursor:not-allowed}
@@ -79,7 +79,7 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
 
   <div>
     <label for="dpi">Resolution (pixels per inch)</label>
-    <input id="dpi" type="number" step="50" min="10" value="600">
+    <input id="dpi" type="number" step="50" min="50" value="600">
   </div>
 
   <div>
@@ -90,7 +90,7 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
 
   <div>
     <label for="duty">Line thickness: <span id="dutyOut"></span></label>
-    <input id="duty" type="range" min="1" max="90" step="0.5" value="50">
+    <input id="duty" type="range" min="1" max="90" step="0.1" value="50">
     <label class="check"><input id="auto" type="checkbox" checked> Auto: about 50% of the area black</label>
   </div>
 
@@ -119,11 +119,13 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
 
 <script>
 /* Changelog
+   v0.4  Fixed button font, DPI field stepping, and auto-thickness snapping (finer slider step);
+         thickness readout rounded to the nearest percent.
    v0.3  Much finer spacing allowed (limits are now per pattern, not a fixed tile count); hex/Penrose
          draw each edge once; preview updates are debounced.
    v0.2  Penrose tiling pattern; version label.
    v0.1  Lines, square, isometric and hex patterns; PNG/SVG export. */
-const VERSION = 'v0.3';
+const VERSION = 'v0.4';
 const $ = id => document.getElementById(id);
 const f = n => Math.round(n * 1e5) / 1e5;
 const INCH = { in: 1, mm: 1 / 25.4 };
@@ -264,11 +266,11 @@ function render() {
   const m = model(), info = $('info'), warn = $('warn');
   $('pitchHint').textContent = PATTERNS[$('pattern').value].hint;
   const t = $('duty').value / 100;
-  $('dutyOut').textContent = `${(+$('duty').value).toFixed(1)}% of spacing`;
+  $('dutyOut').textContent = `${Math.round(+$('duty').value)}% of spacing`;
   if (m.err) { last = null; info.textContent = ''; warn.textContent = m.err; $('png').disabled = $('svg').disabled = true; return; }
   last = m;
   const tu = m.lw / INCH[unit], warns = [];
-  $('dutyOut').textContent = `${(t * 100).toFixed(1)}% of spacing (${+tu.toFixed(3)} ${unit})`;
+  $('dutyOut').textContent = `${Math.round(t * 100)}% of spacing (${+tu.toFixed(3)} ${unit})`;
   const mp = m.pxW * m.pxH / 1e6, tooBig = mp > 150 || Math.max(m.pxW, m.pxH) > 32000;
   if (tooBig) warns.push('This image is too large for a browser canvas. Lower the resolution or the size.');
   if (m.lw * m.dpi < 2) warns.push('Lines are under 2 px wide at this resolution. Raise the resolution or the thickness.');
