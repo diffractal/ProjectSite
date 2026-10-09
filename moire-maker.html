@@ -44,6 +44,7 @@ main{background:var(--table);display:flex;flex-direction:column;align-items:cent
 canvas{display:block;max-width:100%;max-height:calc(100vh - 8rem)}
 #info{margin:0;text-align:center;font-size:.85rem;font-variant-numeric:tabular-nums;max-width:40rem}
 #warn{margin:0;color:var(--warn);font-size:.85rem;text-align:center;max-width:40rem;min-height:1.2em}
+footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb,var(--ink) 55%,transparent);font-variant-numeric:tabular-nums}
 @media (max-width:820px){
   .app{grid-template-columns:1fr} aside{position:static;max-height:none;border:0}
   main{padding:1rem 1rem 2rem} canvas{max-height:none}
@@ -90,7 +91,7 @@ canvas{display:block;max-width:100%;max-height:calc(100vh - 8rem)}
   <div>
     <label for="duty">Line thickness: <span id="dutyOut"></span></label>
     <input id="duty" type="range" min="1" max="90" step="0.5" value="50">
-    <label class="check"><input id="auto" type="checkbox" checked> Auto: 50% of the area printed black</label>
+    <label class="check"><input id="auto" type="checkbox" checked> Auto: about 50% of the area black</label>
   </div>
 
   <div>
@@ -105,6 +106,8 @@ canvas{display:block;max-width:100%;max-height:calc(100vh - 8rem)}
     <button id="png">Download PNG</button>
     <button id="svg" class="alt">Download SVG</button>
   </div>
+
+  <footer>Moiré pattern maker <span id="ver"></span></footer>
 </aside>
 
 <main>
@@ -115,10 +118,15 @@ canvas{display:block;max-width:100%;max-height:calc(100vh - 8rem)}
 </div>
 
 <script>
+/* Changelog
+   v0.2  Penrose tiling pattern; version label.
+   v0.1  Lines, square, isometric and hex patterns; PNG/SVG export. */
+const VERSION = 'v0.2';
 const $ = id => document.getElementById(id);
 const f = n => Math.round(n * 1e5) / 1e5;
 const INCH = { in: 1, mm: 1 / 25.4 };
 let unit = 'in', last = null;
+$('ver').textContent = VERSION;
 
 /* ---------- Pattern registry ----------
    To add a pattern (e.g. Penrose): add an entry with
@@ -158,13 +166,51 @@ const hexes = (r, d) => {               // pointy-top hexagons, d = flat-to-flat
   }
   return s;
 };
+const penrose = (r, d) => {              // P3 rhombs via Robinson-triangle subdivision; d = rhomb edge length
+  const [x0, y0, x1, y1] = r, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, PHI = (1 + Math.sqrt(5)) / 2;
+  const need = Math.hypot(x1 - x0, y1 - y0) / 2 + 2 * d;
+  let R = d, n = 0;
+  while (R * Math.cos(Math.PI / 10) < need) { R *= PHI; n++; }
+  let T = [];                                // [color, Ax,Ay, Bx,By, Cx,Cy]; A is the apex
+  for (let i = 0; i < 10; i++) {
+    let a = (2 * i - 1) * Math.PI / 10, b = (2 * i + 1) * Math.PI / 10;
+    if (i % 2 === 0) [a, b] = [b, a];
+    T.push([0, cx, cy, cx + R * Math.cos(a), cy + R * Math.sin(a), cx + R * Math.cos(b), cy + R * Math.sin(b)]);
+  }
+  const near = t => Math.max(t[1], t[3], t[5]) >= x0 - d && Math.min(t[1], t[3], t[5]) <= x1 + d &&
+                    Math.max(t[2], t[4], t[6]) >= y0 - d && Math.min(t[2], t[4], t[6]) <= y1 + d;
+  for (let k = 0; k < n; k++) {
+    const U = [];
+    for (const [c, ax, ay, bx, by, qx, qy] of T) {
+      if (c === 0) {
+        const px = ax + (bx - ax) / PHI, py = ay + (by - ay) / PHI;
+        U.push([0, qx, qy, px, py, bx, by], [1, px, py, qx, qy, ax, ay]);
+      } else {
+        const Qx = bx + (ax - bx) / PHI, Qy = by + (ay - by) / PHI;
+        const Rx = bx + (qx - bx) / PHI, Ry = by + (qy - by) / PHI;
+        U.push([1, Rx, Ry, qx, qy, ax, ay], [1, Qx, Qy, Rx, Ry, bx, by], [0, Rx, Ry, Qx, Qy, ax, ay]);
+      }
+    }
+    T = U.filter(near);
+  }
+  const seen = new Set(); let s = '';
+  const seg = (x, y, u, v) => {
+    let p = f(x) + ' ' + f(y), q = f(u) + ' ' + f(v);
+    if (p > q) [p, q] = [q, p];
+    const key = p + '|' + q;
+    if (!seen.has(key)) { seen.add(key); s += `M${p}L${q}`; }
+  };
+  for (const t of T) { seg(t[1], t[2], t[3], t[4]); seg(t[1], t[2], t[5], t[6]); }
+  return s;
+};
 const SQ = 1 - Math.SQRT1_2;            // line/spacing giving 50% black for square & hex cells
 const PATTERNS = {
   v:   { label: 'Vertical lines',   ink: 0.5,        hint: LINE_HINT, gen: lines([90]) },
   h:   { label: 'Horizontal lines', ink: 0.5,        hint: LINE_HINT, gen: lines([0]) },
   sq:  { label: 'Square grid',      ink: SQ,         hint: LINE_HINT, gen: lines([0, 90]) },
   iso: { label: 'Isometric grid',   ink: SQ * 2 / 3, hint: LINE_HINT + ' Lines run at 0°, 60° and 120°.', gen: lines([0, 60, 120]) },
-  hex: { label: 'Hex grid',         ink: SQ,         hint: 'Distance between opposite flat sides of each hexagon.', gen: hexes }
+  hex: { label: 'Hex grid',         ink: SQ,         hint: 'Distance between opposite flat sides of each hexagon.', gen: hexes },
+  pen: { label: 'Penrose tiling',   ink: 0.24,       hint: 'Edge length of every rhombus (thin and thick). Auto thickness is approximate.', gen: penrose, max: 1e5 }
 };
 for (const [k, p] of Object.entries(PATTERNS)) $('pattern').add(new Option(p.label, k));
 
@@ -178,7 +224,7 @@ function model() {
   const rect = [b, b, W - b, H - b];
   if (rect[2] <= rect[0] || rect[3] <= rect[1]) return { err: 'The border is larger than the sheet.' };
   const cells = (rect[2] - rect[0]) * (rect[3] - rect[1]) / (d * d);
-  if (cells > 4e6) return { err: 'Spacing is too small for this sheet size; increase the spacing.' };
+  if (cells > (pat.max || 4e6)) return { err: 'Spacing is too small for this sheet size; increase the spacing.' };
   const lw = d * $('duty').value / 100;
   return { W, H, d, b, dpi, rect, lw, pat, u,
            pxW: Math.round(W * dpi), pxH: Math.round(H * dpi),
@@ -193,7 +239,7 @@ function paint(ctx, s, m) {
   ctx.save(); ctx.scale(s, s);
   const [x0, y0, x1, y1] = m.rect;
   ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
-  ctx.lineWidth = m.lw; ctx.strokeStyle = m.fg; ctx.lineJoin = 'miter'; ctx.lineCap = 'butt';
+  ctx.lineWidth = m.lw; ctx.strokeStyle = m.fg; ctx.lineJoin = 'miter'; ctx.lineCap = 'round';
   ctx.stroke(new Path2D(m.path));
   ctx.restore();
 }
@@ -270,7 +316,7 @@ $('svg').onclick = () => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${f(m.W)}in" height="${f(m.H)}in" viewBox="0 0 ${f(m.W)} ${f(m.H)}">` +
     `<defs><clipPath id="c"><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1 - x0)}" height="${f(y1 - y0)}"/></clipPath></defs>` +
     `<rect width="${f(m.W)}" height="${f(m.H)}" fill="${m.bg}"/>` +
-    `<g clip-path="url(#c)"><path d="${m.path}" fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter"/></g></svg>`;
+    `<g clip-path="url(#c)"><path d="${m.path}" fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter" stroke-linecap="round"/></g></svg>`;
   save(new Blob([svg], { type: 'image/svg+xml' }), 'svg');
 };
 
