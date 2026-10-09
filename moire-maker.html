@@ -119,9 +119,11 @@ footer{margin-top:auto;padding-top:.5rem;font-size:.8rem;color:color-mix(in srgb
 
 <script>
 /* Changelog
+   v0.3  Much finer spacing allowed (limits are now per pattern, not a fixed tile count); hex/Penrose
+         draw each edge once; preview updates are debounced.
    v0.2  Penrose tiling pattern; version label.
    v0.1  Lines, square, isometric and hex patterns; PNG/SVG export. */
-const VERSION = 'v0.2';
+const VERSION = 'v0.3';
 const $ = id => document.getElementById(id);
 const f = n => Math.round(n * 1e5) / 1e5;
 const INCH = { in: 1, mm: 1 / 25.4 };
@@ -152,56 +154,54 @@ const lines = angles => (r, d) => {
 const hexes = (r, d) => {               // pointy-top hexagons, d = flat-to-flat
   const [x0, y0, x1, y1] = r, R = d / Math.sqrt(3), rowH = 1.5 * R;
   const rows = Math.ceil((y1 - y0) / rowH) + 2, cols = Math.ceil((x1 - x0) / d) + 2;
-  let s = '';
+  const out = [], vx = [], vy = [];      // each hexagon draws only its E, NE and SE edges, so no edge is drawn twice
   for (let j = -1; j <= rows; j++) {
     const cy = y0 + R + j * rowH, sh = (Math.abs(j) % 2) * d / 2;
     for (let i = -1; i <= cols; i++) {
       const cx = x0 + d / 2 + sh + i * d;
-      for (let k = 0; k < 6; k++) {
-        const a = (30 + 60 * k) * Math.PI / 180;
-        s += (k ? 'L' : 'M') + f(cx + R * Math.cos(a)) + ' ' + f(cy + R * Math.sin(a));
-      }
-      s += 'Z';
+      for (let k = 0; k < 6; k++) { const a = (30 + 60 * k) * Math.PI / 180; vx[k] = cx + R * Math.cos(a); vy[k] = cy + R * Math.sin(a); }
+      out.push(vx[0], vy[0], vx[1], vy[1], vx[4], vy[4], vx[5], vy[5], vx[5], vy[5], vx[0], vy[0]);
     }
   }
-  return s;
+  return out;                            // flat [x1,y1,x2,y2, ...]
 };
 const penrose = (r, d) => {              // P3 rhombs via Robinson-triangle subdivision; d = rhomb edge length
   const [x0, y0, x1, y1] = r, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, PHI = (1 + Math.sqrt(5)) / 2;
   const need = Math.hypot(x1 - x0, y1 - y0) / 2 + 2 * d;
   let R = d, n = 0;
   while (R * Math.cos(Math.PI / 10) < need) { R *= PHI; n++; }
-  let T = [];                                // [color, Ax,Ay, Bx,By, Cx,Cy]; A is the apex
+  let T = [];                            // flat list, 7 numbers per triangle: color, Ax,Ay, Bx,By, Cx,Cy (A is the apex)
   for (let i = 0; i < 10; i++) {
     let a = (2 * i - 1) * Math.PI / 10, b = (2 * i + 1) * Math.PI / 10;
     if (i % 2 === 0) [a, b] = [b, a];
-    T.push([0, cx, cy, cx + R * Math.cos(a), cy + R * Math.sin(a), cx + R * Math.cos(b), cy + R * Math.sin(b)]);
+    T.push(0, cx, cy, cx + R * Math.cos(a), cy + R * Math.sin(a), cx + R * Math.cos(b), cy + R * Math.sin(b));
   }
-  const near = t => Math.max(t[1], t[3], t[5]) >= x0 - d && Math.min(t[1], t[3], t[5]) <= x1 + d &&
-                    Math.max(t[2], t[4], t[6]) >= y0 - d && Math.min(t[2], t[4], t[6]) <= y1 + d;
+  const add = (U, c, ax, ay, bx, by, qx, qy) => {   // keep only triangles that can touch the sheet
+    if (Math.max(ax, bx, qx) >= x0 - d && Math.min(ax, bx, qx) <= x1 + d &&
+        Math.max(ay, by, qy) >= y0 - d && Math.min(ay, by, qy) <= y1 + d) U.push(c, ax, ay, bx, by, qx, qy);
+  };
   for (let k = 0; k < n; k++) {
     const U = [];
-    for (const [c, ax, ay, bx, by, qx, qy] of T) {
+    for (let i = 0; i < T.length; i += 7) {
+      const c = T[i], ax = T[i + 1], ay = T[i + 2], bx = T[i + 3], by = T[i + 4], qx = T[i + 5], qy = T[i + 6];
       if (c === 0) {
         const px = ax + (bx - ax) / PHI, py = ay + (by - ay) / PHI;
-        U.push([0, qx, qy, px, py, bx, by], [1, px, py, qx, qy, ax, ay]);
+        add(U, 0, qx, qy, px, py, bx, by); add(U, 1, px, py, qx, qy, ax, ay);
       } else {
         const Qx = bx + (ax - bx) / PHI, Qy = by + (ay - by) / PHI;
         const Rx = bx + (qx - bx) / PHI, Ry = by + (qy - by) / PHI;
-        U.push([1, Rx, Ry, qx, qy, ax, ay], [1, Qx, Qy, Rx, Ry, bx, by], [0, Rx, Ry, Qx, Qy, ax, ay]);
+        add(U, 1, Rx, Ry, qx, qy, ax, ay); add(U, 1, Qx, Qy, Rx, Ry, bx, by); add(U, 0, Rx, Ry, Qx, Qy, ax, ay);
       }
     }
-    T = U.filter(near);
+    T = U;
   }
-  const seen = new Set(); let s = '';
+  const seen = new Set(), out = [];      // each edge is a leg of two triangles; keep it once (keyed by its midpoint)
   const seg = (x, y, u, v) => {
-    let p = f(x) + ' ' + f(y), q = f(u) + ' ' + f(v);
-    if (p > q) [p, q] = [q, p];
-    const key = p + '|' + q;
-    if (!seen.has(key)) { seen.add(key); s += `M${p}L${q}`; }
+    const key = Math.round((x + u) * 5e3) * 67108864 + Math.round((y + v) * 5e3);
+    if (!seen.has(key)) { seen.add(key); out.push(x, y, u, v); }
   };
-  for (const t of T) { seg(t[1], t[2], t[3], t[4]); seg(t[1], t[2], t[5], t[6]); }
-  return s;
+  for (let i = 0; i < T.length; i += 7) { seg(T[i+1], T[i+2], T[i+3], T[i+4]); seg(T[i+1], T[i+2], T[i+5], T[i+6]); }
+  return out;                            // flat [x1,y1,x2,y2, ...]
 };
 const SQ = 1 - Math.SQRT1_2;            // line/spacing giving 50% black for square & hex cells
 const PATTERNS = {
@@ -209,8 +209,8 @@ const PATTERNS = {
   h:   { label: 'Horizontal lines', ink: 0.5,        hint: LINE_HINT, gen: lines([0]) },
   sq:  { label: 'Square grid',      ink: SQ,         hint: LINE_HINT, gen: lines([0, 90]) },
   iso: { label: 'Isometric grid',   ink: SQ * 2 / 3, hint: LINE_HINT + ' Lines run at 0°, 60° and 120°.', gen: lines([0, 60, 120]) },
-  hex: { label: 'Hex grid',         ink: SQ,         hint: 'Distance between opposite flat sides of each hexagon.', gen: hexes },
-  pen: { label: 'Penrose tiling',   ink: 0.24,       hint: 'Edge length of every rhombus (thin and thick). Auto thickness is approximate.', gen: penrose, max: 1e5 }
+  hex: { label: 'Hex grid',         ink: SQ,         hint: 'Distance between opposite flat sides of each hexagon.', gen: hexes, max: 1e6 },
+  pen: { label: 'Penrose tiling',   ink: 0.24,       hint: 'Edge length of every rhombus (thin and thick). Auto thickness is approximate.', gen: penrose, max: 1.5e6 }
 };
 for (const [k, p] of Object.entries(PATTERNS)) $('pattern').add(new Option(p.label, k));
 
@@ -223,14 +223,27 @@ function model() {
   if (![W, H, d, dpi].every(v => v > 0) || !(b >= 0)) return { err: 'Enter positive values for size, resolution and spacing.' };
   const rect = [b, b, W - b, H - b];
   if (rect[2] <= rect[0] || rect[3] <= rect[1]) return { err: 'The border is larger than the sheet.' };
-  const cells = (rect[2] - rect[0]) * (rect[3] - rect[1]) / (d * d);
-  if (cells > (pat.max || 4e6)) return { err: 'Spacing is too small for this sheet size; increase the spacing.' };
+  const area = (rect[2] - rect[0]) * (rect[3] - rect[1]), cap = pat.max || 1e8;
+  if (area / (d * d) > cap) return { err: `Spacing is too small for this pattern on this sheet (the smallest allowed here is about ${+(Math.sqrt(area / cap) / INCH[unit]).toPrecision(2)} ${unit}).` };
   const lw = d * $('duty').value / 100;
   return { W, H, d, b, dpi, rect, lw, pat, u,
            pxW: Math.round(W * dpi), pxH: Math.round(H * dpi),
            fg: $('invert').checked ? '#fff' : '#000', bg: $('invert').checked ? '#000' : '#fff',
            path: pat.gen(rect, d) };
 }
+
+const toPath2D = p => {                 // patterns return an SVG path string or a flat [x1,y1,x2,y2,...] list
+  if (typeof p === 'string') return new Path2D(p);
+  const q = new Path2D();
+  for (let i = 0; i < p.length; i += 4) { q.moveTo(p[i], p[i + 1]); q.lineTo(p[i + 2], p[i + 3]); }
+  return q;
+};
+const toSvgD = p => {
+  if (typeof p === 'string') return p;
+  const parts = [];
+  for (let i = 0; i < p.length; i += 4) parts.push(`M${f(p[i])} ${f(p[i + 1])}L${f(p[i + 2])} ${f(p[i + 3])}`);
+  return parts.join('');
+};
 
 function paint(ctx, s, m) {
   const c = ctx.canvas;
@@ -240,9 +253,12 @@ function paint(ctx, s, m) {
   const [x0, y0, x1, y1] = m.rect;
   ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, y1 - y0); ctx.clip();
   ctx.lineWidth = m.lw; ctx.strokeStyle = m.fg; ctx.lineJoin = 'miter'; ctx.lineCap = 'round';
-  ctx.stroke(new Path2D(m.path));
+  ctx.stroke(toPath2D(m.path));
   ctx.restore();
 }
+
+let timer;
+const schedule = () => { clearTimeout(timer); $('info').textContent = 'Rendering…'; timer = setTimeout(render, 60); };
 
 function render() {
   const m = model(), info = $('info'), warn = $('warn');
@@ -257,6 +273,7 @@ function render() {
   if (tooBig) warns.push('This image is too large for a browser canvas. Lower the resolution or the size.');
   if (m.lw * m.dpi < 2) warns.push('Lines are under 2 px wide at this resolution. Raise the resolution or the thickness.');
   if (m.d * m.dpi < 6) warns.push('Spacing is only a few pixels. Raise the resolution.');
+  if (Array.isArray(m.path) && m.path.length / 4 > 5e5) warns.push('The SVG will be very large here; PNG is the better choice.');
   $('png').disabled = tooBig; $('svg').disabled = false;
   const sz = x => +(x / INCH[unit]).toFixed(unit === 'in' ? 3 : 1);
   info.textContent = `${sz(m.W)} × ${sz(m.H)} ${unit} · ${m.pxW} × ${m.pxH} px (${mp.toFixed(1)} MP) · line ${+(m.lw * m.dpi).toFixed(1)} px. Preview is downsampled; the download is full resolution.`;
@@ -268,17 +285,17 @@ function render() {
 
 /* ---------- Controls ---------- */
 function applyAuto() { if ($('auto').checked) $('duty').value = (PATTERNS[$('pattern').value].ink * 100).toFixed(1); }
-$('auto').onchange = () => { applyAuto(); render(); };
-$('duty').oninput = () => { $('auto').checked = false; render(); };
-$('pattern').onchange = () => { applyAuto(); render(); };
+$('auto').onchange = () => { applyAuto(); schedule(); };
+$('duty').oninput = () => { $('auto').checked = false; schedule(); };
+$('pattern').onchange = () => { applyAuto(); schedule(); };
 document.querySelectorAll('input[name=unit]').forEach(r => r.onchange = () => {
   const k = INCH[unit] / INCH[r.value], dp = r.value === 'in' ? 3 : 2;
   for (const id of ['w', 'h', 'pitch', 'border']) { const v = num(id); if (isFinite(v)) $(id).value = +(v * k).toFixed(dp); }
   unit = r.value;
   document.querySelectorAll('.u').forEach(e => e.textContent = unit);
-  render();
+  schedule();
 });
-['w', 'h', 'dpi', 'pitch', 'border', 'invert'].forEach(id => $(id).addEventListener('input', render));
+['w', 'h', 'dpi', 'pitch', 'border', 'invert'].forEach(id => $(id).addEventListener('input', schedule));
 
 /* ---------- Export ---------- */
 function save(blob, ext) {
@@ -316,7 +333,7 @@ $('svg').onclick = () => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${f(m.W)}in" height="${f(m.H)}in" viewBox="0 0 ${f(m.W)} ${f(m.H)}">` +
     `<defs><clipPath id="c"><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1 - x0)}" height="${f(y1 - y0)}"/></clipPath></defs>` +
     `<rect width="${f(m.W)}" height="${f(m.H)}" fill="${m.bg}"/>` +
-    `<g clip-path="url(#c)"><path d="${m.path}" fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter" stroke-linecap="round"/></g></svg>`;
+    `<g clip-path="url(#c)"><path d="${toSvgD(m.path)}" fill="none" stroke="${m.fg}" stroke-width="${f(m.lw)}" stroke-linejoin="miter" stroke-linecap="round"/></g></svg>`;
   save(new Blob([svg], { type: 'image/svg+xml' }), 'svg');
 };
 
